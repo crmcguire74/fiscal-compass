@@ -1,16 +1,27 @@
-
-import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate, Link } from 'react-router-dom';
-import Layout from '@/components/layout/Layout';
-import BlogPostCard from '@/components/blog/BlogPostCard';
-import { getBlogPosts, getBlogCategories, getBlogTags } from '@/services/blogService';
-import { BlogPost, BlogCategory, BlogTag } from '@/types/blog';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Search, Filter, BookOpen, Tag, TrendingUp, ChevronRight, ChevronDown } from 'lucide-react';
-import { Card } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate, Link } from "react-router-dom";
+import Layout from "@/components/layout/Layout";
+import BlogPostCard from "@/components/blog/BlogPostCard";
+import {
+  getBlogPosts,
+  getBlogCategories,
+  getBlogTags,
+} from "@/services/blogService";
+import { BlogPost, BlogCategory, BlogTag } from "@/types/blog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Search,
+  Filter,
+  BookOpen,
+  Tag,
+  TrendingUp,
+  ChevronRight,
+  ChevronDown,
+} from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,131 +36,132 @@ const BlogIndex = () => {
   const [tags, setTags] = useState<BlogTag[]>([]);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [activeTag, setActiveTag] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [activeTab, setActiveTab] = useState('categories');
+  const [activeTab, setActiveTab] = useState("categories");
   const [isLoading, setIsLoading] = useState(true);
   const postsPerPage = 9;
-  
+
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   useEffect(() => {
     const blogCategories = getBlogCategories();
     const blogTags = getBlogTags();
     setCategories(blogCategories);
     setTags(blogTags.slice(0, 15));
-    
+
     const searchParams = new URLSearchParams(location.search);
-    const categoryParam = searchParams.get('category');
-    const tagParam = searchParams.get('tag');
-    const pageParam = searchParams.get('page');
-    const searchParam = searchParams.get('search');
-    
+    const categoryParam = searchParams.get("category");
+    const tagParam = searchParams.get("tag");
+    const pageParam = searchParams.get("page");
+    const searchParam = searchParams.get("search");
+
     if (categoryParam) {
       setActiveCategory(categoryParam);
-      setActiveTab('categories');
+      setActiveTab("categories");
     }
-    
+
     if (tagParam) {
       setActiveTag(tagParam);
-      setActiveTab('tags');
+      setActiveTab("tags");
     }
-    
+
     if (searchParam) setSearchTerm(searchParam);
     if (pageParam) setCurrentPage(parseInt(pageParam) || 1);
-    
+
     setIsLoading(true);
     loadPosts(
-      pageParam ? parseInt(pageParam) : 1, 
-      categoryParam, 
+      pageParam ? parseInt(pageParam) : 1,
+      categoryParam,
       tagParam,
       searchParam
     );
   }, [location.search]);
-  
+
   const loadPosts = (
-    page: number = 1, 
-    category?: string | null, 
-    tag?: string | null, 
+    page: number = 1,
+    category?: string | null,
+    tag?: string | null,
     search?: string | null
   ) => {
     const result = getBlogPosts(page, postsPerPage, category || undefined);
-    
+
     let filteredPosts = result.posts;
-    
-    if (tag && tag.trim() !== '') {
-      filteredPosts = filteredPosts.filter(post => 
-        post.tags.some(t => t.toLowerCase() === tag.toLowerCase())
+
+    if (tag && tag.trim() !== "") {
+      filteredPosts = filteredPosts.filter((post) =>
+        post.tags.some((t) => t.toLowerCase() === tag.toLowerCase())
       );
     }
-    
-    if (search && search.trim() !== '') {
+
+    if (search && search.trim() !== "") {
       const searchLower = search.toLowerCase();
-      filteredPosts = filteredPosts.filter(post => 
-        post.title.toLowerCase().includes(searchLower) || 
-        post.excerpt.toLowerCase().includes(searchLower) ||
-        post.tags.some(tag => tag.toLowerCase().includes(searchLower))
+      filteredPosts = filteredPosts.filter(
+        (post) =>
+          post.title.toLowerCase().includes(searchLower) ||
+          post.excerpt.toLowerCase().includes(searchLower) ||
+          post.tags.some((tag) => tag.toLowerCase().includes(searchLower))
       );
     }
-    
+
     setPosts(filteredPosts);
     setTotalPages(result.totalPages);
     setCurrentPage(result.currentPage);
     setIsLoading(false);
   };
-  
+
   const handleCategoryClick = (categorySlug: string | null) => {
     setActiveCategory(categorySlug);
     setActiveTag(null);
     updateUrlParams(1, categorySlug, null, searchTerm);
   };
-  
+
   const handleTagClick = (tag: string | null) => {
     setActiveTag(tag);
     setActiveCategory(null);
     updateUrlParams(1, null, tag, searchTerm);
   };
-  
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     updateUrlParams(1, activeCategory, activeTag, searchTerm);
   };
-  
+
   const handlePageChange = (page: number) => {
     updateUrlParams(page, activeCategory, activeTag, searchTerm);
   };
-  
+
   const handleClearFilters = () => {
     setActiveCategory(null);
     setActiveTag(null);
-    setSearchTerm('');
-    navigate('/blog');
+    setSearchTerm("");
+    navigate("/blog");
   };
-  
+
   const updateUrlParams = (
-    page: number, 
-    category: string | null, 
-    tag: string | null, 
+    page: number,
+    category: string | null,
+    tag: string | null,
     search: string
   ) => {
     const params = new URLSearchParams();
-    
-    if (page > 1) params.set('page', page.toString());
-    if (category) params.set('category', category);
-    if (tag) params.set('tag', tag);
-    if (search.trim() !== '') params.set('search', search);
-    
+
+    if (page > 1) params.set("page", page.toString());
+    if (category) params.set("category", category);
+    if (tag) params.set("tag", tag);
+    if (search.trim() !== "") params.set("search", search);
+
     navigate(`/blog?${params.toString()}`);
   };
-  
+
   const handleTabChange = (value: string) => {
     setActiveTab(value);
-    if (value === 'categories') {
+    if (value === "categories") {
       setActiveTag(null);
       updateUrlParams(1, activeCategory, null, searchTerm);
-    } else if (value === 'tags') {
+    } else if (value === "tags") {
       setActiveCategory(null);
       updateUrlParams(1, null, activeTag, searchTerm);
     }
@@ -161,20 +173,23 @@ const BlogIndex = () => {
       <div className="bg-gradient-to-r from-finance-primary to-finance-primary/90 text-white py-12">
         <div className="container max-w-5xl mx-auto px-4">
           <div className="flex items-center text-sm mb-3 text-white/80">
-            <Link to="/calculators" className="hover:text-white">Home</Link>
+            <Link to="/calculators" className="hover:text-white">
+              Home
+            </Link>
             <ChevronRight className="h-4 w-4 mx-1" />
             <span>Blog</span>
           </div>
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">
             Financial Insights Blog
           </h1>
-          
+
           <p className="text-center text-white/90 mb-6 max-w-2xl mx-auto">
-            Discover actionable advice on investing, retirement planning, budgeting, and more to help you make informed financial decisions.
+            Discover actionable advice on investing, retirement planning,
+            budgeting, and more to help you make informed financial decisions.
           </p>
         </div>
       </div>
-      
+
       <div className="container py-8">
         <div className="max-w-5xl mx-auto">
           {/* Search and Quick Links section */}
@@ -193,7 +208,7 @@ const BlogIndex = () => {
                   Search
                 </Button>
               </form>
-              
+
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="ml-auto">
@@ -204,25 +219,37 @@ const BlogIndex = () => {
                 <DropdownMenuContent align="end" className="w-52">
                   <DropdownMenuGroup>
                     <DropdownMenuItem asChild>
-                      <Link to="/blog/featured" className="flex items-center w-full">
+                      <Link
+                        to="/blog/featured"
+                        className="flex items-center w-full"
+                      >
                         <TrendingUp className="h-4 w-4 mr-2" />
                         Featured Articles
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link to="/blog/related/category/investing" className="flex items-center w-full">
+                      <Link
+                        to="/blog/related/category/investing"
+                        className="flex items-center w-full"
+                      >
                         <BookOpen className="h-4 w-4 mr-2" />
                         Investing Guides
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link to="/blog/related/category/retirement" className="flex items-center w-full">
+                      <Link
+                        to="/blog/related/category/retirement"
+                        className="flex items-center w-full"
+                      >
                         <BookOpen className="h-4 w-4 mr-2" />
                         Retirement Planning
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link to="/blog/related/category/health" className="flex items-center w-full">
+                      <Link
+                        to="/blog/related/category/health"
+                        className="flex items-center w-full"
+                      >
                         <BookOpen className="h-4 w-4 mr-2" />
                         Health & Wellness
                       </Link>
@@ -232,7 +259,7 @@ const BlogIndex = () => {
               </DropdownMenu>
             </div>
           </Card>
-          
+
           {/* Filters section */}
           <Card className="mb-8 overflow-hidden">
             <div className="border-b bg-muted/30 px-4 py-3">
@@ -241,9 +268,13 @@ const BlogIndex = () => {
                 Filter Articles
               </h3>
             </div>
-            
-            <div className="p-4">
-              <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+
+            <div className="p-4 bg-blue-50">
+              <Tabs
+                value={activeTab}
+                onValueChange={handleTabChange}
+                className="w-full"
+              >
                 <TabsList className="grid grid-cols-2 w-64 mx-auto mb-6">
                   <TabsTrigger value="categories" className="flex items-center">
                     <Filter className="h-4 w-4 mr-2" />
@@ -254,44 +285,60 @@ const BlogIndex = () => {
                     Tags
                   </TabsTrigger>
                 </TabsList>
-                
+
                 <TabsContent value="categories" className="mt-0">
                   <div className="flex flex-wrap gap-2 justify-center">
                     <Button
-                      variant={activeCategory === null ? "default" : "outline"}
                       size="sm"
                       onClick={() => handleCategoryClick(null)}
+                      className={
+                        activeCategory === null
+                          ? "bg-blue-700 text-white hover:bg-blue-800" // Active style
+                          : "bg-blue-100 text-blue-800 hover:bg-blue-200 border border-blue-200" // Inactive style
+                      }
                     >
                       All Topics
                     </Button>
                     {categories.map((category) => (
                       <Button
                         key={category.id}
-                        variant={activeCategory === category.slug ? "default" : "outline"}
                         size="sm"
                         onClick={() => handleCategoryClick(category.slug)}
+                        className={
+                          activeCategory === category.slug
+                            ? "bg-blue-700 text-white hover:bg-blue-800" // Active style
+                            : "bg-blue-100 text-blue-800 hover:bg-blue-200 border border-blue-200" // Inactive style
+                        }
                       >
                         {category.name} ({category.count})
                       </Button>
                     ))}
                   </div>
                 </TabsContent>
-                
+
                 <TabsContent value="tags" className="mt-0">
                   <div className="flex flex-wrap gap-2 justify-center">
                     <Button
-                      variant={activeTag === null ? "default" : "outline"}
                       size="sm"
                       onClick={() => handleTagClick(null)}
+                      className={
+                        activeTag === null
+                          ? "bg-blue-700 text-white hover:bg-blue-800" // Active style
+                          : "bg-blue-100 text-blue-800 hover:bg-blue-200 border border-blue-200" // Inactive style
+                      }
                     >
                       All Tags
                     </Button>
                     {tags.map((tag) => (
                       <Button
                         key={tag.id}
-                        variant={activeTag === tag.id ? "default" : "outline"}
                         size="sm"
                         onClick={() => handleTagClick(tag.id)}
+                        className={
+                          activeTag === tag.id
+                            ? "bg-blue-700 text-white hover:bg-blue-800" // Active style
+                            : "bg-blue-100 text-blue-800 hover:bg-blue-200 border border-blue-200" // Inactive style
+                        }
                       >
                         {tag.name} ({tag.count})
                       </Button>
@@ -299,16 +346,31 @@ const BlogIndex = () => {
                   </div>
                 </TabsContent>
               </Tabs>
-              
+
               {(activeCategory || activeTag || searchTerm) && (
                 <div className="flex justify-center mt-6 pt-4 border-t">
                   <div className="text-sm text-muted-foreground mb-2 text-center">
-                    {activeCategory && <span>Category: <Badge variant="outline">{activeCategory.replace('category/', '')}</Badge> </span>}
-                    {activeTag && <span>Tag: <Badge variant="outline">{activeTag}</Badge> </span>}
-                    {searchTerm && <span>Search: <Badge variant="outline">{searchTerm}</Badge></span>}
+                    {activeCategory && (
+                      <span>
+                        Category:{" "}
+                        <Badge variant="outline">
+                          {activeCategory.replace("category/", "")}
+                        </Badge>{" "}
+                      </span>
+                    )}
+                    {activeTag && (
+                      <span>
+                        Tag: <Badge variant="outline">{activeTag}</Badge>{" "}
+                      </span>
+                    )}
+                    {searchTerm && (
+                      <span>
+                        Search: <Badge variant="outline">{searchTerm}</Badge>
+                      </span>
+                    )}
                   </div>
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     size="sm"
                     onClick={handleClearFilters}
                     className="ml-3"
@@ -319,7 +381,7 @@ const BlogIndex = () => {
               )}
             </div>
           </Card>
-          
+
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               {[...Array(6)].map((_, index) => (
@@ -352,8 +414,8 @@ const BlogIndex = () => {
               <p className="text-muted-foreground mb-4">
                 Try changing your search term or filter selection.
               </p>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="mt-2"
                 onClick={handleClearFilters}
               >
@@ -361,7 +423,7 @@ const BlogIndex = () => {
               </Button>
             </div>
           )}
-          
+
           {totalPages > 1 && posts.length > 0 && (
             <div className="flex justify-center space-x-2 mt-8">
               <Button
@@ -372,11 +434,11 @@ const BlogIndex = () => {
               >
                 Previous
               </Button>
-              
+
               {[...Array(totalPages)].map((_, i) => {
                 if (
-                  i === 0 || 
-                  i === totalPages - 1 || 
+                  i === 0 ||
+                  i === totalPages - 1 ||
                   (i >= currentPage - 2 && i <= currentPage + 2)
                 ) {
                   return (
@@ -389,16 +451,17 @@ const BlogIndex = () => {
                       {i + 1}
                     </Button>
                   );
-                } else if (
-                  i === currentPage - 3 || 
-                  i === currentPage + 3
-                ) {
-                  return <span key={i} className="px-2 self-center">...</span>;
+                } else if (i === currentPage - 3 || i === currentPage + 3) {
+                  return (
+                    <span key={i} className="px-2 self-center">
+                      ...
+                    </span>
+                  );
                 } else {
                   return null;
                 }
               })}
-              
+
               <Button
                 variant="outline"
                 size="sm"
