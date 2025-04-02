@@ -88,11 +88,12 @@ const About = () => {
               <AvatarImage src="/lovable-uploads/61f9246e-544a-4f54-a156-a5374baed0c1.png" alt="Christopher R McGuire" />
               <AvatarFallback>CRM</AvatarFallback>
             </Avatar>
+            <a href="https://www.paguire.com" target="_blank" rel="noopener noreferrer" className="hover:underline">
             <h3 className="text-xl font-medium">Christopher R McGuire</h3>
+            </a>
             <p className="text-sm text-finance-primary mb-2">
-              <a href="https://www.paguire.com" target="_blank" rel="noopener noreferrer" className="hover:underline">
-                Senior Vice President of Software Engineering at Mesirow
-              </a>
+              
+                Senior Vice President of Software Engineering at <a href="https://www.mesirow.com" target="_blank" rel="noopener noreferrer" className="hover:underline">Mesirow</a>
             </p>
             <div className="mt-4 text-muted-foreground text-left">
               <p className="mb-3">
