@@ -15,7 +15,7 @@ const Logo = ({ variant = 'default', size = 'md' }: LogoProps) => { // size prop
     <div className="flex items-center gap-2">
       {/* Responsive SVG: smaller height/offset on mobile */}
       <svg
-        className={`w-auto ${fillColor} relative h-10 md:h-[6rem] left-[-1rem] md:left-[-2.5rem]`} // Adjusted height and left offset
+        className={`w-auto ${fillColor} relative h-10 left-[-1rem]`} // Fixed to mobile size
         viewBox="0 0 1547.62 1099.09"
         xmlns="http://www.w3.org/2000/svg"
     >
@@ -51,7 +51,7 @@ const Logo = ({ variant = 'default', size = 'md' }: LogoProps) => { // size prop
       </svg>
       {/* Responsive Text: smaller size/offset on mobile, no wrap */}
       <span
-        className={`font-playfair font-bold ${textColor} relative mb-4 whitespace-nowrap text-xl md:text-[2.1rem] left-[-2rem] md:left-[-4rem]`} // Adjusted font size, left offset, added whitespace-nowrap
+        className={`font-playfair font-bold ${textColor} relative mb-4 whitespace-nowrap text-xl left-[-2rem]`} // Fixed to mobile size
       >
         Fiscal Compass
       </span>
