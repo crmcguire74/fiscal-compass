@@ -75,7 +75,7 @@ const CalculatorsIndex = () => {
       </div>
 
       <div className="container max-w-6xl">
-        <h2 className="text-2xl font-semibold mb-8 text-center">Calculator Categories</h2>
+        <h2 className="text-2xl font-semibold mb-8 mt-8 text-center">Calculator Categories</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {CALCULATOR_CATEGORIES.map(category => <Card key={category.id} className="transition-all hover:shadow-md hover:border-finance-primary/30">

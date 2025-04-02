@@ -1,10 +1,11 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CALCULATOR_CATEGORIES } from '@/lib/constants';
 import Logo from '@/components/ui/logo';
+import { useActiveRoute } from '@/hooks/use-active-route';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -17,6 +18,10 @@ import {
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { isActive } = useActiveRoute();
+
+  // Custom styles for active links
+  const activeStyles = "bg-gradient-to-r from-finance-primary/10 via-finance-primary/20 to-finance-primary/10 text-finance-primary";
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -32,7 +37,10 @@ const Header = () => {
           <NavigationMenu>
             <NavigationMenuList>
               <NavigationMenuItem>
-                <Link to="/calculators" className={navigationMenuTriggerStyle()}>
+                <Link 
+                  to="/calculators" 
+                  className={`${navigationMenuTriggerStyle()} ${isActive('/calculators') ? activeStyles : ''}`}
+                >
                   Home
                 </Link>
               </NavigationMenuItem>
@@ -61,13 +69,19 @@ const Header = () => {
               </NavigationMenuItem>
               
               <NavigationMenuItem>
-                <Link to="/blog" className={navigationMenuTriggerStyle()}>
+                <Link 
+                  to="/blog" 
+                  className={`${navigationMenuTriggerStyle()} ${isActive('/blog') ? activeStyles : ''}`}
+                >
                   Blog
                 </Link>
               </NavigationMenuItem>
               
               <NavigationMenuItem>
-                <Link to="/about" className={navigationMenuTriggerStyle()}>
+                <Link 
+                  to="/about" 
+                  className={`${navigationMenuTriggerStyle()} ${isActive('/about') ? activeStyles : ''}`}
+                >
                   About
                 </Link>
               </NavigationMenuItem>
@@ -88,7 +102,9 @@ const Header = () => {
           <div className="container py-4 space-y-1">
             <Link
               to="/"
-              className="flex items-center gap-2 w-full p-2 text-sm font-medium rounded-md hover:bg-muted transition-colors"
+              className={`flex items-center gap-2 w-full p-2 text-sm font-medium rounded-md hover:bg-muted transition-colors ${
+                isActive('/') ? activeStyles : ''
+              }`}
               onClick={() => setMobileMenuOpen(false)}
             >
               <Home className="h-4 w-4" />
@@ -100,7 +116,9 @@ const Header = () => {
                 <Link
                   key={category.id}
                   to={`/calculators/${category.id}`}
-                  className="flex w-full p-2 text-sm font-medium rounded-md hover:bg-muted transition-colors pl-4"
+                  className={`flex w-full p-2 text-sm font-medium rounded-md hover:bg-muted transition-colors pl-4 ${
+                    isActive(`/calculators/${category.id}`) ? activeStyles : ''
+                  }`}
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {category.name}
@@ -110,14 +128,18 @@ const Header = () => {
             <div className="border-t border-border/40 my-2" />
             <Link
               to="/blog"
-              className="flex w-full p-2 text-sm font-medium rounded-md hover:bg-muted transition-colors"
+              className={`flex w-full p-2 text-sm font-medium rounded-md hover:bg-muted transition-colors ${
+                isActive('/blog') ? activeStyles : ''
+              }`}
               onClick={() => setMobileMenuOpen(false)}
             >
               Blog
             </Link>
             <Link
               to="/about"
-              className="flex w-full p-2 text-sm font-medium rounded-md hover:bg-muted transition-colors"
+              className={`flex w-full p-2 text-sm font-medium rounded-md hover:bg-muted transition-colors ${
+                isActive('/about') ? activeStyles : ''
+              }`}
               onClick={() => setMobileMenuOpen(false)}
             >
               About

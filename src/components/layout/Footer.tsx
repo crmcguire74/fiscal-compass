@@ -1,10 +1,15 @@
 
 import { Link } from 'react-router-dom';
+import { useActiveRoute } from '@/hooks/use-active-route';
 import { CALCULATOR_CATEGORIES } from '@/lib/constants';
 import Logo from '@/components/ui/logo';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const { isActive } = useActiveRoute();
+
+  // Custom styles for active links with a subtle underline effect
+  const activeStyles = "text-finance-primary relative after:absolute after:bottom-[-2px] after:left-0 after:w-full after:h-[2px] after:bg-gradient-to-r after:from-finance-primary/40 after:to-finance-primary/10";
 
   return (
     <footer className="bg-gray-50 border-t">
@@ -26,7 +31,9 @@ const Footer = () => {
                 <li key={category.id}>
                   <Link 
                     to={`/calculators/${category.id}`}
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                    className={`text-sm text-muted-foreground hover:text-primary transition-colors relative ${
+                      isActive(`/calculators/${category.id}`) ? activeStyles : ''
+                    }`}
                   >
                     {category.name}
                   </Link>
@@ -42,7 +49,9 @@ const Footer = () => {
                 <li key={category.id}>
                   <Link 
                     to={`/calculators/${category.id}`}
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                    className={`text-sm text-muted-foreground hover:text-primary transition-colors relative ${
+                      isActive(`/calculators/${category.id}`) ? activeStyles : ''
+                    }`}
                   >
                     {category.name}
                   </Link>
@@ -57,7 +66,9 @@ const Footer = () => {
               <li>
                 <Link 
                   to="/about"
-                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                  className={`text-sm text-muted-foreground hover:text-primary transition-colors relative ${
+                    isActive('/about') ? activeStyles : ''
+                  }`}
                 >
                   About Us
                 </Link>
@@ -65,7 +76,9 @@ const Footer = () => {
               <li>
                 <Link 
                   to="/blog"
-                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                  className={`text-sm text-muted-foreground hover:text-primary transition-colors relative ${
+                    isActive('/blog') ? activeStyles : ''
+                  }`}
                 >
                   Blog
                 </Link>
@@ -73,7 +86,9 @@ const Footer = () => {
               <li>
                 <Link 
                   to="/privacy"
-                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                  className={`text-sm text-muted-foreground hover:text-primary transition-colors relative ${
+                    isActive('/privacy') ? activeStyles : ''
+                  }`}
                 >
                   Privacy Policy
                 </Link>
@@ -81,7 +96,9 @@ const Footer = () => {
               <li>
                 <Link 
                   to="/terms"
-                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                  className={`text-sm text-muted-foreground hover:text-primary transition-colors relative ${
+                    isActive('/terms') ? activeStyles : ''
+                  }`}
                 >
                   Terms of Service
                 </Link>
@@ -89,7 +106,9 @@ const Footer = () => {
               <li>
                 <Link 
                   to="/contact"
-                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                  className={`text-sm text-muted-foreground hover:text-primary transition-colors relative ${
+                    isActive('/contact') ? activeStyles : ''
+                  }`}
                 >
                   Contact Us
                 </Link>
@@ -107,19 +126,25 @@ const Footer = () => {
             <div className="flex items-center gap-6">
               <Link 
                 to="/privacy"
-                className="text-xs text-muted-foreground hover:text-primary transition-colors"
+                className={`text-xs text-muted-foreground hover:text-primary transition-colors relative ${
+                  isActive('/privacy') ? activeStyles : ''
+                }`}
               >
                 Privacy
               </Link>
               <Link 
                 to="/terms"
-                className="text-xs text-muted-foreground hover:text-primary transition-colors"
+                className={`text-xs text-muted-foreground hover:text-primary transition-colors relative ${
+                  isActive('/terms') ? activeStyles : ''
+                }`}
               >
                 Terms
               </Link>
               <Link 
                 to="/cookies"
-                className="text-xs text-muted-foreground hover:text-primary transition-colors"
+                className={`text-xs text-muted-foreground hover:text-primary transition-colors relative ${
+                  isActive('/cookies') ? activeStyles : ''
+                }`}
               >
                 Cookies
               </Link>
