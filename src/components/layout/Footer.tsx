@@ -102,7 +102,8 @@ const Footer = () => {
         <div className="mt-12 pt-8 border-t border-border/60">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-muted-foreground">
-              © {currentYear} Fiscal Compass. All rights reserved.
+              © {currentYear} Fiscal Compass. All rights reserved.<br />
+              <span className="text-xs">As an Amazon Associate and affiliate of other programs, we may earn from qualifying purchases.</span>
             </p>
             <div className="flex items-center gap-6">
               <Link 
