@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Fiscal Compass Blog</title>
+    <link>https://fiscalcompass.net/blog</link>
+    <description>Financial planning insights, calculator guides, and money management tips from Fiscal Compass</description>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 02 Apr 2025 10:27:59 -0500</lastBuildDate>
+    <atom:link href="https://fiscalcompass.net/rss.xml" rel="self" type="application/rss+xml" />
+    <copyright>Copyright 2025, Christopher R McGuire</copyright>
+    <category>Finance</category>
+    <category>Personal Finance</category>
+    <category>Financial Planning</category>
+    <category>Calculator Guides</category>
+    
+    <!-- Featured Articles Section -->
+    <item>
+      <title>Understanding Mortgage Calculations: A Complete Guide</title>
+      <link>https://fiscalcompass.net/blog/mortgage-calculations-guide</link>
+      <description>Learn how mortgage calculations work and how to use our mortgage calculator effectively to make informed home buying decisions.</description>
+      <pubDate>Tue, 02 Apr 2025 09:00:00 -0500</pubDate>
+      <guid>https://fiscalcompass.net/blog/mortgage-calculations-guide</guid>
+      <category>Mortgage</category>
+      <category>Home Buying</category>
+    </item>
+
+    <item>
+      <title>Retirement Planning: Essential Calculations for Your Future</title>
+      <link>https://fiscalcompass.net/blog/retirement-planning-calculations</link>
+      <description>Discover how to use retirement calculators to plan your financial future and ensure a comfortable retirement.</description>
+      <pubDate>Mon, 01 Apr 2025 09:00:00 -0500</pubDate>
+      <guid>https://fiscalcompass.net/blog/retirement-planning-calculations</guid>
+      <category>Retirement</category>
+      <category>Financial Planning</category>
+    </item>
+
+    <item>
+      <title>Investment Returns: Understanding Compound Interest</title>
+      <link>https://fiscalcompass.net/blog/compound-interest-guide</link>
+      <description>Learn how compound interest works and how to maximize your investment returns using our calculator tools.</description>
+      <pubDate>Sun, 31 Mar 2025 09:00:00 -0500</pubDate>
+      <guid>https://fiscalcompass.net/blog/compound-interest-guide</guid>
+      <category>Investing</category>
+      <category>Compound Interest</category>
+    </item>
+
+    <!-- Recent Calculator Updates -->
+    <item>
+      <title>New Feature: Tax Bracket Visualization Tool</title>
+      <link>https://fiscalcompass.net/blog/tax-bracket-visualization-launch</link>
+      <description>Explore our new interactive tax bracket visualization tool to better understand your tax situation.</description>
+      <pubDate>Sat, 30 Mar 2025 09:00:00 -0500</pubDate>
+      <guid>https://fiscalcompass.net/blog/tax-bracket-visualization-launch</guid>
+      <category>Tax Planning</category>
+      <category>Calculator Updates</category>
+    </item>
+
+    <item>
+      <title>Enhanced Debt Payoff Calculator: New Features</title>
+      <link>https://fiscalcompass.net/blog/debt-payoff-calculator-update</link>
+      <description>Check out the new features in our debt payoff calculator, including multiple debt comparison and optimized payment strategies.</description>
+      <pubDate>Fri, 29 Mar 2025 09:00:00 -0500</pubDate>
+      <guid>https://fiscalcompass.net/blog/debt-payoff-calculator-update</guid>
+      <category>Debt Management</category>
+      <category>Calculator Updates</category>
+    </item>
+  </channel>
+</rss>
