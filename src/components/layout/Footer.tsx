@@ -13,7 +13,6 @@ const Footer = () => {
           <div className="md:col-span-1">
             <Link to="/calculators" className="flex items-center gap-2 font-heading text-xl font-bold text-finance-primary">
               <Logo size="sm" />
-              <span className="font-playfair">Fiscal Compass</span>
             </Link>
             <p className="mt-4 text-sm text-muted-foreground">
               Comprehensive financial planning tools that respect your privacy and help you make informed decisions.
