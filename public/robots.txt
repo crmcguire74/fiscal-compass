@@ -1,3 +1,16 @@
+# Fiscal Compass robots.txt
+# https://fiscalcompass.net
+
+User-agent: *
+Allow: /
+Allow: /calculators/
+Allow: /blog/
+Allow: /about/
+Disallow: /api/
+Disallow: /*.json$
+Disallow: /*?*
+
+# Allow social media bots full access
 User-agent: Googlebot
 Allow: /
 
@@ -10,5 +23,5 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
-User-agent: *
-Allow: /
+# Sitemaps
+Sitemap: https://fiscalcompass.net/sitemap.xml
