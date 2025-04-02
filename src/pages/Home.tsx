@@ -31,7 +31,7 @@ const Home = () => {
               </div>
               {/* Added whitespace-nowrap spans and block to second line for mobile alignment */}
               <h1 className="font-bold font-heading leading-tight animate-fade-in">
-                <span className="whitespace-nowrap text-[1.7rem] md:text-4xl block">Free Financial Calculators</span>
+                <span className="whitespace-nowrap text-[1.7rem] md:text-4xl block">Free Financial Calculators </span>
                 <span className="text-finance-accent text-yellow-500 text-[2.1rem] md:text-[2.8rem] whitespace-nowrap block">No Sign Up Required</span>
               </h1>
               <p className="text-lg md:text-xl text-white/90 max-w-md animate-fade-in" style={{
