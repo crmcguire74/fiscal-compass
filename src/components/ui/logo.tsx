@@ -6,20 +6,18 @@ interface LogoProps {
   size?: 'sm' | 'md' | 'lg';
 }
 
-const Logo = ({ variant = 'default', size = 'md' }: LogoProps) => {
-  const sizeClasses = {
-    sm: 'h-6 w-auto',
-    md: 'h-10 w-auto',
-    lg: 'h-16 w-auto',
-  };
-
+const Logo = ({ variant = 'default', size = 'md' }: LogoProps) => { // size prop is less relevant now with fixed responsive classes
   const fillColor = variant === 'white' ? 'fill-white' : 'fill-finance-primary';
+  const textColor = variant === 'white' ? 'text-white' : 'text-finance-primary';
 
+  // Responsive classes directly applied below
   return (
-    <svg
-      className={`${sizeClasses[size]} ${fillColor}`}
-      viewBox="0 0 1547.62 1099.09"
-      xmlns="http://www.w3.org/2000/svg"
+    <div className="flex items-center gap-2">
+      {/* Responsive SVG: smaller height/offset on mobile */}
+      <svg
+        className={`w-auto ${fillColor} relative h-10 md:h-[6rem] left-[-1rem] md:left-[-2.5rem]`} // Adjusted height and left offset
+        viewBox="0 0 1547.62 1099.09"
+        xmlns="http://www.w3.org/2000/svg"
     >
       <g>
         <path d="M639.66,521.27l3.46-3,1.33.78c5.7,4.96,11.2,9.42,15.98,14.03,6.55,6.32,4.54,10.77-3.84,5.85-4.51-2.65-8.94-8.54-14.13-5.9l-148.91,147.23-7.21.92c-6.76-9.3,4.01-11.9,9.11-17.02,47.78-47.9,95.07-96.38,144.21-142.89Z"/>
@@ -49,8 +47,15 @@ const Logo = ({ variant = 'default', size = 'md' }: LogoProps) => {
           <path d="M758.4,3.11c.56-1.95,4.34-3.98,6.67-2.71l5.27,6.77.05,108.95c157.31,2.07,295.9,135.05,304.01,291.99h118l1.88,8.75-2.88,3.25h-117c3.32,68.72-20.93,135.19-59.79,190.71-5.16.77,81.24,63.02,47.79,58.3,0,0-53.94-48.21-53.94-48.21-7.08-1.97-15.45,9.99-19.92,14.48-.94,5.4,48.45,42.46,53.95,51.62,5.33,8.87-.06,13.07-7.94,8.06-7.75-4.94-47.61-48.57-51.14-48.59-57.64,54.62-130.51,86.75-210.51,89.26l-4.51-2.62v-157l58.1-9.09,27.79,57.65c4.05,5.14,10.89,3.46,11.79-3.2l-27.68-61.33c19.39-7.11,34.07-22.2,50.65-33.74,21.41,11.97,75.44,73.37,92.35,83.02,5,.31,9.45-6.6,6.02-11.32l-88.81-83.4c-.85-3.35,11.58-21.59,14.13-27.25,9.06-20.1,15.9-43.19,15.66-65.34h93c3.97,0,3.97-12,0-12h-93c-.74-33.62-14.76-62.66-31.7-90.71l84.74-81.24,4.47-7.07c-5.17-7-5.6-7.96-12.48-2.96-27.33,20.65-57.45,60.53-86.02,80.06l-46.8-33.41,18.95-56.66c-3.97-2.95-7.36-6.26-10.93-.79-5.19,7.94-17.94,49.3-22.19,51.95-19.09-4.14-38.14-10.62-58.02-9.16v-110h-12v107c-91.91,26.14-45.62,31.2-97.75-38.09-3.66-.5-9.7,2.55-7.48,7.17l30.76,58.95-36.5,32.48-102.54-98.49c52.46-62.02,134.01-100.84,215.51-103.03V3.11Z"/>
           <path d="M826.91,414.65c-1.23,71.81-108.04,71.8-109.26,0,1.23-71.81,108.04-71.8,109.26,0Z"/>
         </g>
-      </g>
-    </svg>
+        </g>
+      </svg>
+      {/* Responsive Text: smaller size/offset on mobile, no wrap */}
+      <span
+        className={`font-playfair font-bold ${textColor} relative mb-4 whitespace-nowrap text-xl md:text-[2.1rem] left-[-2rem] md:left-[-4rem]`} // Adjusted font size, left offset, added whitespace-nowrap
+      >
+        Fiscal Compass
+      </span>
+    </div>
   );
 };
 

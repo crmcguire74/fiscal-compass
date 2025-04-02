@@ -24,13 +24,15 @@ const Home = () => {
         <div className="container relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
-              <div className="flex flex-col items-center md:items-start mb-6">
+              {/* Changed items-center to items-start for mobile left-alignment */}
+              <div className="flex flex-col items-start mb-6"> 
                 <Logo variant="white" size="lg" />
                 <h2 className="text-xl md:text-2xl font-bold font-heading mt-2">Financial Tools For Everyone</h2>
               </div>
-              <h1 className="text-3xl md:text-5xl font-bold font-heading leading-tight animate-fade-in">
-                Free Financial Calculators<br /> 
-                <span className="text-finance-accent text-yellow-500">No Sign Up Required</span>
+              {/* Added whitespace-nowrap spans and block to second line for mobile alignment */}
+              <h1 className="font-bold font-heading leading-tight animate-fade-in">
+                <span className="whitespace-nowrap text-[1.7rem] md:text-4xl block">Free Financial Calculators</span>
+                <span className="text-finance-accent text-yellow-500 text-[2.1rem] md:text-[2.8rem] whitespace-nowrap block">No Sign Up Required</span>
               </h1>
               <p className="text-lg md:text-xl text-white/90 max-w-md animate-fade-in" style={{
               animationDelay: '100ms'
