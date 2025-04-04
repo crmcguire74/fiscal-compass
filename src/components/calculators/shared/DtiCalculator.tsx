@@ -4,8 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider';
-import { Progress } from '@/components/ui/progress';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Label as RechartsLabel } from 'recharts'; // Added Recharts components
 import { toast } from '@/hooks/use-toast';
 import { formatCurrency, formatPercentage } from '@/utils/calculatorUtils';
 import { saveCalculatorData, getCalculatorData } from '@/services/storageService';
@@ -102,6 +101,23 @@ const DtiCalculator = () => {
   const backEndStatus = getDtiStatus(dtiRatio);
   const frontEndStatus = getDtiStatus(frontEndDti);
 
+  // Data for the charts
+  const dtiChartData = [
+    { name: 'Back-End DTI', value: dtiRatio },
+    { name: 'Front-End DTI', value: frontEndDti },
+  ];
+
+  // Threshold definitions with labels
+  const backEndThresholds = [
+    { value: 36, label: 'Good', color: '#22c55e' }, // Green
+    { value: 43, label: 'Fair', color: '#facc15' }, // Yellow
+    { value: 50, label: 'High', color: '#f97316' }, // Orange
+  ];
+  const frontEndThresholds = [
+    { value: 28, label: 'Good', color: '#22c55e' }, // Green
+    // Add more if needed, e.g., { value: 36, label: 'High', color: '#f97316' }
+  ];
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -180,23 +196,31 @@ const DtiCalculator = () => {
           {/* Back-end DTI */}
           <div className="space-y-2">
             <div className="flex justify-between">
-              <Label>Back-End DTI (All Debts)</Label>
-              <span className="text-sm font-medium">{dtiRatio.toFixed(1)}%</span>
+              <Label>Back-End DTI (All Debts): <span className="font-bold">{dtiRatio.toFixed(1)}%</span></Label>
             </div>
-            <div className="h-2 relative rounded-full overflow-hidden">
-              <div className="h-full bg-gray-200 absolute inset-0"></div>
-              <div 
-                className={`h-full ${backEndStatus.color} absolute inset-0 transition-all duration-500`} 
-                style={{width: `${Math.min(dtiRatio, 100)}%`}}
-              ></div>
+            <div className="h-40"> {/* Increased height for chart */}
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart 
+                  layout="vertical" 
+                  data={[{ name: 'Back-End', dti: dtiRatio }]} 
+                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                  barSize={20}
+                >
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                  <XAxis type="number" domain={[0, 100]} unit="%" />
+                  <YAxis type="category" dataKey="name" hide />
+                  <Tooltip formatter={(value) => `${Number(value).toFixed(1)}%`} />
+                  <Bar dataKey="dti" fill={backEndStatus.color.replace('bg-', '#')} background={{ fill: '#eee' }} radius={[4, 4, 4, 4]} />
+                  {/* Reference Lines for Thresholds */}
+                  {backEndThresholds.map(t => (
+                    <ReferenceLine key={`ref-back-${t.value}`} x={t.value} stroke={t.color} strokeDasharray="3 3">
+                       <RechartsLabel value={`${t.label} (${t.value}%)`} position="insideTopRight" fill={t.color} fontSize={10} />
+                    </ReferenceLine>
+                  ))}
+                </BarChart>
+              </ResponsiveContainer>
             </div>
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>0%</span>
-              <span>25%</span>
-              <span>43%</span>
-              <span>50%+</span>
-            </div>
-            <div className="text-sm">
+             <div className="text-sm mt-1">
               Status: <span className="font-medium">{backEndStatus.label}</span>
             </div>
           </div>
@@ -204,23 +228,31 @@ const DtiCalculator = () => {
           {/* Front-end DTI */}
           <div className="space-y-2">
             <div className="flex justify-between">
-              <Label>Front-End DTI (Housing Only)</Label>
-              <span className="text-sm font-medium">{frontEndDti.toFixed(1)}%</span>
+              <Label>Front-End DTI (Housing Only): <span className="font-bold">{frontEndDti.toFixed(1)}%</span></Label>
             </div>
-            <div className="h-2 relative rounded-full overflow-hidden">
-              <div className="h-full bg-gray-200 absolute inset-0"></div>
-              <div 
-                className={`h-full ${frontEndStatus.color} absolute inset-0 transition-all duration-500`} 
-                style={{width: `${Math.min(frontEndDti, 100)}%`}}
-              ></div>
-            </div>
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>0%</span>
-              <span>25%</span>
-              <span>28%</span>
-              <span>36%+</span>
-            </div>
-            <div className="text-sm">
+            <div className="h-40"> {/* Increased height for chart */}
+               <ResponsiveContainer width="100%" height="100%">
+                 <BarChart 
+                   layout="vertical" 
+                   data={[{ name: 'Front-End', dti: frontEndDti }]} 
+                   margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                   barSize={20}
+                 >
+                   <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                   <XAxis type="number" domain={[0, 100]} unit="%" />
+                   <YAxis type="category" dataKey="name" hide />
+                   <Tooltip formatter={(value) => `${Number(value).toFixed(1)}%`} />
+                   <Bar dataKey="dti" fill={frontEndStatus.color.replace('bg-', '#')} background={{ fill: '#eee' }} radius={[4, 4, 4, 4]} />
+                   {/* Reference Lines for Thresholds */}
+                   {frontEndThresholds.map(t => (
+                     <ReferenceLine key={`ref-front-${t.value}`} x={t.value} stroke={t.color} strokeDasharray="3 3">
+                        <RechartsLabel value={`${t.label} (${t.value}%)`} position="insideTopRight" fill={t.color} fontSize={10} />
+                     </ReferenceLine>
+                   ))}
+                 </BarChart>
+               </ResponsiveContainer>
+             </div>
+             <div className="text-sm mt-1">
               Status: <span className="font-medium">{frontEndStatus.label}</span>
             </div>
           </div>

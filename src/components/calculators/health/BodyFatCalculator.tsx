@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group" // Added ToggleGroup
 import {
   Tooltip,
   TooltipContent,
@@ -43,7 +44,14 @@ const DEFAULTS = {
   waist: 85, // cm
   hip: 90, // cm (only for females)
   method: 'navy',
+  unitSystem: 'metric', // Added unit system default
 };
+
+// Conversion constants
+const KG_TO_LBS = 2.20462;
+const LBS_TO_KG = 1 / KG_TO_LBS;
+const CM_TO_IN = 0.393701;
+const IN_TO_CM = 1 / CM_TO_IN;
 
 const BodyFatCalculator = () => {
   const { toast } = useToast();
@@ -56,6 +64,7 @@ const BodyFatCalculator = () => {
   const [waist, setWaist] = useState(DEFAULTS.waist);
   const [hip, setHip] = useState(DEFAULTS.hip);
   const [method, setMethod] = useState<'navy' | 'bmi'>(DEFAULTS.method as 'navy' | 'bmi');
+  const [unitSystem, setUnitSystem] = useState<'metric' | 'imperial'>(DEFAULTS.unitSystem as 'metric' | 'imperial'); // Added unit system state
   
   const [bodyFat, setBodyFat] = useState<number | null>(null);
   const [category, setCategory] = useState<string>('');
@@ -75,33 +84,58 @@ const BodyFatCalculator = () => {
       setWaist(savedData.waist || DEFAULTS.waist);
       setHip(savedData.hip || DEFAULTS.hip);
       setMethod(savedData.method || DEFAULTS.method);
+      setUnitSystem(savedData.unitSystem || DEFAULTS.unitSystem); // Load unit system
       setDataStored(true);
-      
-      // Calculate with saved data
-      calculateBodyFat();
     }
   }, []);
+
+  // Recalculate when inputs or unit system change
+  useEffect(() => {
+    calculateBodyFat();
+  }, [gender, age, weight, height, neck, waist, hip, method, unitSystem]); // Added unitSystem dependency
   
   // Calculate body fat percentage
   const calculateBodyFat = () => {
+    // Convert inputs to metric if necessary
+    const weightInKg = unitSystem === 'imperial' ? weight * LBS_TO_KG : weight;
+    const heightInCm = unitSystem === 'imperial' ? height * IN_TO_CM : height;
+    const neckInCm = unitSystem === 'imperial' ? neck * IN_TO_CM : neck;
+    const waistInCm = unitSystem === 'imperial' ? waist * IN_TO_CM : waist;
+    const hipInCm = unitSystem === 'imperial' ? hip * IN_TO_CM : hip;
+
+    // Validate converted inputs
+    if (heightInCm <= 0 || weightInKg <= 0 || (method === 'navy' && (neckInCm <= 0 || waistInCm <= 0 || (gender === 'female' && hipInCm <= 0)))) {
+      setBodyFat(null);
+      setCategory('');
+      setLeanMass(null);
+      setFatMass(null);
+      return;
+    }
+
     let bodyFatPercentage: number;
     
     if (method === 'navy') {
-      // Navy method formula
+      // Navy method formula (uses metric units)
       if (gender === 'male') {
-        // Male formula: 495 / (1.0324 - 0.19077 * log10(waist-neck) + 0.15456 * log10(height)) - 450
-        const logWaistNeck = Math.log10(waist - neck);
-        const logHeight = Math.log10(height);
+        if (waistInCm <= neckInCm) { // Avoid log10(non-positive)
+           setBodyFat(null); // Or set to a default low value?
+           return;
+        }
+        const logWaistNeck = Math.log10(waistInCm - neckInCm);
+        const logHeight = Math.log10(heightInCm);
         bodyFatPercentage = 495 / (1.0324 - 0.19077 * logWaistNeck + 0.15456 * logHeight) - 450;
       } else {
-        // Female formula: 495 / (1.29579 - 0.35004 * log10(waist+hip-neck) + 0.22100 * log10(height)) - 450
-        const logMeasurement = Math.log10(waist + hip - neck);
-        const logHeight = Math.log10(height);
+         if (waistInCm + hipInCm <= neckInCm) { // Avoid log10(non-positive)
+           setBodyFat(null);
+           return;
+         }
+        const logMeasurement = Math.log10(waistInCm + hipInCm - neckInCm);
+        const logHeight = Math.log10(heightInCm);
         bodyFatPercentage = 495 / (1.29579 - 0.35004 * logMeasurement + 0.22100 * logHeight) - 450;
       }
     } else {
-      // BMI method (less accurate)
-      const bmi = weight / ((height / 100) * (height / 100));
+      // BMI method (uses metric units)
+      const bmi = weightInKg / ((heightInCm / 100) * (heightInCm / 100));
       if (gender === 'male') {
         bodyFatPercentage = (1.20 * bmi) + (0.23 * age) - 16.2;
       } else {
@@ -115,12 +149,13 @@ const BodyFatCalculator = () => {
     setBodyFat(Math.round(bodyFatPercentage * 10) / 10);
     setCategory(getBodyFatCategory(gender, bodyFatPercentage));
     
-    // Calculate lean mass and fat mass
-    const fatMassCalc = (bodyFatPercentage / 100) * weight;
-    const leanMassCalc = weight - fatMassCalc;
+    // Calculate lean mass and fat mass using weight in KG
+    const fatMassCalc = (bodyFatPercentage / 100) * weightInKg;
+    const leanMassCalc = weightInKg - fatMassCalc;
     
-    setFatMass(Math.round(fatMassCalc * 10) / 10);
-    setLeanMass(Math.round(leanMassCalc * 10) / 10);
+    // Display mass in the selected unit system
+    setFatMass(unitSystem === 'imperial' ? Math.round(fatMassCalc * KG_TO_LBS * 10) / 10 : Math.round(fatMassCalc * 10) / 10);
+    setLeanMass(unitSystem === 'imperial' ? Math.round(leanMassCalc * KG_TO_LBS * 10) / 10 : Math.round(leanMassCalc * 10) / 10);
   };
   
   // Get body fat category
@@ -169,6 +204,7 @@ const BodyFatCalculator = () => {
       waist,
       hip,
       method,
+      unitSystem, // Save unit system
       timestamp: Date.now()
     };
     
@@ -206,6 +242,24 @@ const BodyFatCalculator = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Input Section */}
           <div className="space-y-6">
+             {/* Unit System Toggle */}
+             <div className="space-y-2">
+               <Label>Unit System</Label>
+               <ToggleGroup 
+                 type="single" 
+                 defaultValue={unitSystem} 
+                 onValueChange={(value) => { if (value) setUnitSystem(value as 'metric' | 'imperial')}}
+                 className="grid grid-cols-2"
+               >
+                 <ToggleGroupItem value="metric" aria-label="Metric units">
+                   Metric (kg, cm)
+                 </ToggleGroupItem>
+                 <ToggleGroupItem value="imperial" aria-label="Imperial units">
+                   Imperial (lbs, in)
+                 </ToggleGroupItem>
+               </ToggleGroup>
+             </div>
+
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <Label className="text-base font-medium">Calculation Method</Label>
@@ -265,7 +319,7 @@ const BodyFatCalculator = () => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="weight">Weight (kg)</Label>
+                <Label htmlFor="weight">Weight ({unitSystem === 'metric' ? 'kg' : 'lbs'})</Label>
                 <Input
                   id="weight"
                   type="number"
@@ -278,7 +332,7 @@ const BodyFatCalculator = () => {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="height">Height (cm)</Label>
+              <Label htmlFor="height">Height ({unitSystem === 'metric' ? 'cm' : 'in'})</Label>
               <Input
                 id="height"
                 type="number"
@@ -292,7 +346,7 @@ const BodyFatCalculator = () => {
             {method === 'navy' && (
               <div className="space-y-4 border-t pt-4">
                 <div className="space-y-2">
-                  <Label htmlFor="neck">Neck Circumference (cm)</Label>
+                  <Label htmlFor="neck">Neck Circumference ({unitSystem === 'metric' ? 'cm' : 'in'})</Label>
                   <Input
                     id="neck"
                     type="number"
@@ -304,7 +358,7 @@ const BodyFatCalculator = () => {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="waist">Waist Circumference (cm)</Label>
+                  <Label htmlFor="waist">Waist Circumference ({unitSystem === 'metric' ? 'cm' : 'in'})</Label>
                   <Input
                     id="waist"
                     type="number"
@@ -317,7 +371,7 @@ const BodyFatCalculator = () => {
                 
                 {gender === 'female' && (
                   <div className="space-y-2">
-                    <Label htmlFor="hip">Hip Circumference (cm)</Label>
+                    <Label htmlFor="hip">Hip Circumference ({unitSystem === 'metric' ? 'cm' : 'in'})</Label>
                     <Input
                       id="hip"
                       type="number"
@@ -367,11 +421,11 @@ const BodyFatCalculator = () => {
                 <div className="grid grid-cols-2 gap-4 mb-6">
                   <div className="bg-gray-50 p-4 rounded-lg text-center">
                     <p className="text-sm text-muted-foreground">Fat Mass</p>
-                    <p className="text-2xl font-semibold">{fatMass} kg</p>
+                    <p className="text-2xl font-semibold">{fatMass} {unitSystem === 'metric' ? 'kg' : 'lbs'}</p>
                   </div>
                   <div className="bg-gray-50 p-4 rounded-lg text-center">
                     <p className="text-sm text-muted-foreground">Lean Mass</p>
-                    <p className="text-2xl font-semibold">{leanMass} kg</p>
+                    <p className="text-2xl font-semibold">{leanMass} {unitSystem === 'metric' ? 'kg' : 'lbs'}</p>
                   </div>
                 </div>
                 

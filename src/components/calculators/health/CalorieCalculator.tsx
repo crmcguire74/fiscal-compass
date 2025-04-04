@@ -6,8 +6,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group" // Added ToggleGroup
 import { Info } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+
+// Conversion constants (same as BodyFatCalculator)
+const KG_TO_LBS = 2.20462;
+const LBS_TO_KG = 1 / KG_TO_LBS;
+const CM_TO_IN = 0.393701;
+const IN_TO_CM = 1 / CM_TO_IN;
 
 const CalorieCalculator = () => {
   const [activeTab, setActiveTab] = useState('harris');
@@ -16,6 +23,7 @@ const CalorieCalculator = () => {
   const [weight, setWeight] = useState('');
   const [height, setHeight] = useState('');
   const [activityLevel, setActivityLevel] = useState('sedentary');
+  const [unitSystem, setUnitSystem] = useState<'metric' | 'imperial'>('metric'); // Added unit system state
   const [results, setResults] = useState<null | {
     bmr: number;
     maintenance: number;
@@ -37,8 +45,9 @@ const CalorieCalculator = () => {
     }
 
     const ageNum = parseInt(age);
-    const weightNum = parseFloat(weight);
-    const heightNum = parseFloat(height);
+    // Convert inputs to metric for calculation
+    const weightNum = unitSystem === 'imperial' ? parseFloat(weight) * LBS_TO_KG : parseFloat(weight);
+    const heightNum = unitSystem === 'imperial' ? parseFloat(height) * IN_TO_CM : parseFloat(height);
 
     if (ageNum < 15 || ageNum > 80) {
       toast({
@@ -117,6 +126,24 @@ const CalorieCalculator = () => {
           </TabsList>
           
           <div className="space-y-4">
+             {/* Unit System Toggle */}
+             <div className="space-y-2">
+               <Label>Unit System</Label>
+               <ToggleGroup 
+                 type="single" 
+                 defaultValue={unitSystem} 
+                 onValueChange={(value) => { if (value) setUnitSystem(value as 'metric' | 'imperial')}}
+                 className="grid grid-cols-2"
+               >
+                 <ToggleGroupItem value="metric" aria-label="Metric units">
+                   Metric (kg, cm)
+                 </ToggleGroupItem>
+                 <ToggleGroupItem value="imperial" aria-label="Imperial units">
+                   Imperial (lbs, in)
+                 </ToggleGroupItem>
+               </ToggleGroup>
+             </div>
+
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="w-full sm:w-1/2">
                 <Label htmlFor="gender">Gender</Label>
@@ -146,7 +173,7 @@ const CalorieCalculator = () => {
             
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="w-full sm:w-1/2">
-                <Label htmlFor="weight">Weight (kg)</Label>
+                <Label htmlFor="weight">Weight ({unitSystem === 'metric' ? 'kg' : 'lbs'})</Label>
                 <Input 
                   id="weight"
                   type="number" 
@@ -159,7 +186,7 @@ const CalorieCalculator = () => {
                 />
               </div>
               <div className="w-full sm:w-1/2">
-                <Label htmlFor="height">Height (cm)</Label>
+                <Label htmlFor="height">Height ({unitSystem === 'metric' ? 'cm' : 'in'})</Label>
                 <Input 
                   id="height"
                   type="number" 

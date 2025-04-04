@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { saveCalculatorData, getCalculatorData } from '@/services/storageService';
 import { formatCurrency, formatPercentage } from '@/utils/calculatorUtils';
+import { calculateStateIncomeTax, STATE_TAX_RATES } from '@/utils/taxUtils'; // Import state tax function and rates
 import { useToast } from '@/hooks/use-toast';
 
 const CALCULATOR_ID = 'early-ira-withdrawal-calculator';
@@ -21,7 +22,8 @@ const DEFAULTS = {
   age: 50,
   accountType: 'traditional' as const,
   federalTaxBracket: '22',
-  stateTaxRate: 5,
+  // stateTaxRate: 5, // Replaced by selectedState
+  selectedState: 'California', // Added state selection default
   hasQualifiedReason: false,
   qualifiedReason: 'none',
   payWithdrawalPenaltyFromOtherFunds: false,
@@ -58,7 +60,8 @@ const EarlyIraWithdrawalCalculator = () => {
   const [age, setAge] = useState(DEFAULTS.age);
   const [accountType, setAccountType] = useState<'traditional' | 'roth'>(DEFAULTS.accountType);
   const [federalTaxBracket, setFederalTaxBracket] = useState(DEFAULTS.federalTaxBracket);
-  const [stateTaxRate, setStateTaxRate] = useState(DEFAULTS.stateTaxRate);
+  // const [stateTaxRate, setStateTaxRate] = useState(DEFAULTS.stateTaxRate); // Replaced by selectedState
+  const [selectedState, setSelectedState] = useState(DEFAULTS.selectedState); // Added state for selected state
   const [hasQualifiedReason, setHasQualifiedReason] = useState(DEFAULTS.hasQualifiedReason);
   const [qualifiedReason, setQualifiedReason] = useState(DEFAULTS.qualifiedReason);
   const [payWithdrawalPenaltyFromOtherFunds, setPayWithdrawalPenaltyFromOtherFunds] = useState(
@@ -79,7 +82,8 @@ const EarlyIraWithdrawalCalculator = () => {
       setAge(savedData.age ?? DEFAULTS.age);
       setAccountType((savedData.accountType as 'traditional' | 'roth') ?? DEFAULTS.accountType);
       setFederalTaxBracket(savedData.federalTaxBracket ?? DEFAULTS.federalTaxBracket);
-      setStateTaxRate(savedData.stateTaxRate ?? DEFAULTS.stateTaxRate);
+      // setStateTaxRate(savedData.stateTaxRate ?? DEFAULTS.stateTaxRate); // Remove loading old state rate
+      setSelectedState(savedData.selectedState ?? DEFAULTS.selectedState); // Load selected state
       setHasQualifiedReason(savedData.hasQualifiedReason ?? DEFAULTS.hasQualifiedReason);
       setQualifiedReason(savedData.qualifiedReason ?? DEFAULTS.qualifiedReason);
       setPayWithdrawalPenaltyFromOtherFunds(
@@ -99,7 +103,7 @@ const EarlyIraWithdrawalCalculator = () => {
     age,
     accountType,
     federalTaxBracket,
-    stateTaxRate,
+    selectedState, // Use selectedState instead of stateTaxRate
     hasQualifiedReason,
     qualifiedReason,
     payWithdrawalPenaltyFromOtherFunds,
@@ -131,7 +135,9 @@ const EarlyIraWithdrawalCalculator = () => {
     
     // Calculate taxes
     const federalTaxAmount = isTaxableWithdrawal ? withdrawalAmount * federalTaxRate : 0;
-    const stateTaxAmount = isTaxableWithdrawal ? withdrawalAmount * (stateTaxRate / 100) : 0;
+    // Calculate state tax using the imported function and selected state
+    // Treat withdrawal amount as income for this calculation (simplification)
+    const stateTaxAmount = isTaxableWithdrawal ? calculateStateIncomeTax(withdrawalAmount, selectedState) : 0; 
     const totalTaxes = federalTaxAmount + stateTaxAmount;
     
     // Calculate total cost and net amount
@@ -167,7 +173,8 @@ const EarlyIraWithdrawalCalculator = () => {
       age,
       accountType,
       federalTaxBracket,
-      stateTaxRate,
+      // stateTaxRate, // Remove old state rate
+      selectedState, // Save selected state
       hasQualifiedReason,
       qualifiedReason,
       payWithdrawalPenaltyFromOtherFunds,
@@ -299,20 +306,20 @@ const EarlyIraWithdrawalCalculator = () => {
                 </div>
                 
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="stateTaxRate">State Tax Rate (%)</Label>
-                    <span className="text-sm font-medium">{stateTaxRate}%</span>
-                  </div>
-                  <Input
-                    id="stateTaxRate"
-                    type="number"
-                    value={stateTaxRate}
-                    onChange={(e) => setStateTaxRate(Number(e.target.value))}
-                    min={0}
-                    max={15}
-                    step={0.1}
-                  />
-                </div>
+                   <Label htmlFor="state">State</Label>
+                   <Select value={selectedState} onValueChange={setSelectedState}>
+                     <SelectTrigger id="state">
+                       <SelectValue placeholder="Select state" />
+                     </SelectTrigger>
+                     <SelectContent>
+                       {Object.keys(STATE_TAX_RATES).sort().map((stateName) => (
+                         <SelectItem key={stateName} value={stateName}>
+                           {stateName}
+                         </SelectItem>
+                       ))}
+                     </SelectContent>
+                   </Select>
+                 </div>
                 
                 <div className="space-y-2 border-t pt-4">
                   <Label>Special Circumstances</Label>
@@ -445,12 +452,12 @@ const EarlyIraWithdrawalCalculator = () => {
                     
                     <div className="bg-gray-50 rounded-lg border p-4">
                       <div className="flex justify-between items-center mb-2">
-                        <span>State Income Tax:</span>
+                        <span>State Income Tax ({selectedState}):</span>
                         <span className="font-medium">{formatCurrency(results.stateTax)}</span>
                       </div>
                       <div className="text-xs text-muted-foreground">
                         {results.isTaxableWithdrawal 
-                          ? `Based on ${stateTaxRate}% state tax rate` 
+                          ? `Calculated based on ${selectedState} tax rules (simplified)` 
                           : "Not applicable for qualified Roth distributions"}
                       </div>
                     </div>

@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Area, Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, ReferenceLine, ComposedChart } from 'recharts';
 import { Calculator, DollarSign, HelpCircle, Info, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { formatCurrency, formatLargeNumber, formatPercentage } from '@/utils/calculatorUtils';
@@ -29,6 +30,8 @@ const RETIREMENT_DEFAULTS = {
   socialSecurityBenefit: 1500,
   includeInflation: true,
   includeSocialSecurity: true,
+  calculationMode: 'projection' as const,
+  targetMonthlyIncome: 5000,
 };
 
 interface ProjectionData {
@@ -53,6 +56,8 @@ const RetirementCalculator = () => {
   const [socialSecurityBenefit, setSocialSecurityBenefit] = useState(RETIREMENT_DEFAULTS.socialSecurityBenefit);
   const [includeInflation, setIncludeInflation] = useState(RETIREMENT_DEFAULTS.includeInflation);
   const [includeSocialSecurity, setIncludeSocialSecurity] = useState(RETIREMENT_DEFAULTS.includeSocialSecurity);
+  const [calculationMode, setCalculationMode] = useState<'projection' | 'targetIncome'>(RETIREMENT_DEFAULTS.calculationMode);
+  const [targetMonthlyIncome, setTargetMonthlyIncome] = useState(RETIREMENT_DEFAULTS.targetMonthlyIncome);
   
   const [activeTab, setActiveTab] = useState('projection');
   const [dataStored, setDataStored] = useState(false);
@@ -74,20 +79,122 @@ const RetirementCalculator = () => {
       setSocialSecurityBenefit(savedData.socialSecurityBenefit ?? RETIREMENT_DEFAULTS.socialSecurityBenefit);
       setIncludeInflation(savedData.includeInflation ?? RETIREMENT_DEFAULTS.includeInflation);
       setIncludeSocialSecurity(savedData.includeSocialSecurity ?? RETIREMENT_DEFAULTS.includeSocialSecurity);
+      setCalculationMode(savedData.calculationMode ?? RETIREMENT_DEFAULTS.calculationMode);
+      setTargetMonthlyIncome(savedData.targetMonthlyIncome ?? RETIREMENT_DEFAULTS.targetMonthlyIncome);
       setDataStored(true);
     }
   }, []);
 
   // Calculate retirement projections whenever inputs change
   useEffect(() => {
-    calculateRetirement();
+    if (calculationMode === 'projection') {
+      calculateRetirement();
+    } else {
+      calculateRequiredSavings();
+    }
   }, [
-    currentAge, retirementAge, lifeExpectancy, currentSavings, 
-    annualContribution, annualReturnRate, inflationRate, 
-    withdrawalRate, socialSecurityBenefit, includeInflation, includeSocialSecurity
+    currentAge, retirementAge, lifeExpectancy, currentSavings,
+    annualContribution, annualReturnRate, inflationRate,
+    withdrawalRate, socialSecurityBenefit, includeInflation, includeSocialSecurity,
+    calculationMode, targetMonthlyIncome
   ]);
 
-  // Calculate retirement projections
+  // Calculate required savings for target income using binary search
+  const calculateRequiredSavings = () => {
+    if (currentAge >= retirementAge || retirementAge >= lifeExpectancy) {
+      return;
+    }
+
+    const targetAnnualIncome = targetMonthlyIncome * 12;
+    const annualSocialSecurity = includeSocialSecurity ? socialSecurityBenefit * 12 : 0;
+    const requiredAnnualIncome = targetAnnualIncome - annualSocialSecurity;
+    
+    // Calculate required savings at retirement
+    const requiredSavings = (requiredAnnualIncome * 100) / withdrawalRate;
+    
+    // Binary search to find required annual contribution
+    let low = 0;
+    let high = requiredSavings; // Start with high estimate
+    let bestContribution = 0;
+    let bestProjection = null;
+    
+    for (let i = 0; i < 20; i++) { // Max 20 iterations for precision
+      const testContribution = (low + high) / 2;
+      const projection = projectRetirement(testContribution);
+      const finalSavings = projection[projection.length - 1].savingsWithInflation;
+      
+      if (Math.abs(finalSavings - requiredSavings) < 1000) { // Within $1000 tolerance
+        bestContribution = testContribution;
+        bestProjection = projection;
+        break;
+      }
+      
+      if (finalSavings < requiredSavings) {
+        low = testContribution;
+      } else {
+        high = testContribution;
+        bestContribution = testContribution;
+        bestProjection = projection;
+      }
+    }
+    
+    // Update state with results
+    setAnnualContribution(Math.round(bestContribution));
+    setProjectionData(bestProjection || []);
+    
+    if (bestProjection) {
+      const retirementSavings = bestProjection[retirementAge - currentAge].savingsWithInflation;
+      const annualRetirementIncome = retirementSavings * (withdrawalRate / 100);
+      const monthlyRetirementIncome = annualRetirementIncome / 12;
+      const totalSocialSecurityIncome = (socialSecurityBenefit * 12) * (lifeExpectancy - retirementAge);
+      
+      setResults({
+        yearsUntilRetirement: retirementAge - currentAge,
+        yearsInRetirement: lifeExpectancy - retirementAge,
+        retirementSavings,
+        annualRetirementIncome,
+        monthlyRetirementIncome,
+        totalSocialSecurityIncome,
+        incomeReplacementRate: (annualRetirementIncome + annualSocialSecurity) / bestContribution * 100
+      });
+    }
+  };
+
+  // Helper function to project retirement savings for a given contribution
+  const projectRetirement = (testContribution: number) => {
+    const yearsUntilRetirement = retirementAge - currentAge;
+    let projection: ProjectionData[] = [];
+    let savingsWithoutInflation = currentSavings;
+    let savingsWithInflation = currentSavings;
+    const currentYear = new Date().getFullYear();
+    const realReturnRate = includeInflation
+      ? (1 + annualReturnRate / 100) / (1 + inflationRate / 100) - 1
+      : annualReturnRate / 100;
+    
+    // Project savings growth until retirement
+    for (let year = 0; year <= yearsUntilRetirement; year++) {
+      projection.push({
+        age: currentAge + year,
+        year: currentYear + year,
+        savingsWithoutInflation,
+        savingsWithInflation,
+        annualContribution: year > 0 ? testContribution : 0,
+        annualReturn: year > 0 ? savingsWithoutInflation * (annualReturnRate / 100) : 0
+      });
+      
+      if (year < yearsUntilRetirement) {
+        const returnWithoutInflation = savingsWithoutInflation * (annualReturnRate / 100);
+        savingsWithoutInflation += testContribution + returnWithoutInflation;
+        
+        const returnWithInflation = savingsWithInflation * realReturnRate;
+        savingsWithInflation += testContribution + returnWithInflation;
+      }
+    }
+    
+    return projection;
+  };
+
+  // Calculate retirement projections (normal mode)
   const calculateRetirement = () => {
     if (currentAge >= retirementAge || retirementAge >= lifeExpectancy) {
       return;
@@ -205,6 +312,8 @@ const RetirementCalculator = () => {
       socialSecurityBenefit,
       includeInflation,
       includeSocialSecurity,
+      calculationMode,
+      targetMonthlyIncome,
       timestamp: Date.now()
     };
     
@@ -220,12 +329,37 @@ const RetirementCalculator = () => {
   // Custom tooltip for charts
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      const age = label;
+      const isRetirementPhase = age >= retirementAge;
+
       return (
-        <div className="bg-white p-4 border rounded shadow-sm">
-          <p className="font-semibold">Age: {label}</p>
-          <p className="text-sm text-blue-700">
-            Savings: {formatCurrency(includeInflation ? payload[0].value : payload[1].value)}
-          </p>
+        <div className="bg-white p-4 border rounded shadow-sm space-y-2 min-w-[200px]">
+          <p className="font-semibold border-b pb-2">Age: {label}</p>
+          <div className="space-y-1">
+            <p className="text-sm font-medium">
+              Total Balance: <span className="text-blue-700">{formatCurrency(data.savingsWithInflation)}</span>
+            </p>
+            {isRetirementPhase ? (
+              <>
+                <p className="text-sm text-red-600">
+                  Withdrawal: {formatCurrency(Math.abs(data.annualContribution))}
+                </p>
+                {includeSocialSecurity && (
+                  <p className="text-sm text-amber-600">
+                    Social Security: {formatCurrency(socialSecurityBenefit * 12)}
+                  </p>
+                )}
+              </>
+            ) : (
+              <p className="text-sm text-green-600">
+                Contribution: {formatCurrency(data.annualContribution)}
+              </p>
+            )}
+            <p className="text-sm text-emerald-600">
+              Investment Return: {formatCurrency(data.annualReturn)}
+            </p>
+          </div>
         </div>
       );
     }
@@ -257,6 +391,45 @@ const RetirementCalculator = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Input Section */}
           <div className="space-y-6">
+            {/* Calculation Mode Selection */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium">Choose Calculation Method</h3>
+              <RadioGroup
+                value={calculationMode}
+                onValueChange={(value) => setCalculationMode(value as 'projection' | 'targetIncome')}
+                className="flex flex-col space-y-2"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="projection" id="projection" />
+                  <Label htmlFor="projection">Project based on contributions</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="targetIncome" id="targetIncome" />
+                  <Label htmlFor="targetIncome">Calculate needed savings for target income</Label>
+                </div>
+              </RadioGroup>
+
+              {calculationMode === 'targetIncome' && (
+                <div className="space-y-2">
+                  <Label htmlFor="targetMonthlyIncome">Target Monthly Retirement Income</Label>
+                  <div className="flex items-center">
+                    <span className="mr-2 text-sm font-medium">$</span>
+                    <Input
+                      id="targetMonthlyIncome"
+                      type="number"
+                      value={targetMonthlyIncome}
+                      onChange={(e) => setTargetMonthlyIncome(Number(e.target.value))}
+                      min={0}
+                    />
+                    <span className="ml-2 text-sm text-muted-foreground">/month</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Enter your desired monthly income during retirement
+                  </p>
+                </div>
+              )}
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
@@ -506,7 +679,7 @@ const RetirementCalculator = () => {
                     <h3 className="text-lg font-medium mb-4">Retirement Savings Projection</h3>
                     <div className="h-72">
                       <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={projectionData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+                        <ComposedChart data={projectionData} margin={{ top: 5, right: 5, left: 10, bottom: 5 }}>
                           <CartesianGrid strokeDasharray="3 3" />
                           <XAxis 
                             dataKey="age" 
@@ -514,25 +687,84 @@ const RetirementCalculator = () => {
                           />
                           <YAxis 
                             tickFormatter={(value) => formatLargeNumber(value)}
-                            label={{ value: 'Savings', angle: -90, position: 'insideLeft' }} 
+                            label={{ value: 'Balance', angle: -90, position: 'outside', offset: 0 }} 
                           />
                           <Tooltip content={<CustomTooltip />} />
-                          <Legend />
-                          <Line 
-                            type="monotone" 
-                            dataKey="savingsWithInflation" 
-                            name="Inflation-Adjusted Savings" 
-                            stroke="#3b82f6" 
-                            activeDot={{ r: 8 }} 
+                          <Legend verticalAlign="top" height={36} />
+                          
+                          {/* Area for investment returns */}
+                          <Area
+                            type="monotone"
+                            dataKey="annualReturn"
+                            name="Investment Returns"
+                            stackId="1"
+                            fill="#22c55e"
+                            fillOpacity={0.4}
+                            stroke="#16a34a"
                           />
-                          <Line 
-                            type="monotone" 
-                            dataKey="savingsWithoutInflation" 
-                            name="Nominal Savings" 
-                            stroke="#60a5fa" 
-                            strokeDasharray="5 5" 
+                          
+                          {/* Area for contributions */}
+                          <Area
+                            type="monotone"
+                            dataKey="annualContribution"
+                            name="Contributions"
+                            stackId="1"
+                            fill="#3b82f6"
+                            fillOpacity={0.4}
+                            stroke="#2563eb"
                           />
-                        </LineChart>
+                          
+                          {/* Line for total savings */}
+                          <Line
+                            type="monotone"
+                            dataKey="savingsWithInflation"
+                            name="Inflation-Adjusted Balance"
+                            stroke="#1e3a8a"
+                            strokeWidth={2}
+                            dot={false}
+                          />
+                          
+                          {/* Social Security benefits */}
+                          {includeSocialSecurity && (
+                            <Area
+                              type="monotone"
+                              dataKey={(d) => d.age >= retirementAge ? socialSecurityBenefit * 12 : 0}
+                              name="Social Security"
+                              stackId="2"
+                              fill="#f59e0b"
+                              fillOpacity={0.4}
+                              stroke="#d97706"
+                            />
+                          )}
+                          
+                          {/* Retirement age marker */}
+                          <ReferenceLine 
+                            x={retirementAge} 
+                            stroke="#dc2626"
+                            strokeDasharray="3 3" 
+                            label={{ 
+                              value: 'Retirement', 
+                              position: 'top',
+                              fill: '#dc2626',
+                              fontSize: 12,
+                              fontWeight: 500
+                            }} 
+                          />
+                          
+                          {/* Add reference line for contribution end */}
+                          <ReferenceLine 
+                            x={retirementAge} 
+                            stroke="#1e3a8a"
+                            strokeDasharray="3 3" 
+                            label={{ 
+                              value: 'Contributions End', 
+                              position: 'bottom',
+                              fill: '#1e3a8a',
+                              fontSize: 12,
+                              fontWeight: 500
+                            }} 
+                          />
+                        </ComposedChart>
                       </ResponsiveContainer>
                     </div>
                     

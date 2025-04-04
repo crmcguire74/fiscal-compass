@@ -56,6 +56,12 @@ import ToolsCalculatorsIndex from "./pages/calculators/tools/ToolsCalculatorsInd
 import CurrencyConverterPage from "./pages/calculators/tools/CurrencyConverterPage";
 import MeasurementConverterPage from "./pages/calculators/tools/MeasurementConverterPage";
 import TimeCalculatorPage from "./pages/calculators/tools/TimeCalculatorPage";
+import AutoLoanPage from "./pages/calculators/auto/AutoLoanPage"; 
+import AutoLeasePage from "./pages/calculators/auto/AutoLeasePage"; 
+import GasMaintenancePage from "./pages/calculators/auto/GasMaintenancePage";
+import AutoCalculatorsIndex from "./pages/calculators/auto/AutoCalculatorsIndex";
+import RentVsBuyPage from "./pages/calculators/mortgage/RentVsBuyPage";
+import RealEstateCalculatorsIndex from "./pages/calculators/real-estate/RealEstateCalculatorsIndex";
 
 const queryClient = new QueryClient();
 
@@ -76,9 +82,9 @@ const App = () => {
       <TooltipProvider>
         <BrowserRouter>
           <AnalyticsWrapper>
-        <Toaster />
-        <Sonner />
-          <Routes>
+            <Toaster />
+            <Sonner />
+            <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
             
@@ -122,7 +128,11 @@ const App = () => {
             <Route path="/calculators/tax/tax-bracket-calculator" element={<TaxBracketCalculatorPage />} />
             
             {/* Real Estate Calculator Routes */}
+            <Route path="/calculators/real-estate" element={<RealEstateCalculatorsIndex />} />
             <Route path="/calculators/real-estate/home-equity-calculator" element={<HomeEquityCalculatorPage />} />
+
+            {/* Mortgage Calculator Routes */}
+            <Route path="/calculators/mortgage/rent-vs-buy" element={<RentVsBuyPage />} />
             
             {/* Debt Management Calculator Routes */}
             <Route path="/calculators/debt" element={<DebtCalculatorsIndex />} />
@@ -146,6 +156,12 @@ const App = () => {
             <Route path="/calculators/life-events/wedding-budget" element={<WeddingBudgetPage />} />
             <Route path="/calculators/life-events/baby-costs" element={<BabyCostPage />} />
             <Route path="/calculators/life-events/divorce-calculator" element={<DivorceCalculatorPage />} />
+
+            {/* Auto Calculator Routes */}
+            <Route path="/calculators/auto" element={<AutoCalculatorsIndex />} />
+            <Route path="/calculators/auto/auto-loan" element={<AutoLoanPage />} />
+            <Route path="/calculators/auto/auto-lease" element={<AutoLeasePage />} />
+            <Route path="/calculators/auto/gas-maintenance" element={<GasMaintenancePage />} />
             
             {/* Blog Routes */}
             <Route path="/blog" element={<BlogIndex />} />

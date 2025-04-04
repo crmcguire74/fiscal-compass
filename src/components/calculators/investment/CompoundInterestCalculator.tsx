@@ -67,6 +67,7 @@ const CompoundInterestCalculator = () => {
   const [principal, setPrincipal] = useState(COMPOUND_INTEREST_DEFAULTS.principal);
   const [monthlyContribution, setMonthlyContribution] = useState(COMPOUND_INTEREST_DEFAULTS.monthlyContribution);
   const [interestRate, setInterestRate] = useState(COMPOUND_INTEREST_DEFAULTS.interestRate);
+  const [interestRateVariance, setInterestRateVariance] = useState(0); // Added variance state
   const [years, setYears] = useState(COMPOUND_INTEREST_DEFAULTS.years);
   const [compoundingFrequency, setCompoundingFrequency] = useState(COMPOUND_INTEREST_DEFAULTS.compoundingFrequency);
   const [results, setResults] = useState<any>(null);
@@ -94,7 +95,7 @@ const CompoundInterestCalculator = () => {
   // Calculate results whenever inputs change
   useEffect(() => {
     calculateResults();
-  }, [principal, monthlyContribution, interestRate, years, compoundingFrequency]);
+  }, [principal, monthlyContribution, interestRate, interestRateVariance, years, compoundingFrequency]); // Added interestRateVariance dependency
 
   // Calculate and update results
   const calculateResults = () => {
@@ -103,7 +104,8 @@ const CompoundInterestCalculator = () => {
       monthlyContribution,
       interestRate,
       years,
-      selectedFrequency.timesPerYear
+      selectedFrequency.timesPerYear,
+      interestRateVariance // Pass variance to calculation function (will need to update function later)
     );
     
     setResults(calculationResults);
@@ -115,11 +117,11 @@ const CompoundInterestCalculator = () => {
       principal,
       monthlyContribution,
       interestRate,
+      interestRateVariance, // Save variance
       years,
       compoundingFrequency,
       timestamp: Date.now()
     };
-    
     saveCalculatorData(CALCULATOR_ID, dataToSave);
     setDataStored(true);
     
@@ -322,6 +324,43 @@ const CompoundInterestCalculator = () => {
                 <span>20%</span>
               </div>
             </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="interestRateVariance" className="calculator-label">Interest Rate Variance (+/- %)</Label>
+                <span className="text-sm font-medium">{interestRateVariance.toFixed(1)}%</span>
+              </div>
+              <Slider
+                id="interestRateVariance"
+                value={[interestRateVariance]}
+                min={0}
+                max={5} // Example max variance, adjust as needed
+                step={0.1}
+                onValueChange={(value) => setInterestRateVariance(value[0])}
+                className="py-4"
+              />
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>0%</span>
+                <span>1%</span>
+                <span>2%</span>
+                <span>3%</span>
+                <span>4%</span>
+                <span>5%</span>
+              </div>
+               <TooltipProvider>
+                  <UITooltip>
+                    <TooltipTrigger asChild>
+                       <div className="flex items-center text-xs text-muted-foreground cursor-help">
+                         <Info className="h-3 w-3 mr-1" />
+                         <span>How does variance work?</span>
+                       </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="w-80 text-xs">This range accounts for potential fluctuations in the interest rate. The calculation will consider rates from (Rate - Variance) to (Rate + Variance).</p>
+                    </TooltipContent>
+                  </UITooltip>
+                </TooltipProvider>
+            </div>
             
             <div className="space-y-2">
               <div className="flex items-center justify-between">
@@ -356,7 +395,15 @@ const CompoundInterestCalculator = () => {
                       <Info className="h-4 w-4 text-muted-foreground cursor-help" />
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p className="w-80 text-xs">How often interest is calculated and added to your balance. More frequent compounding leads to slightly higher returns.</p>
+                      <p className="w-80 text-xs">
+                        Determines how often interest is added to the principal.
+                        <br />- <strong>Daily:</strong> Common for high-yield savings accounts.
+                        <br />- <strong>Monthly:</strong> Typical for many savings and investment accounts.
+                        <br />- <strong>Quarterly:</strong> Sometimes used for specific investments.
+                        <br />- <strong>Semi-Annually:</strong> Often used for bonds.
+                        <br />- <strong>Annually:</strong> Less common for growth-focused accounts.
+                        <br />More frequent compounding generally results in slightly higher returns.
+                      </p>
                     </TooltipContent>
                   </UITooltip>
                 </TooltipProvider>
@@ -402,9 +449,16 @@ const CompoundInterestCalculator = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div className="space-y-1">
                         <p className="text-xs text-muted-foreground">Final Balance</p>
-                        <p className="text-2xl font-semibold text-finance-primary">
-                          {formatCurrency(results.finalBalance)}
-                        </p>
+                        {results.minFinalBalance && results.maxFinalBalance ? (
+                          <p className="text-xl font-semibold text-finance-primary">
+                            {formatCurrency(results.minFinalBalance)} - {formatCurrency(results.maxFinalBalance)}
+                           <span className="text-xs text-muted-foreground block">(Based on +/- {interestRateVariance.toFixed(1)}% variance)</span>
+                         </p>
+                       ) : (
+                         <p className="text-lg font-medium text-finance-primary"> {/* Changed font size class */}
+                           {formatCurrency(results.finalBalance)}
+                         </p>
+                        )}
                       </div>
                       <div className="space-y-1">
                         <p className="text-xs text-muted-foreground">Total Contributions</p>
@@ -414,9 +468,16 @@ const CompoundInterestCalculator = () => {
                       </div>
                       <div className="space-y-1">
                         <p className="text-xs text-muted-foreground">Interest Earned</p>
-                        <p className="text-lg font-medium text-finance-accent">
-                          {formatCurrency(results.totalInterestEarned)}
-                        </p>
+                        {results.minTotalInterestEarned && results.maxTotalInterestEarned ? (
+                           <p className="text-base font-medium text-finance-accent">
+                             {formatCurrency(results.minTotalInterestEarned)} - {formatCurrency(results.maxTotalInterestEarned)}
+                             <span className="text-xs text-muted-foreground block">(Based on +/- {interestRateVariance.toFixed(1)}% variance)</span>
+                           </p>
+                        ) : (
+                          <p className="text-lg font-medium text-finance-accent">
+                            {formatCurrency(results.totalInterestEarned)}
+                          </p>
+                        )}
                       </div>
                     </div>
                     <div className="mt-4 text-xs text-muted-foreground">
@@ -454,14 +515,16 @@ const CompoundInterestCalculator = () => {
                           <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
                           <XAxis 
                             dataKey="year" 
-                            label={{ value: 'Years', position: 'insideBottomRight', offset: -10 }} 
+                            label={{ value: 'Years', position: 'insideBottomRight', offset: -10, style: { fontSize: '0.8rem' } }} 
+                            tick={{ fontSize: '0.75rem' }} // Smaller tick labels too
                           />
                           <YAxis 
                             tickFormatter={formatLargeNumber} 
-                            label={{ value: 'Balance', angle: -90, position: 'insideLeft' }} 
+                            label={{ value: 'Balance', angle: -90, position: 'outsideLeft', offset: -5, style: { fontSize: '0.8rem' } }} // Adjusted position and offset
+                            tick={{ fontSize: '0.75rem' }} // Smaller tick labels too
                           />
                           <Tooltip content={<CustomTooltip />} />
-                          <Legend verticalAlign="top" height={36} />
+                          <Legend verticalAlign="top" height={36} wrapperStyle={{ fontSize: '0.8rem' }}/>
                           <Line 
                             type="monotone" 
                             dataKey="balance" 
@@ -502,16 +565,17 @@ const CompoundInterestCalculator = () => {
                               labelFormatter={() => ''} 
                             />
                             <Legend />
+                            {/* Reversed order: Principal first, then Contributions, then Interest */}
                             <Bar 
-                              dataKey="interest" 
-                              name="Interest Earned" 
+                              dataKey="principal" 
+                              name="Initial Investment" 
                               stackId="a" 
-                              fill={breakdownColors.interest} 
+                              fill={breakdownColors.principal}
                               className="animate-chart-bar"
-                              animationDuration={1000}
-                              animationBegin={600}
+                              animationDuration={600}
+                              animationBegin={0}
                             />
-                            <Bar 
+                             <Bar 
                               dataKey="contributions" 
                               name="Your Contributions" 
                               stackId="a" 
@@ -521,13 +585,13 @@ const CompoundInterestCalculator = () => {
                               animationBegin={300}
                             />
                             <Bar 
-                              dataKey="principal" 
-                              name="Initial Investment" 
+                              dataKey="interest" 
+                              name="Interest Earned" 
                               stackId="a" 
-                              fill={breakdownColors.principal}
+                              fill={breakdownColors.interest} 
                               className="animate-chart-bar"
-                              animationDuration={600}
-                              animationBegin={0}
+                              animationDuration={1000}
+                              animationBegin={600}
                             />
                           </BarChart>
                         </ResponsiveContainer>

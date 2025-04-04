@@ -6,6 +6,12 @@ export const CALCULATOR_CATEGORIES = [
     icon: 'home',
   },
   {
+    id: 'auto',
+    name: 'Auto & Vehicle',
+    description: 'Calculate auto loans, leases, and vehicle ownership costs',
+    icon: 'car',
+  },
+  {
     id: 'retirement',
     name: 'Retirement Planning',
     description: 'Tools for planning your retirement and estimating future needs',

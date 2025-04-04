@@ -340,9 +340,10 @@ export const calculateHomeEquity = (
   mortgageBalance: number,
   sellingPrice: number = 0,
   realtorCommission: number = 6,
-  closingCosts: number = 2,
+  closingCosts: number = 2, // Percentage
   repairs: number = 0,
-  otherFees: number = 0
+  additionalCosts: Array<{ name: string; amount: number }> = [], // Added additional costs array
+  escrowFunds: number = 0 // Added escrow funds
 ): {
   homeValue: number;
   mortgageBalance: number;
@@ -351,7 +352,9 @@ export const calculateHomeEquity = (
   realtorCommissionAmount: number;
   closingCostsAmount: number;
   repairsAmount: number;
-  otherFeesAmount: number;
+  additionalCostsBreakdown: Array<{ name: string; amount: number }>; // Return breakdown
+  totalAdditionalCosts: number; // Return total
+  escrowFunds: number; // Return escrow funds
   totalSellingCosts: number;
   netProceeds: number;
   profitOrLoss: number;
@@ -366,15 +369,18 @@ export const calculateHomeEquity = (
   const realtorCommissionAmount = actualSellingPrice * (realtorCommission / 100);
   const closingCostsAmount = actualSellingPrice * (closingCosts / 100);
   const repairsAmount = repairs;
-  const otherFeesAmount = otherFees;
+  // Calculate total additional costs
+  const totalAdditionalCosts = additionalCosts.reduce((sum, cost) => sum + cost.amount, 0);
   
-  const totalSellingCosts = realtorCommissionAmount + closingCostsAmount + repairsAmount + otherFeesAmount;
+  const totalSellingCosts = realtorCommissionAmount + closingCostsAmount + repairsAmount + totalAdditionalCosts;
   
-  // Calculate net proceeds from sale
-  const netProceeds = actualSellingPrice - mortgageBalance - totalSellingCosts;
+  // Calculate net proceeds from sale, adding back escrow funds
+  const netProceeds = actualSellingPrice - mortgageBalance - totalSellingCosts + escrowFunds;
   
-  // Calculate profit or loss compared to original value
-  const profitOrLoss = netProceeds - currentEquity;
+  // Calculate profit or loss compared to original equity
+  // Note: Escrow funds returned don't typically count as "profit" from the sale itself, 
+  // but they are part of the cash received. The profit/loss calculation remains based on equity change.
+  const profitOrLoss = (actualSellingPrice - totalSellingCosts) - (homeValue - mortgageBalance); 
   
   return {
     homeValue,
@@ -384,7 +390,9 @@ export const calculateHomeEquity = (
     realtorCommissionAmount,
     closingCostsAmount,
     repairsAmount,
-    otherFeesAmount,
+    additionalCostsBreakdown: additionalCosts, // Return the breakdown
+    totalAdditionalCosts, // Return the total
+    escrowFunds, // Return escrow funds
     totalSellingCosts,
     netProceeds,
     profitOrLoss

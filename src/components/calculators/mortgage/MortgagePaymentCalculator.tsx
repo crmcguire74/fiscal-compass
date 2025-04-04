@@ -10,11 +10,13 @@ import {
   CartesianGrid, 
   Tooltip, 
   Legend, 
-  ResponsiveContainer, 
-  BarChart, 
-  Bar
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  LabelList, // Added LabelList for Pie chart labels
 } from 'recharts';
-import { Home, Download, Save, Info } from 'lucide-react';
+import { Home, Download, Save, Info, Calendar as CalendarIcon, PlusCircle, XCircle } from 'lucide-react'; // Added CalendarIcon, PlusCircle, XCircle
+import { format } from 'date-fns'; // Added for date formatting
 import { 
   Card, 
   CardContent, 
@@ -40,16 +42,24 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { 
-  Tabs, 
-  TabsContent, 
-  TabsList, 
-  TabsTrigger 
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'; // Added Popover
+import { Calendar } from '@/components/ui/calendar'; // Added Calendar
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'; // Added RadioGroup
 import { formatCurrency, formatPercentage } from '@/utils/calculatorUtils';
 import { saveCalculatorData, getCalculatorData } from '@/services/storageService';
 import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils'; // Added cn utility
 
 const CALCULATOR_ID = 'mortgage-payment';
 
@@ -68,10 +78,29 @@ const MORTGAGE_DEFAULTS = {
   propertyTaxRate: 1.2,
   homeInsurance: 1200,
   pmi: 0.5,
-  includePmi: true,
+  includePmi: false, // Changed to false since down payment is 20%
   includePropertyTax: true,
-  includeHomeInsurance: true
+  includeHomeInsurance: true,
+  hoaFee: 0,
+  paymentFrequency: 'monthly',
+  startDate: null,
 };
+
+// Interface for custom costs and extra payments (will use later)
+interface CustomCost {
+  id: string;
+  name: string;
+  amount: number;
+}
+
+interface ExtraPayment {
+  id: string;
+  amount: number;
+  date?: Date; // For one-time
+  frequency?: 'monthly' | 'yearly' | 'one-time'; // For recurring/one-time
+  startPaymentNumber?: number; // Alternative for recurring
+  endPaymentNumber?: number; // Alternative for recurring
+}
 
 const MortgagePaymentCalculator = () => {
   const { toast } = useToast();
@@ -92,7 +121,13 @@ const MortgagePaymentCalculator = () => {
   const [includePmi, setIncludePmi] = useState(MORTGAGE_DEFAULTS.includePmi);
   const [includePropertyTax, setIncludePropertyTax] = useState(MORTGAGE_DEFAULTS.includePropertyTax);
   const [includeHomeInsurance, setIncludeHomeInsurance] = useState(MORTGAGE_DEFAULTS.includeHomeInsurance);
-  
+  const [hoaFee, setHoaFee] = useState(MORTGAGE_DEFAULTS.hoaFee); // Added HOA state
+  const [paymentFrequency, setPaymentFrequency] = useState<'monthly' | 'bi-weekly'>(MORTGAGE_DEFAULTS.paymentFrequency as 'monthly' | 'bi-weekly'); // Added frequency state
+  const [startDate, setStartDate] = useState<Date | undefined>(MORTGAGE_DEFAULTS.startDate ? new Date(MORTGAGE_DEFAULTS.startDate) : undefined); // Added start date state
+  // State for other costs and extra payments (will add UI later)
+  const [otherCosts, setOtherCosts] = useState<CustomCost[]>([]);
+  const [extraPayments, setExtraPayments] = useState<ExtraPayment[]>([]);
+
   const [activeTab, setActiveTab] = useState('payment');
   const [results, setResults] = useState<any>(null);
   const [dataStored, setDataStored] = useState(false);
@@ -117,6 +152,17 @@ const MortgagePaymentCalculator = () => {
       setIncludePmi(savedData.includePmi ?? MORTGAGE_DEFAULTS.includePmi);
       setIncludePropertyTax(savedData.includePropertyTax ?? MORTGAGE_DEFAULTS.includePropertyTax);
       setIncludeHomeInsurance(savedData.includeHomeInsurance ?? MORTGAGE_DEFAULTS.includeHomeInsurance);
+      setHoaFee(savedData.hoaFee || MORTGAGE_DEFAULTS.hoaFee); // Load HOA
+      setPaymentFrequency(savedData.paymentFrequency || MORTGAGE_DEFAULTS.paymentFrequency); // Load frequency
+      setStartDate(savedData.startDate ? new Date(savedData.startDate) : undefined); // Load start date
+      // Load other costs and extra payments if saved (will implement saving later)
+      setOtherCosts(savedData.otherCosts || []); // Load other costs
+      // Ensure amounts are numbers
+      setExtraPayments((savedData.extraPayments || []).map((p: any) => ({ 
+        ...p, 
+        date: p.date ? new Date(p.date) : undefined, // Rehydrate dates
+        amount: Number(p.amount || 0) 
+      }))); // Load extra payments
       setDataStored(true);
     }
   }, []);
@@ -147,122 +193,297 @@ const MortgagePaymentCalculator = () => {
     loanAmount, interestRate, loanTerm, 
     propertyTaxRate, homeInsurance, pmi, 
     includePmi, includePropertyTax, includeHomeInsurance, 
-    loanType, armInitialRate, armAdjustmentRate, armRateCap, armType
+    loanType, armInitialRate, armAdjustmentRate, armRateCap, armType,
+    hoaFee, paymentFrequency, startDate, otherCosts, extraPayments // Added otherCosts and extraPayments dependencies
   ]);
 
   const calculateMortgage = () => {
-    const monthlyRate = loanType === 'fixed' 
-      ? interestRate / 100 / 12
-      : armInitialRate / 100 / 12;
-    
-    const numberOfPayments = loanTerm * 12;
-    
-    let principalAndInterest = 0;
-    if (monthlyRate > 0) {
-      principalAndInterest = loanAmount * (monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)) / (Math.pow(1 + monthlyRate, numberOfPayments) - 1);
-    } else {
-      principalAndInterest = loanAmount / numberOfPayments;
+    // Basic validation
+    if (loanAmount <= 0 || loanTerm <= 0) {
+      setResults(null);
+      setAmortizationData([]);
+      return;
     }
-    
-    const monthlyPropertyTax = includePropertyTax ? (homePrice * (propertyTaxRate / 100)) / 12 : 0;
-    
-    const monthlyHomeInsurance = includeHomeInsurance ? homeInsurance / 12 : 0;
-    
-    const monthlyPmi = includePmi && downPaymentPercent < 20 ? (loanAmount * (pmi / 100)) / 12 : 0;
-    
-    const totalMonthlyPayment = principalAndInterest + monthlyPropertyTax + monthlyHomeInsurance + monthlyPmi;
-    
-    const loanToValueRatio = (loanAmount / homePrice) * 100;
-    
-    const amortizationSchedule = generateAmortizationSchedule(
-      loanAmount, 
-      monthlyRate, 
-      numberOfPayments, 
-      principalAndInterest, 
+
+    const annualRate = (loanType === 'fixed' ? interestRate : armInitialRate) / 100; // Convert to decimal
+    const periodsPerYear = paymentFrequency === 'monthly' ? 12 : 26;
+    const ratePerPeriod = annualRate / periodsPerYear;
+    const totalNumberOfPayments = loanTerm * periodsPerYear;
+
+    // Calculate base payment using standard mortgage amortization formula
+    let basePaymentPerPeriod = 0;
+    if (ratePerPeriod > 0) {
+      const numerator = loanAmount * ratePerPeriod * Math.pow(1 + ratePerPeriod, totalNumberOfPayments);
+      const denominator = Math.pow(1 + ratePerPeriod, totalNumberOfPayments) - 1;
+      basePaymentPerPeriod = numerator / denominator;
+    } else {
+      basePaymentPerPeriod = loanAmount / totalNumberOfPayments;
+    }
+
+    // Calculate periodic costs
+    const periodicPropertyTax = includePropertyTax ? (homePrice * (propertyTaxRate / 100)) / periodsPerYear : 0;
+    const periodicHomeInsurance = includeHomeInsurance ? homeInsurance / periodsPerYear : 0;
+    const periodicPmi = includePmi && downPaymentPercent < 20 ? (loanAmount * (pmi / 100)) / periodsPerYear : 0;
+    const periodicHoaFee = hoaFee / periodsPerYear;
+    const periodicOtherCostsTotal = otherCosts.reduce((sum, cost) => sum + (cost.amount / periodsPerYear), 0);
+
+    const totalPaymentPerPeriod = basePaymentPerPeriod + periodicPropertyTax + periodicHomeInsurance + periodicPmi + periodicHoaFee + periodicOtherCostsTotal;
+
+    const loanToValueRatio = homePrice > 0 ? (loanAmount / homePrice) * 100 : 0;
+
+    // --- Generate Amortization Schedule ---
+    const fullSchedule = generateAmortizationSchedule(
+      loanAmount,
+      annualRate, // Pass annual rate for PMI check and ARM logic
+      loanTerm, // Pass loan term in years
+      basePaymentPerPeriod, // P&I payment per period
+      pmi / 100, // PMI rate as decimal
+      homePrice, // Needed for LTV check
+      startDate,
+      paymentFrequency,
       loanType === 'arm' ? {
-        initialRate: armInitialRate / 100 / 12,
-        adjustmentRate: armAdjustmentRate / 100 / 12,
-        adjustmentPeriod: parseInt(armType.split('/')[0], 10) * 12,
-        adjustmentFrequency: parseInt(armType.split('/')[1], 10) * 12,
-        rateCap: armRateCap / 100 / 12
-      } : undefined
+        initialRate: armInitialRate / 100, // Annual ARM rates
+        adjustmentRate: armAdjustmentRate / 100, // Max adjustment per period (annual)
+        rateCap: armRateCap / 100, // Lifetime cap (annual)
+        initialFixedPeriods: parseInt(armType.split('/')[0], 10) * periodsPerYear,
+        adjustmentFrequencyPeriods: parseInt(armType.split('/')[1], 10) * periodsPerYear,
+      } : undefined,
+      extraPayments // Pass extra payments
     );
+
+    // --- Calculate Totals from the *full* schedule ---
+    const lastPayment = fullSchedule.length > 0 ? fullSchedule[fullSchedule.length - 1] : null;
+    const totalPrincipalPaid = loanAmount; // Should always equal loan amount if paid off
+    const totalInterestPaid = fullSchedule.reduce((sum, p) => sum + p.interestPayment, 0);
+    const totalPmiPaid = fullSchedule.reduce((sum, p) => sum + p.pmiPayment, 0);
     
+    // Recalculate totals including taxes/insurance/HOA/Other based on the *actual* number of payments made
+    const actualNumberOfPayments = fullSchedule.length;
+    const totalPropertyTaxPaid = periodicPropertyTax * actualNumberOfPayments;
+    const totalHomeInsurancePaid = periodicHomeInsurance * actualNumberOfPayments;
+    const totalHoaPaid = periodicHoaFee * actualNumberOfPayments;
+    const totalOtherCostsPaid = periodicOtherCostsTotal * actualNumberOfPayments; // Added total other costs
+
+    const totalPaid = totalPrincipalPaid + totalInterestPaid + totalPropertyTaxPaid + totalHomeInsurancePaid + totalPmiPaid + totalHoaPaid + totalOtherCostsPaid; // Add HOA & Other Costs
+
     setResults({
-      principalAndInterest,
-      monthlyPropertyTax,
-      monthlyHomeInsurance,
-      monthlyPmi,
-      totalMonthlyPayment,
-      loanToValueRatio,
-      totalInterestPaid: amortizationSchedule[amortizationSchedule.length - 1].totalInterestPaid,
-      totalCostOfLoan: loanAmount + amortizationSchedule[amortizationSchedule.length - 1].totalInterestPaid
+      principalAndInterest: basePaymentPerPeriod, // P&I per period
+      periodicPropertyTax,
+      periodicHomeInsurance,
+      periodicPmi: periodicPmi, // Base PMI per period (may stop early)
+      periodicHoaFee,
+      periodicOtherCosts: periodicOtherCostsTotal, // Added periodic other costs
+      totalPaymentPerPeriod, // Base total per period (P&I + Tax + Ins + PMI + HOA + Other)
+      loanToValueRatio, // Stays the same
+      totalInterestPaid, // Use calculated total
+      totalPrincipalPaid, // Use accurate total from schedule
+      totalPropertyTaxPaid, // Use accurate total
+      totalHomeInsurancePaid, // Use accurate total
+      totalPmiPaid, // Use accurate total from schedule
+      totalHoaPaid, // Use accurate total
+      totalOtherCostsPaid, // Added total other costs paid
+      totalPaid, // Use accurate grand total
+      payoffDate: lastPayment?.date, // Get from schedule
+      // Add total paid to date later
+      // Add total breakdown later
     });
-    
-    setAmortizationData(amortizationSchedule);
+
+    // Store the full schedule for download, but maybe only yearly for chart
+    // For now, store full schedule for chart too, might need optimization later
+    setAmortizationData(fullSchedule); 
   };
 
+  // --- Refactored Amortization Schedule Generator ---
   const generateAmortizationSchedule = (
-    principal: number,
-    initialMonthlyRate: number,
-    totalPayments: number,
-    initialMonthlyPayment: number,
+    initialLoanAmount: number,
+    initialAnnualRate: number, // Pass annual rate for easier ARM logic
+    loanTermYears: number,
+    basePaymentPerPeriod: number, // P&I only
+    annualPmiRate: number, // As decimal (e.g., 0.005 for 0.5%)
+    initialHomePrice: number, // For LTV calculation
+    startDate?: Date,
+    frequency: 'monthly' | 'bi-weekly' = 'monthly',
     armOptions?: {
-      initialRate: number;
-      adjustmentRate: number;
-      adjustmentPeriod: number;
-      adjustmentFrequency: number;
-      rateCap: number;
+      initialRate: number; // Annual
+      adjustmentRate: number; // Max annual adjustment rate change per period
+      rateCap: number; // Lifetime annual rate cap
+      initialFixedPeriods: number;
+      adjustmentFrequencyPeriods: number;
+    },
+    extraPayments: ExtraPayment[] = []
+  ): any[] => {
+    const periodsPerYear = frequency === 'monthly' ? 12 : 26;
+    const totalNumberOfPayments = loanTermYears * periodsPerYear;
+    
+    // Calculate base monthly payment using standard amortization formula
+    let currentAnnualRate = armOptions ? armOptions.initialRate : initialAnnualRate; // initialAnnualRate is already decimal
+    let currentRatePerPeriod = currentAnnualRate / periodsPerYear;
+    
+    let currentPiPayment;
+    if (currentRatePerPeriod > 0) {
+      currentPiPayment = initialLoanAmount * 
+        (currentRatePerPeriod * Math.pow(1 + currentRatePerPeriod, totalNumberOfPayments)) / 
+        (Math.pow(1 + currentRatePerPeriod, totalNumberOfPayments) - 1);
+    } else {
+      currentPiPayment = initialLoanAmount / totalNumberOfPayments;
     }
-  ) => {
-    let balance = principal;
-    let schedule = [];
-    let totalPrincipalPaid = 0;
-    let totalInterestPaid = 0;
-    let currentRate = initialMonthlyRate;
-    let currentPayment = initialMonthlyPayment;
 
-    for (let paymentNumber = 1; paymentNumber <= totalPayments; paymentNumber++) {
-      if (armOptions && paymentNumber > armOptions.adjustmentPeriod && 
-          (paymentNumber - armOptions.adjustmentPeriod) % armOptions.adjustmentFrequency === 0) {
-        
-        currentRate = Math.min(currentRate + armOptions.adjustmentRate, armOptions.rateCap);
-        
-        const remainingPayments = totalPayments - paymentNumber + 1;
-        if (currentRate > 0 && balance > 0) {
-          currentPayment = balance * (currentRate * Math.pow(1 + currentRate, remainingPayments)) / 
-                          (Math.pow(1 + currentRate, remainingPayments) - 1);
-        } else {
-          currentPayment = balance / remainingPayments;
+    let balance = initialLoanAmount;
+    const schedule = [];
+    let cumulativeInterestPaid = 0;
+    let cumulativePrincipalPaid = 0;
+    let cumulativePmiPaid = 0;
+    let cumulativeExtraPaid = 0;
+    let currentDate = startDate ? new Date(startDate.getTime()) : new Date();
+
+    // Sort extra payments for efficient lookup (handle different types later)
+    const oneTimeExtraPayments = extraPayments
+      .filter(p => p.frequency === 'one-time' && p.date)
+      .sort((a, b) => (a.date as Date).getTime() - (b.date as Date).getTime());
+    // TODO: Add logic for recurring extra payments
+
+    let oneTimePaymentIndex = 0;
+
+    for (let paymentNumber = 1; paymentNumber <= totalNumberOfPayments && balance > 0.005; paymentNumber++) {
+      // --- Date Calculation ---
+      let paymentDate = new Date(currentDate.getTime());
+      if (paymentNumber > 1) {
+        if (frequency === 'monthly') {
+          let currentMonth = paymentDate.getMonth();
+          paymentDate.setMonth(currentMonth + 1);
+          if (paymentDate.getMonth() !== (currentMonth + 1) % 12) {
+            paymentDate.setDate(0);
+          }
+        } else { // bi-weekly
+          paymentDate.setDate(paymentDate.getDate() + 14);
         }
       }
-      
-      const interestPayment = balance * currentRate;
-      
-      const principalPayment = currentPayment - interestPayment;
-      
-      totalPrincipalPaid += principalPayment;
-      totalInterestPaid += interestPayment;
-      balance -= principalPayment;
+      currentDate = paymentDate;
 
-      const isArmAdjustmentPoint = armOptions && 
-          (paymentNumber === armOptions.adjustmentPeriod || 
-           (paymentNumber > armOptions.adjustmentPeriod && 
-            (paymentNumber - armOptions.adjustmentPeriod) % armOptions.adjustmentFrequency === 0));
-            
-      if (paymentNumber % 12 === 0 || paymentNumber === 1 || paymentNumber === totalPayments || isArmAdjustmentPoint) {
-        schedule.push({
-          paymentNumber,
-          year: Math.ceil(paymentNumber / 12),
-          currentRate: currentRate * 12 * 100,
-          principalPayment,
-          interestPayment,
-          monthlyPayment: currentPayment,
-          totalPrincipalPaid,
-          totalInterestPaid,
-          remainingBalance: balance > 0 ? balance : 0
-        });
+      // --- ARM Adjustment Check ---
+      let rateAdjustedThisPeriod = false;
+      if (armOptions && paymentNumber > armOptions.initialFixedPeriods &&
+          (paymentNumber - armOptions.initialFixedPeriods - 1) % armOptions.adjustmentFrequencyPeriods === 0) {
+        
+        rateAdjustedThisPeriod = true;
+        // Calculate potential new rate based on previous *annual* rate
+        // Note: Real ARM adjustments often depend on an index + margin, this is simplified
+        const potentialNewAnnualRate = currentAnnualRate + armOptions.adjustmentRate; // Simplistic adjustment
+        const cappedRate = Math.min(potentialNewAnnualRate, armOptions.rateCap); // Apply lifetime cap
+        // Also consider periodic caps if needed (e.g., max 2% change per adjustment) - not implemented here
+        currentAnnualRate = Math.max(cappedRate, 0); // Ensure rate doesn't go below 0
+        currentRatePerPeriod = currentAnnualRate / periodsPerYear;
+
+        // Recalculate P&I payment
+        const remainingPayments = totalNumberOfPayments - paymentNumber + 1;
+        if (currentRatePerPeriod > 0 && balance > 0) {
+          currentPiPayment = balance * (currentRatePerPeriod * Math.pow(1 + currentRatePerPeriod, remainingPayments)) /
+                             (Math.pow(1 + currentRatePerPeriod, remainingPayments) - 1);
+        } else if (remainingPayments > 0) {
+          currentPiPayment = balance / remainingPayments;
+        } else {
+          currentPiPayment = balance; // Pay off remaining balance
+        }
       }
+
+      // --- Interest and Principal Calculations ---
+      const interestPayment = balance * currentRatePerPeriod;
+      let basePaymentForPeriod = currentPiPayment;
+
+      // --- PMI Calculation ---
+      let pmiPayment = 0;
+      const currentLTV = initialHomePrice > 0 ? (balance / initialHomePrice) * 100 : 100;
+      if (includePmi && currentLTV > 80) {
+        pmiPayment = (initialLoanAmount * annualPmiRate) / periodsPerYear;
+      }
+
+      // Validate and adjust payments if needed
+      if (balance < (currentPiPayment - interestPayment)) {
+        const finalInterestPayment = balance * currentRatePerPeriod;
+        basePaymentForPeriod = finalInterestPayment + balance;
+        currentPiPayment = basePaymentForPeriod;
+      }
+
+      // Calculate base principal payment
+      let totalPrincipalPayment = basePaymentForPeriod - interestPayment;
+
+      // --- Apply Extra Payments ---
+      let extraPrincipalPaid = 0;
+      
+      // Apply One-Time Payments scheduled for on or before this payment date
+      while (
+        oneTimePaymentIndex < oneTimeExtraPayments.length &&
+        oneTimeExtraPayments[oneTimePaymentIndex].date && // Ensure date exists
+        (oneTimeExtraPayments[oneTimePaymentIndex].date as Date).getTime() <= paymentDate.getTime()
+      ) {
+        // Only apply if the amount is positive
+        if (oneTimeExtraPayments[oneTimePaymentIndex].amount > 0) {
+           extraPrincipalPaid += oneTimeExtraPayments[oneTimePaymentIndex].amount;
+        }
+        oneTimePaymentIndex++; // Move to the next potential one-time payment
+      }
+
+      // TODO: Implement recurring extra payment logic (monthly, yearly)
+      // Example placeholder for monthly:
+      // const monthlyExtra = extraPayments.find(p => p.frequency === 'monthly');
+      // if (monthlyExtra && paymentNumber >= (monthlyExtra.startPaymentNumber || 1) && paymentNumber <= (monthlyExtra.endPaymentNumber || totalNumberOfPayments)) {
+      //    extraPrincipalPaid += monthlyExtra.amount;
+      // }
+      // Example placeholder for yearly:
+      // const yearlyExtra = extraPayments.find(p => p.frequency === 'yearly');
+      // if (yearlyExtra && paymentDate.getMonth() === (yearlyExtra.date?.getMonth() ?? 0) && paymentNumber >= (yearlyExtra.startPaymentNumber || 1) && paymentNumber <= (yearlyExtra.endPaymentNumber || totalNumberOfPayments)) {
+      //    // Check if it's the correct month for the yearly payment
+      //    extraPrincipalPaid += yearlyExtra.amount;
+      // }
+
+      // Add the extra payment to total principal payment
+      totalPrincipalPayment += extraPrincipalPaid;
+
+      // --- Final Payment Adjustment ---
+      if (totalPrincipalPayment >= balance - 0.005) {
+        extraPrincipalPaid += (totalPrincipalPayment - balance); // Adjust extra paid if it caused overshoot
+        totalPrincipalPayment = balance; // Principal is exactly the remaining balance
+        basePaymentForPeriod = totalPrincipalPayment + interestPayment; // Adjust base payment
+        currentPiPayment = basePaymentForPeriod; // Update current P&I
+        // Final payment might not have PMI if LTV drops below threshold
+        if (((balance - totalPrincipalPayment) / initialHomePrice) * 100 <= 80) {
+            pmiPayment = 0;
+        }
+      }
+
+      // --- Update Cumulative Totals ---
+      cumulativeInterestPaid += interestPayment;
+      cumulativePrincipalPaid += totalPrincipalPayment; // Includes extra payments
+      cumulativePmiPaid += pmiPayment;
+      cumulativeExtraPaid += extraPrincipalPaid;
+
+      const startingBalance = balance;
+      balance -= totalPrincipalPayment; // Reduce balance by total principal paid (base + extra)
+      if (balance < 0) balance = 0;
+
+      // --- Store Schedule Entry ---
+      schedule.push({
+        paymentNumber,
+        date: paymentDate,
+        year: paymentDate.getFullYear(),
+        month: paymentDate.getMonth() + 1,
+        startingBalance: startingBalance,
+        principalPayment: totalPrincipalPayment - extraPrincipalPaid, // Base principal
+        interestPayment,
+        pmiPayment,
+        extraPrincipalPaid,
+        totalPayment: currentPiPayment + pmiPayment + extraPrincipalPaid, // P&I + PMI + Extra
+        cumulativeInterestPaid,
+        cumulativePrincipalPaid, // Includes extra
+        cumulativePmiPaid,
+        cumulativeExtraPaid,
+        remainingBalance: balance,
+        currentAnnualRate: currentAnnualRate * 100,
+        ltv: currentLTV,
+        rateAdjusted: rateAdjustedThisPeriod, // Flag if rate changed this period
+      });
+
+      if (balance <= 0.005) break; // Exit loop if balance is paid off
     }
 
     return schedule;
@@ -286,9 +507,13 @@ const MortgagePaymentCalculator = () => {
       includePmi,
       includePropertyTax,
       includeHomeInsurance,
+      hoaFee, // Save HOA
+      paymentFrequency, // Save frequency
+      startDate: startDate?.toISOString(), // Save start date as ISO string
+      otherCosts, // Save other costs
+      extraPayments: extraPayments.map(p => ({...p, date: p.date?.toISOString()})), // Save extra payments (serialize dates)
       timestamp: Date.now()
     };
-    
     saveCalculatorData(CALCULATOR_ID, dataToSave);
     setDataStored(true);
     
@@ -302,21 +527,30 @@ const MortgagePaymentCalculator = () => {
     if (!amortizationData.length) return;
     
     let csvHeader = "Payment Number,Year,";
-    if (loanType === 'arm') {
-      csvHeader += "Interest Rate,";
-    }
-    csvHeader += "Principal Payment,Interest Payment,Monthly Payment,Total Principal Paid,Total Interest Paid,Remaining Balance\n";
-    
-    let csvContent = csvHeader;
-    amortizationData.forEach((paymentData) => {
-      let row = `${paymentData.paymentNumber},${paymentData.year},`;
-      if (loanType === 'arm') {
-        row += `${paymentData.currentRate.toFixed(3)}%,`;
-      }
-      row += `${paymentData.principalPayment.toFixed(2)},${paymentData.interestPayment.toFixed(2)},${paymentData.monthlyPayment.toFixed(2)},${paymentData.totalPrincipalPaid.toFixed(2)},${paymentData.totalInterestPaid.toFixed(2)},${paymentData.remainingBalance.toFixed(2)}\n`;
-      csvContent += row;
+    // --- Update CSV Download ---
+    let csvContent = "Payment #,Date,Year,Month,Start Balance,Principal,Interest,PMI,Extra Principal,Total Payment,End Balance,Cumulative Interest,Cumulative Principal,Cumulative PMI,Cumulative Extra,Annual Rate (%),LTV (%)\n";
+    amortizationData.forEach((p) => {
+      const row = [
+        p.paymentNumber,
+        format(p.date, 'yyyy-MM-dd'),
+        p.year,
+        p.month,
+        p.startingBalance.toFixed(2),
+        p.principalPayment.toFixed(2), // Base principal
+        p.interestPayment.toFixed(2),
+        p.pmiPayment.toFixed(2),
+        p.extraPrincipalPaid.toFixed(2),
+        p.totalPayment.toFixed(2),
+        p.remainingBalance.toFixed(2),
+        p.cumulativeInterestPaid.toFixed(2),
+        p.cumulativePrincipalPaid.toFixed(2), // Includes extra
+        p.cumulativePmiPaid.toFixed(2),
+        p.cumulativeExtraPaid.toFixed(2),
+        p.currentAnnualRate.toFixed(3),
+        p.ltv.toFixed(2)
+      ].join(',');
+      csvContent += row + '\n';
     });
-    
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -329,56 +563,147 @@ const MortgagePaymentCalculator = () => {
 
   const getPieChartData = () => {
     if (!results) return [];
-    
+
     const data = [
       {
         name: 'Principal & Interest',
-        value: results.principalAndInterest,
-        color: '#1e40af'
-      }
+        value: results.principalAndInterest, // This is P&I per period
+        color: '#1e40af', // Dark Blue
+      },
     ];
-    
-    if (results.monthlyPropertyTax > 0) {
+
+    if (results.periodicPropertyTax > 0) {
       data.push({
         name: 'Property Tax',
-        value: results.monthlyPropertyTax,
-        color: '#3b82f6'
+        value: results.periodicPropertyTax,
+        color: '#3b82f6', // Medium Blue
       });
     }
-    
-    if (results.monthlyHomeInsurance > 0) {
+
+    if (results.periodicHomeInsurance > 0) {
       data.push({
         name: 'Home Insurance',
-        value: results.monthlyHomeInsurance,
-        color: '#60a5fa'
+        value: results.periodicHomeInsurance,
+        color: '#60a5fa', // Light Blue
       });
     }
-    
-    if (results.monthlyPmi > 0) {
+
+    if (results.periodicPmi > 0) {
       data.push({
         name: 'PMI',
-        value: results.monthlyPmi,
-        color: '#93c5fd'
+        value: results.periodicPmi,
+        color: '#93c5fd', // Very Light Blue
       });
     }
     
+    if (results.periodicHoaFee > 0) { // Added HOA
+      data.push({
+        name: 'HOA Fee',
+        value: results.periodicHoaFee,
+        color: '#bfdbfe', // Palest Blue
+      });
+    }
+    // Add Other Costs to Pie Chart
+    otherCosts.forEach((cost, index) => {
+       if (cost.amount > 0) {
+         data.push({
+           name: cost.name || `Other Cost ${index + 1}`,
+           value: cost.amount / (paymentFrequency === 'monthly' ? 12 : 26),
+           color: `hsl(210, 40%, ${70 + index * 5}%)` // Varying shades of blue/grey
+         });
+       }
+    });
+
     return data;
   };
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  // Tooltip for Pie Chart
+  const CustomPieTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
+      const data = payload[0].payload;
       return (
-        <div className="bg-white p-4 border rounded shadow-sm">
-          <p className="font-semibold">Year {label}</p>
-          <p className="text-sm text-blue-700">
-            Remaining Balance: {formatCurrency(payload[0].value)}
-          </p>
+        <div className="bg-white p-2 border rounded shadow-sm text-sm">
+          <span style={{ color: data.color, fontWeight: 'bold' }}>{data.name}</span>: {formatCurrency(data.value)}
         </div>
       );
     }
     return null;
   };
 
+  // Tooltip for Amortization Line Chart
+  const CustomAmortizationTooltip = ({ active, payload, label }: any) => {
+    // Find the specific data point corresponding to the hovered label (paymentNumber)
+    // Note: The 'label' provided by Recharts might be the x-axis value (date or year). 
+    // We need to find the corresponding full data point from our schedule.
+    // This lookup might need refinement depending on how Recharts passes the label for time-based axes.
+    // Assuming payload[0].payload contains the data for the hovered point for now.
+    if (active && payload && payload.length && payload[0].payload) {
+       const dataPoint = payload[0].payload;
+       const displayLabel = startDate ? format(dataPoint.date, 'MMM yyyy') : `Payment ${dataPoint.paymentNumber}`;
+
+       return (
+         <div className="bg-white p-3 border rounded shadow-sm text-xs">
+           <p className="font-semibold mb-1">{displayLabel}</p>
+           <p style={{ color: '#1e40af' }}> {/* Blue */}
+             Balance: {formatCurrency(dataPoint.remainingBalance)}
+           </p>
+           <p style={{ color: '#22c55e' }}> {/* Green */}
+             Principal Paid (Cumulative): {formatCurrency(dataPoint.cumulativePrincipalPaid)}
+           </p>
+           <p style={{ color: '#ef4444' }}> {/* Red */}
+             Interest Paid (Cumulative): {formatCurrency(dataPoint.cumulativeInterestPaid)}
+           </p>
+           {dataPoint.extraPrincipalPaid > 0 && (
+              <p className="text-gray-600">
+                Extra Payment This Period: {formatCurrency(dataPoint.extraPrincipalPaid)}
+              </p>
+           )}
+            {dataPoint.rateAdjusted && (
+              <p className="text-amber-600">
+                Rate Adjusted: {dataPoint.currentAnnualRate.toFixed(3)}%
+              </p>
+           )}
+         </div>
+       );
+    }
+    return null;
+  };
+
+  // --- State Management for Other Costs ---
+  const addOtherCost = () => {
+    setOtherCosts([...otherCosts, { id: crypto.randomUUID(), name: '', amount: 0 }]);
+  };
+
+  const removeOtherCost = (id: string) => {
+    setOtherCosts(otherCosts.filter(cost => cost.id !== id));
+  };
+
+  const updateOtherCost = (id: string, field: 'name' | 'amount', value: string | number) => {
+    setOtherCosts(otherCosts.map(cost => 
+      cost.id === id ? { ...cost, [field]: field === 'amount' ? Number(value) : value } : cost
+    ));
+  };
+
+  // --- State Management for Extra Payments ---
+   const addExtraPayment = () => {
+     setExtraPayments([...extraPayments, { 
+       id: crypto.randomUUID(), 
+       amount: 0, 
+       frequency: 'one-time', // Default to one-time
+       date: new Date() // Default to today
+     }]);
+   };
+
+   const removeExtraPayment = (id: string) => {
+     setExtraPayments(extraPayments.filter(p => p.id !== id));
+   };
+
+   const updateExtraPayment = (id: string, field: keyof ExtraPayment, value: any) => {
+     setExtraPayments(extraPayments.map(p => 
+       p.id === id ? { ...p, [field]: value } : p
+     ));
+   };
+  
   const getArmDescription = () => {
     const initialPeriod = parseInt(armType.split('/')[0], 10);
     const adjustmentFrequency = parseInt(armType.split('/')[1], 10);
@@ -635,6 +960,65 @@ const MortgagePaymentCalculator = () => {
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Payment Frequency */}
+            <div className="space-y-2">
+              <Label className="calculator-label">Payment Frequency</Label>
+              <RadioGroup 
+                defaultValue={paymentFrequency} 
+                onValueChange={(value: 'monthly' | 'bi-weekly') => setPaymentFrequency(value)}
+                className="flex space-x-4"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="monthly" id="monthly" />
+                  <Label htmlFor="monthly">Monthly</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="bi-weekly" id="bi-weekly" />
+                  <Label htmlFor="bi-weekly">Bi-Weekly</Label>
+                </div>
+              </RadioGroup>
+              <p className="text-xs text-muted-foreground">Bi-weekly payments can help pay off your mortgage faster.</p>
+            </div>
+
+            {/* Start Date */}
+            <div className="space-y-2">
+               <div className="flex items-center justify-between">
+                 <Label htmlFor="startDate" className="calculator-label">Optional: First Payment Date</Label>
+                 <TooltipProvider>
+                   <UITooltip>
+                     <TooltipTrigger asChild>
+                       <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                     </TooltipTrigger>
+                     <TooltipContent>
+                       <p className="w-80 text-xs">Select the date of your first mortgage payment to see a projected payoff date.</p>
+                     </TooltipContent>
+                   </UITooltip>
+                 </TooltipProvider>
+               </div>
+               <Popover>
+                 <PopoverTrigger asChild>
+                   <Button
+                     variant={"outline"}
+                     className={cn(
+                       "w-full justify-start text-left font-normal",
+                       !startDate && "text-muted-foreground"
+                     )}
+                   >
+                     <CalendarIcon className="mr-2 h-4 w-4" />
+                     {startDate ? format(startDate, "PPP") : <span>Pick a date</span>}
+                   </Button>
+                 </PopoverTrigger>
+                 <PopoverContent className="w-auto p-0">
+                   <Calendar
+                     mode="single"
+                     selected={startDate}
+                     onSelect={setStartDate}
+                     initialFocus
+                   />
+                 </PopoverContent>
+               </Popover>
+             </div>
             
             <div className="space-y-4 border-t pt-4">
               <h3 className="text-sm font-medium">Additional Costs</h3>
@@ -688,7 +1072,71 @@ const MortgagePaymentCalculator = () => {
                   </div>
                 )}
               </div>
+
+              {/* HOA Fee */}
+               <div className="flex items-center justify-between">
+                 <Label htmlFor="hoaFee" className="calculator-label flex items-center">
+                   HOA Fee (Optional)
+                    <TooltipProvider>
+                      <UITooltip>
+                        <TooltipTrigger asChild>
+                          <Info className="h-3 w-3 text-muted-foreground cursor-help ml-1" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="w-80 text-xs">Homeowners Association fees, if applicable. Enter the monthly amount.</p>
+                        </TooltipContent>
+                      </UITooltip>
+                    </TooltipProvider>
+                 </Label>
+                 <div className="flex items-center">
+                   <span className="mr-1 text-sm">$</span>
+                   <Input
+                     id="hoaFee"
+                     type="number"
+                     value={hoaFee}
+                     onChange={(e) => setHoaFee(Number(e.target.value))}
+                     className="w-24 h-8 text-sm"
+                     min={0}
+                   />
+                   <span className="ml-1 text-sm">/month</span>
+                 </div>
+               </div>
               
+              {/* Other Costs Section */}
+              <div className="space-y-3 border-t pt-4">
+                 <div className="flex justify-between items-center">
+                   <h3 className="text-sm font-medium">Other Monthly Costs (Optional)</h3>
+                   <Button variant="outline" size="sm" onClick={addOtherCost}>
+                     <PlusCircle className="h-4 w-4 mr-1" /> Add Cost
+                   </Button>
+                 </div>
+                 {otherCosts.map((cost, index) => (
+                   <div key={cost.id} className="flex items-center space-x-2">
+                     <Input
+                       type="text"
+                       placeholder={`Cost ${index + 1} Name`}
+                       value={cost.name}
+                       onChange={(e) => updateOtherCost(cost.id, 'name', e.target.value)}
+                       className="h-8 text-sm flex-grow"
+                     />
+                     <div className="flex items-center">
+                       <span className="mr-1 text-sm">$</span>
+                       <Input
+                         type="number"
+                         value={cost.amount}
+                         onChange={(e) => updateOtherCost(cost.id, 'amount', e.target.value)}
+                         className="w-24 h-8 text-sm"
+                         min={0}
+                       />
+                        <span className="ml-1 text-sm">/year</span> 
+                     </div>
+                     <Button variant="ghost" size="sm" onClick={() => removeOtherCost(cost.id)} className="text-red-500 hover:text-red-700">
+                       <XCircle className="h-4 w-4" />
+                     </Button>
+                   </div>
+                 ))}
+               </div>
+
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <Switch 
@@ -717,7 +1165,75 @@ const MortgagePaymentCalculator = () => {
                   </div>
                 )}
               </div>
-            </div>
+             </div>
+
+             {/* Extra Payments Section */}
+             <div className="space-y-3 border-t pt-4">
+               <div className="flex justify-between items-center">
+                 <h3 className="text-sm font-medium">Extra Payments (Optional)</h3>
+                 <Button variant="outline" size="sm" onClick={addExtraPayment}>
+                   <PlusCircle className="h-4 w-4 mr-1" /> Add Payment
+                 </Button>
+               </div>
+               {extraPayments.map((payment, index) => (
+                 <div key={payment.id} className="flex flex-wrap items-center gap-2 border p-2 rounded bg-gray-50">
+                   <div className="flex items-center flex-grow min-w-[150px]">
+                     <span className="mr-1 text-sm">$</span>
+                     <Input
+                       type="number"
+                       value={payment.amount}
+                       onChange={(e) => updateExtraPayment(payment.id, 'amount', Number(e.target.value))}
+                       className="w-24 h-8 text-sm"
+                       min={0}
+                     />
+                   </div>
+                   <Select 
+                      value={payment.frequency} 
+                      onValueChange={(value) => updateExtraPayment(payment.id, 'frequency', value)}
+                    >
+                     <SelectTrigger className="h-8 text-sm w-[120px]">
+                       <SelectValue placeholder="Frequency" />
+                     </SelectTrigger>
+                     <SelectContent>
+                       <SelectItem value="one-time">One-Time</SelectItem>
+                       {/* <SelectItem value="monthly">Monthly</SelectItem> */}
+                       {/* <SelectItem value="yearly">Yearly</SelectItem> */}
+                       {/* TODO: Add recurring options later */}
+                     </SelectContent>
+                   </Select>
+                   {payment.frequency === 'one-time' && (
+                     <Popover>
+                       <PopoverTrigger asChild>
+                         <Button
+                           variant={"outline"}
+                           size="sm"
+                           className={cn(
+                             "h-8 w-[150px] justify-start text-left font-normal text-sm",
+                             !payment.date && "text-muted-foreground"
+                           )}
+                         >
+                           <CalendarIcon className="mr-2 h-4 w-4" />
+                           {payment.date ? format(payment.date, "PPP") : <span>Payment Date</span>}
+                         </Button>
+                       </PopoverTrigger>
+                       <PopoverContent className="w-auto p-0">
+                         <Calendar
+                           mode="single"
+                           selected={payment.date}
+                           onSelect={(date) => updateExtraPayment(payment.id, 'date', date)}
+                           initialFocus
+                         />
+                       </PopoverContent>
+                     </Popover>
+                   )}
+                   {/* TODO: Add inputs for recurring start/end */}
+                   <Button variant="ghost" size="sm" onClick={() => removeExtraPayment(payment.id)} className="text-red-500 hover:text-red-700 ml-auto">
+                     <XCircle className="h-4 w-4" />
+                   </Button>
+                 </div>
+               ))}
+               <p className="text-xs text-muted-foreground">Making extra payments towards the principal can significantly shorten your loan term and reduce total interest paid.</p>
+             </div>
             
             <div className="pt-2 pb-4">
               <Button 
@@ -745,37 +1261,53 @@ const MortgagePaymentCalculator = () => {
                   )}
                   <div className="grid grid-cols-1 gap-2">
                     <div className="text-center p-4 bg-finance-primary/5 rounded-lg border">
-                      <p className="text-sm text-muted-foreground">Total Monthly Payment</p>
-                      <p className="text-3xl font-bold text-finance-primary mt-1">{formatCurrency(results.totalMonthlyPayment)}</p>
+                      {/* Changed Label based on frequency */}
+                      <p className="text-sm text-muted-foreground">Total Payment Per Period ({paymentFrequency === 'monthly' ? 'Monthly' : 'Bi-Weekly'})</p>
+                      {/* Used correct results key */}
+                      <p className="text-3xl font-bold text-finance-primary mt-1">{formatCurrency(results.totalPaymentPerPeriod)}</p> 
                       {loanType === 'arm' && (
-                        <p className="text-xs text-amber-600 mt-1">Initial payment amount; will adjust over time</p>
+                        <p className="text-xs text-amber-600 mt-1">Initial payment amount; may adjust over time</p>
                       )}
                     </div>
                     
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-2">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-2"> {/* Adjusted grid cols */}
                       <div className="p-2 bg-gray-50 rounded border">
                         <p className="text-xs text-muted-foreground">Principal & Interest</p>
-                        <p className="text-lg font-semibold">{formatCurrency(results.principalAndInterest)}</p>
+                        <p className="text-base font-semibold">{formatCurrency(results.principalAndInterest)}</p> {/* Adjusted font size */}
                       </div>
                       
-                      {results.monthlyPropertyTax > 0 && (
+                      {results.periodicPropertyTax > 0 && (
                         <div className="p-2 bg-gray-50 rounded border">
                           <p className="text-xs text-muted-foreground">Property Tax</p>
-                          <p className="text-lg font-semibold">{formatCurrency(results.monthlyPropertyTax)}</p>
+                          <p className="text-base font-semibold">{formatCurrency(results.periodicPropertyTax)}</p> {/* Adjusted font size */}
                         </div>
                       )}
                       
-                      {results.monthlyHomeInsurance > 0 && (
+                      {results.periodicHomeInsurance > 0 && (
                         <div className="p-2 bg-gray-50 rounded border">
                           <p className="text-xs text-muted-foreground">Home Insurance</p>
-                          <p className="text-lg font-semibold">{formatCurrency(results.monthlyHomeInsurance)}</p>
+                          <p className="text-base font-semibold">{formatCurrency(results.periodicHomeInsurance)}</p> {/* Adjusted font size */}
                         </div>
                       )}
                       
-                      {results.monthlyPmi > 0 && (
+                      {results.periodicPmi > 0 && (
                         <div className="p-2 bg-gray-50 rounded border">
                           <p className="text-xs text-muted-foreground">PMI</p>
-                          <p className="text-lg font-semibold">{formatCurrency(results.monthlyPmi)}</p>
+                          <p className="text-base font-semibold">{formatCurrency(results.periodicPmi)}</p> {/* Adjusted font size */}
+                        </div>
+                      )}
+
+                      {results.periodicHoaFee > 0 && (
+                        <div className="p-2 bg-gray-50 rounded border">
+                          <p className="text-xs text-muted-foreground">HOA Fee</p>
+                          <p className="text-base font-semibold">{formatCurrency(results.periodicHoaFee)}</p>
+                        </div>
+                      )}
+                      
+                      {results.periodicOtherCosts > 0 && ( // Added Other Costs display
+                        <div className="p-2 bg-gray-50 rounded border col-span-1 sm:col-span-1"> {/* Adjust span if needed */}
+                          <p className="text-xs text-muted-foreground">Other Costs</p>
+                          <p className="text-base font-semibold">{formatCurrency(results.periodicOtherCosts)}</p>
                         </div>
                       )}
                     </div>
@@ -784,27 +1316,155 @@ const MortgagePaymentCalculator = () => {
                 
                 <div className="pt-4">
                   <ResponsiveContainer width="100%" height={300}>
-                    <PieChart>
-                      <Pie data={getPieChartData()} dataKey="value" nameKey="name" fill="#1e40af">
-                        {getPieChartData().map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip content={<CustomTooltip />} />
+                    <PieChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                       <Pie 
+                         data={getPieChartData()} 
+                         dataKey="value" 
+                         nameKey="name" 
+                         cx="50%" 
+                         cy="50%" 
+                         outerRadius={80} 
+                         fill="#8884d8"
+                         labelLine={false} // Disable default label lines
+                       >
+                         {getPieChartData().map((entry, index) => (
+                           <Cell key={`cell-${index}`} fill={entry.color} />
+                         ))}
+                         {/* Add custom labels */}
+                         <LabelList 
+                           dataKey="name" 
+                           position="outside" 
+                           offset={15} 
+                           stroke="black" 
+                           fill="black"
+                           fontSize={12}
+                           formatter={(value: string) => value} // Display the name
+                         />
+                       </Pie>
+                       <Tooltip content={<CustomPieTooltip />} />
+                       <Legend 
+                         verticalAlign="bottom" 
+                         height={36} 
+                         iconSize={10}
+                         wrapperStyle={{ fontSize: '0.8rem', marginTop: '10px' }} 
+                       />
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
                 
+                {/* Results Totals Section */}
+                <div className="calculator-panel">
+                   <h3 className="text-lg font-medium mb-3">Loan Summary</h3>
+                   <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                     <div className="font-medium text-muted-foreground">Projected Payoff Date:</div>
+                     <div>{results.payoffDate ? format(results.payoffDate, 'MMMM yyyy') : 'N/A'}</div>
+
+                     <div className="font-medium text-muted-foreground">Total Principal Paid:</div>
+                     <div>{formatCurrency(results.totalPrincipalPaid)}</div>
+                     
+                     <div className="font-medium text-muted-foreground">Total Interest Paid:</div>
+                     <div>{formatCurrency(results.totalInterestPaid)}</div>
+
+                     {results.totalPropertyTaxPaid > 0 && (
+                       <>
+                         <div className="font-medium text-muted-foreground">Total Property Tax:</div>
+                         <div>{formatCurrency(results.totalPropertyTaxPaid)}</div>
+                       </>
+                     )}
+                     {results.totalHomeInsurancePaid > 0 && (
+                       <>
+                         <div className="font-medium text-muted-foreground">Total Home Insurance:</div>
+                         <div>{formatCurrency(results.totalHomeInsurancePaid)}</div>
+                       </>
+                     )}
+                     {results.totalPmiPaid > 0 && (
+                       <>
+                         <div className="font-medium text-muted-foreground">Total PMI Paid:</div>
+                         <div>{formatCurrency(results.totalPmiPaid)}</div>
+                       </>
+                     )}
+                      {results.totalHoaPaid > 0 && (
+                       <>
+                         <div className="font-medium text-muted-foreground">Total HOA Fees:</div>
+                         <div>{formatCurrency(results.totalHoaPaid)}</div>
+                       </>
+                     )}
+                      {results.totalOtherCostsPaid > 0 && (
+                       <>
+                         <div className="font-medium text-muted-foreground">Total Other Costs:</div>
+                         <div>{formatCurrency(results.totalOtherCostsPaid)}</div>
+                       </>
+                     )}
+                     
+                     <div className="font-bold text-base mt-2 col-span-2 border-t pt-2"></div>
+                     <div className="font-bold text-base">Total Cost of Loan:</div>
+                     <div className="font-bold text-base">{formatCurrency(results.totalPaid)}</div>
+                   </div>
+                 </div>
+
                 <div className="pt-4">
+                  <h3 className="text-lg font-medium mb-3">Amortization Schedule</h3>
+                   {results.payoffDate && !startDate && ( // Show only if start date wasn't provided initially
+                     <p className="text-sm text-muted-foreground mb-2">
+                       Projected Payoff Date: <span className="font-medium">{format(results.payoffDate, 'MMMM yyyy')}</span> 
+                       <span className="text-xs"> (Assumes first payment today)</span>
+                     </p>
+                   )}
                   <ResponsiveContainer width="100%" height={300}>
-                    <LineChart data={amortizationData}>
-                      <XAxis dataKey="year" />
-                      <YAxis />
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <Tooltip content={<CustomTooltip />} />
-                      <Line type="monotone" dataKey="monthlyPayment" stroke="#1e40af" />
+                    {/* TODO: Refine Amortization Chart */}
+                    <LineChart data={amortizationData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+                      <XAxis 
+                        dataKey={startDate ? "date" : "year"} // Use date if available
+                        tickFormatter={(tick) => startDate ? format(new Date(tick), 'yyyy') : tick} // Format date ticks
+                        label={{ value: 'Year', position: 'insideBottomRight', offset: -5, style: { fontSize: '0.8rem' } }}
+                        tick={{ fontSize: '0.75rem' }}
+                        // Consider adding interval="preserveStartEnd" or type="number" domain={['dataMin', 'dataMax']} if needed
+                      />
+                      <YAxis 
+                        tickFormatter={(value) => formatCurrency(value)} 
+                        label={{ value: 'Remaining Balance', angle: -90, position: 'outsideLeft', offset: -10, style: { fontSize: '0.8rem' } }} // Increased negative offset
+                        tick={{ fontSize: '0.75rem' }}
+                        domain={['auto', 'auto']} // Ensure y-axis starts near 0 if appropriate
+                        allowDataOverflow={true} // Prevent clipping of labels potentially
+                      />
+                      <CartesianGrid strokeDasharray="3 3" opacity={0.3}/>
+                      <Tooltip content={<CustomAmortizationTooltip />} /> 
+                      <Legend verticalAlign="top" height={30} wrapperStyle={{ fontSize: '0.8rem' }}/>
+                      <Line 
+                        type="monotone" 
+                        dataKey="remainingBalance" 
+                        name="Remaining Balance" 
+                        stroke="#1e40af" 
+                        strokeWidth={2} 
+                        dot={false} 
+                        // connectNulls // Temporarily removed to diagnose potential data gaps
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="cumulativePrincipalPaid" 
+                        name="Cumulative Principal Paid" 
+                        stroke="#22c55e" // Green
+                        strokeWidth={2} 
+                        dot={false} 
+                        // connectNulls
+                      />
+                       <Line 
+                        type="monotone" 
+                        dataKey="cumulativeInterestPaid" 
+                        name="Cumulative Interest Paid" 
+                        stroke="#ef4444" // Red
+                        strokeWidth={2} 
+                        dot={false} 
+                        // connectNulls
+                      />
                     </LineChart>
                   </ResponsiveContainer>
+                   <div className="flex justify-end mt-2">
+                     <Button variant="outline" size="sm" onClick={handleDownloadCSV}>
+                       <Download className="h-4 w-4 mr-1" />
+                       Download Full Schedule (CSV)
+                     </Button>
+                   </div>
                 </div>
               </>
             )}

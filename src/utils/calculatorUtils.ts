@@ -5,76 +5,95 @@ export const calculateCompoundInterest = (
   monthlyContribution: number,
   annualInterestRate: number,
   years: number,
-  compoundingFrequency: number
+  compoundingFrequency: number,
+  interestRateVariance: number = 0 // Added variance parameter with default
 ): {
-  finalBalance: number;
+  finalBalance: number; // Base calculation
+  minFinalBalance?: number; // Min balance with variance
+  maxFinalBalance?: number; // Max balance with variance
   totalContributions: number;
-  totalInterestEarned: number;
-  yearlyData: Array<{
+  totalInterestEarned: number; // Base calculation
+  minTotalInterestEarned?: number; // Min interest with variance
+  maxTotalInterestEarned?: number; // Max interest with variance
+  yearlyData: Array<{ // Based on base rate for chart simplicity
     year: number;
-    balance: number;
+    balance: number; 
     contributions: number;
     interest: number;
   }>;
 } => {
-  // Convert annual interest rate to decimal
-  const interestRate = annualInterestRate / 100;
-  
-  // Calculate interest rate per period
-  const ratePerPeriod = interestRate / compoundingFrequency;
-  
-  // Calculate total number of compounding periods
-  const totalPeriods = compoundingFrequency * years;
-  
-  // Calculate contribution per period
-  const contributionPerPeriod = monthlyContribution * 12 / compoundingFrequency;
-  
-  // Initialize variables
-  let balance = principal;
-  let totalContributions = principal;
-  let yearlyData = [];
-  
-  // Track values at the end of each year
-  let previousYearBalance = principal;
-  let yearlyContributions = 0;
-  
-  // Perform calculation for each period
-  for (let period = 1; period <= totalPeriods; period++) {
-    // Add contribution for this period
-    balance += contributionPerPeriod;
-    totalContributions += contributionPerPeriod;
-    yearlyContributions += contributionPerPeriod;
-    
-    // Apply interest for this period
-    const interestEarned = balance * ratePerPeriod;
-    balance += interestEarned;
-    
-    // Check if we've completed a year
-    if (period % compoundingFrequency === 0) {
-      const year = period / compoundingFrequency;
-      const yearlyInterest = balance - previousYearBalance - yearlyContributions;
-      
-      yearlyData.push({
-        year,
-        balance,
-        contributions: yearlyContributions,
-        interest: yearlyInterest
-      });
-      
-      // Reset yearly tracking
-      previousYearBalance = balance;
-      yearlyContributions = 0;
+  // Helper function to run the core calculation logic for a given rate
+  const runCalculation = (rate: number) => {
+    const currentInterestRate = rate / 100;
+    const ratePerPeriod = currentInterestRate / compoundingFrequency;
+    const totalPeriods = compoundingFrequency * years;
+    const contributionPerPeriod = monthlyContribution * 12 / compoundingFrequency;
+
+    let currentBalance = principal;
+    let currentTotalContributions = principal;
+    let currentYearlyData = [];
+    let previousYearBalance = principal;
+    let yearlyContributions = 0;
+
+    for (let period = 1; period <= totalPeriods; period++) {
+      currentBalance += contributionPerPeriod;
+      currentTotalContributions += contributionPerPeriod;
+      yearlyContributions += contributionPerPeriod;
+
+      const interestEarned = currentBalance * ratePerPeriod;
+      currentBalance += interestEarned;
+
+      // Only store yearly data for the base rate calculation
+      if (rate === annualInterestRate && period % compoundingFrequency === 0) {
+        const year = period / compoundingFrequency;
+        const yearlyInterest = currentBalance - previousYearBalance - yearlyContributions;
+        
+        currentYearlyData.push({
+          year,
+          balance: currentBalance,
+          contributions: yearlyContributions,
+          interest: yearlyInterest
+        });
+
+        previousYearBalance = currentBalance;
+        yearlyContributions = 0;
+      }
     }
+    const currentTotalInterestEarned = currentBalance - currentTotalContributions;
+    
+    return {
+      finalBalance: currentBalance,
+      totalContributions: currentTotalContributions,
+      totalInterestEarned: currentTotalInterestEarned,
+      yearlyData: currentYearlyData // Will be empty if not base rate
+    };
+  };
+
+  // --- Base Calculation ---
+  const baseResults = runCalculation(annualInterestRate);
+  
+  let minResults = null;
+  let maxResults = null;
+
+  // --- Variance Calculations (if variance > 0) ---
+  if (interestRateVariance > 0) {
+    const minRate = Math.max(0, annualInterestRate - interestRateVariance); // Ensure rate doesn't go below 0
+    const maxRate = annualInterestRate + interestRateVariance;
+    
+    minResults = runCalculation(minRate);
+    maxResults = runCalculation(maxRate);
   }
-  
-  // Calculate total interest earned
-  const totalInterestEarned = balance - totalContributions;
-  
+
+  // Return combined results
   return {
-    finalBalance: balance,
-    totalContributions,
-    totalInterestEarned,
-    yearlyData
+    finalBalance: baseResults.finalBalance,
+    minFinalBalance: minResults?.finalBalance,
+    maxFinalBalance: maxResults?.finalBalance,
+    totalContributions: baseResults.totalContributions, // Contributions are the same regardless of rate
+    totalInterestEarned: baseResults.totalInterestEarned,
+    minTotalInterestEarned: minResults?.totalInterestEarned,
+    maxTotalInterestEarned: maxResults?.totalInterestEarned,
+    yearlyData: baseResults.yearlyData // Use base rate data for the table/chart
   };
 };
 
@@ -121,13 +140,13 @@ export const calculateDTI = (
   };
 };
 
-// Format number as currency
+// Format number as currency (always show cents)
 export const formatCurrency = (value: number): string => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
+    minimumFractionDigits: 2, // Changed to 2
+    maximumFractionDigits: 2, // Changed to 2
   }).format(value);
 };
 
@@ -149,6 +168,23 @@ export const formatLargeNumber = (value: number): string => {
   } else if (value >= 1000) {
     return `$${(value / 1000).toFixed(1)}K`;
   } else {
-    return `$${value.toFixed(0)}`;
+    // Use formatCurrency for smaller numbers to ensure cents are shown
+    return formatCurrency(value); 
   }
+};
+
+// Calculate monthly mortgage payment
+export const calculateMonthlyMortgage = (principal: number, annualRate: number, years: number): number => {
+  const monthlyRate = (annualRate / 100) / 12;
+  const totalPayments = years * 12;
+
+  if (monthlyRate === 0) {
+    return principal / totalPayments;
+  }
+
+  const payment = principal * 
+    (monthlyRate * Math.pow(1 + monthlyRate, totalPayments)) / 
+    (Math.pow(1 + monthlyRate, totalPayments) - 1);
+
+  return payment;
 };

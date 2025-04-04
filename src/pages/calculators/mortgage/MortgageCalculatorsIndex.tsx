@@ -16,6 +16,13 @@ const MortgageCalculatorsIndex = () => {
       path: "/calculators/mortgage/mortgage-payment",
     },
     {
+      id: "rent-vs-buy",
+      title: "Rent vs Buy Calculator",
+      description: "Compare the financial implications of renting versus buying a home.",
+      icon: <Calculator className="h-8 w-8 text-primary" />,
+      path: "/calculators/mortgage/rent-vs-buy",
+    },
+    {
       id: "dti-calculator",
       title: "Debt-to-Income Ratio Calculator",
       description: "Calculate your DTI ratio to see if you qualify for a mortgage and determine what you can afford.",

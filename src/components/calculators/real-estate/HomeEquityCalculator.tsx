@@ -1,36 +1,53 @@
 
 import React, { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
-import { calculateHomeEquity } from '@/utils/taxUtils';
+import { Home, MinusCircle, PlusCircle, XCircle } from 'lucide-react'; // Added icons
+import { calculateHomeEquity } from '@/utils/taxUtils'; // Will need update
 import { formatCurrency } from '@/utils/calculatorUtils';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
+import { Button } from '@/components/ui/button'; // Added Button
+
+// Interface for additional costs
+interface AdditionalCost {
+  id: string;
+  name: string;
+  amount: number;
+}
 
 const HomeEquityCalculator = () => {
   // State for input values
   const [homeValue, setHomeValue] = useState<number>(500000);
   const [mortgageBalance, setMortgageBalance] = useState<number>(350000);
-  const [sellingPrice, setSellingPrice] = useState<number>(0);
+  const [sellingPrice, setSellingPrice] = useState<number>(0); // Use 0 to default to homeValue
   const [realtorCommission, setRealtorCommission] = useState<number>(6);
-  const [closingCosts, setClosingCosts] = useState<number>(2);
+  const [closingCosts, setClosingCosts] = useState<number>(2); // Percentage
   const [repairs, setRepairs] = useState<number>(0);
-  const [otherFees, setOtherFees] = useState<number>(0);
+  const [escrowFunds, setEscrowFunds] = useState<number>(0); // Added Escrow Funds state
+  const [additionalCosts, setAdditionalCosts] = useState<AdditionalCost[]>([]); // Added Additional Costs state
   
   // State for calculation results
   const [results, setResults] = useState<any>(null);
+  // TODO: Add state for selectedState later
   
   // Calculate home equity when inputs change
+  // Calculate home equity when inputs change
   useEffect(() => {
+    // Use sellingPrice if > 0, otherwise use homeValue
+    const effectiveSellingPrice = sellingPrice > 0 ? sellingPrice : homeValue;
+
+    // TODO: Update calculateHomeEquity function signature in taxUtils.ts
     const calculationResults = calculateHomeEquity(
-      homeValue,
+      homeValue, // Keep original home value for context if needed
       mortgageBalance,
-      sellingPrice,
+      effectiveSellingPrice, // Pass the price used for calculation
       realtorCommission,
       closingCosts,
       repairs,
-      otherFees
+      additionalCosts, // Pass array of additional costs
+      escrowFunds // Pass escrow funds
     );
     
     setResults(calculationResults);
@@ -41,7 +58,8 @@ const HomeEquityCalculator = () => {
     realtorCommission,
     closingCosts,
     repairs,
-    otherFees
+    additionalCosts, // Add dependency
+    escrowFunds // Add dependency
   ]);
   
   // Format data for pie chart
@@ -55,10 +73,15 @@ const HomeEquityCalculator = () => {
       { name: "Net Proceeds", value: results.netProceeds, color: "#4CAF50" },
       { name: "Mortgage Balance", value: results.mortgageBalance, color: "#FF4560" },
       { name: "Realtor Commission", value: results.realtorCommissionAmount, color: "#FFBB28" },
-      { name: "Closing Costs", value: results.closingCostsAmount, color: "#00E396" },
-      { name: "Repairs", value: results.repairsAmount, color: "#775DD0" },
-      { name: "Other Fees", value: results.otherFeesAmount, color: "#008FFB" }
-    ].filter(item => item.value > 0);
+      { name: "Closing Costs", value: results.closingCostsAmount, color: "#00E396" }, // Teal
+      { name: "Repairs", value: results.repairsAmount, color: "#775DD0" }, // Purple
+      // Map additional costs to pie chart segments
+      ...results.additionalCostsBreakdown.map((cost: any, index: number) => ({
+        name: cost.name || `Additional Cost ${index + 1}`,
+        value: cost.amount,
+        color: `hsl(200, 70%, ${60 + index * 5}%)` // Varying shades of blue
+      }))
+    ].filter(item => item.value > 0); // Filter out zero-value items
   };
 
   const pieChartData = getPieChartData();
@@ -75,6 +98,21 @@ const HomeEquityCalculator = () => {
       );
     }
     return null;
+  };
+
+  // --- State Management for Additional Costs ---
+  const addAdditionalCost = () => {
+    setAdditionalCosts([...additionalCosts, { id: crypto.randomUUID(), name: '', amount: 0 }]);
+  };
+
+  const removeAdditionalCost = (id: string) => {
+    setAdditionalCosts(additionalCosts.filter(cost => cost.id !== id));
+  };
+
+  const updateAdditionalCost = (id: string, field: 'name' | 'amount', value: string | number) => {
+    setAdditionalCosts(additionalCosts.map(cost => 
+      cost.id === id ? { ...cost, [field]: field === 'amount' ? Number(value) : value } : cost
+    ));
   };
 
   return (
@@ -179,21 +217,60 @@ const HomeEquityCalculator = () => {
                 />
               </div>
             </div>
-            
+
+            {/* Escrow Funds Input */}
             <div>
-              <Label htmlFor="otherFees">Other Fees/Costs</Label>
+              <Label htmlFor="escrowFunds">Funds Remaining in Escrow (Optional)</Label>
               <div className="flex items-center mt-1">
                 <span className="text-gray-500 mr-2">$</span>
                 <Input 
-                  id="otherFees" 
+                  id="escrowFunds" 
                   type="number" 
-                  value={otherFees} 
-                  onChange={(e) => setOtherFees(Number(e.target.value))} 
+                  value={escrowFunds} 
+                  onChange={(e) => setEscrowFunds(Number(e.target.value))} 
                 />
               </div>
+               <p className="text-xs text-muted-foreground mt-1">
+                 Money held for taxes/insurance, often refunded after sale.
+               </p>
             </div>
+
           </div>
         </div>
+
+        {/* Additional Costs Section */}
+        <div className="mt-6 space-y-3 border-t pt-4">
+           <div className="flex justify-between items-center">
+             <h3 className="text-sm font-medium">Additional Selling Costs (Optional)</h3>
+             <Button variant="outline" size="sm" onClick={addAdditionalCost}>
+               <PlusCircle className="h-4 w-4 mr-1" /> Add Cost
+             </Button>
+           </div>
+           {additionalCosts.map((cost, index) => (
+             <div key={cost.id} className="flex items-center space-x-2">
+               <Input
+                 type="text"
+                 placeholder={`Cost ${index + 1} Name (e.g., Staging, Liens)`}
+                 value={cost.name}
+                 onChange={(e) => updateAdditionalCost(cost.id, 'name', e.target.value)}
+                 className="h-8 text-sm flex-grow"
+               />
+               <div className="flex items-center">
+                 <span className="mr-1 text-sm">$</span>
+                 <Input
+                   type="number"
+                   value={cost.amount}
+                   onChange={(e) => updateAdditionalCost(cost.id, 'amount', e.target.value)}
+                   className="w-24 h-8 text-sm"
+                   min={0}
+                 />
+               </div>
+               <Button variant="ghost" size="sm" onClick={() => removeAdditionalCost(cost.id)} className="text-red-500 hover:text-red-700">
+                 <XCircle className="h-4 w-4" />
+               </Button>
+             </div>
+           ))}
+         </div>
         
         {results && (
           <div className="mt-8 space-y-8">
@@ -293,15 +370,26 @@ const HomeEquityCalculator = () => {
                     </div>
                   )}
                   
-                  {results.otherFeesAmount > 0 && (
-                    <div className="flex justify-between text-red-600">
-                      <span>Other Fees/Costs</span>
-                      <span>-{formatCurrency(results.otherFeesAmount)}</span>
-                    </div>
-                  )}
+                  {/* Display Additional Costs */}
+                  {results.additionalCostsBreakdown.map((cost: any, index: number) => (
+                     cost.amount > 0 && (
+                       <div key={index} className="flex justify-between text-red-600">
+                         <span>{cost.name || `Additional Cost ${index + 1}`}</span>
+                         <span>-{formatCurrency(cost.amount)}</span>
+                       </div>
+                     )
+                  ))}
+
+                  {/* Display Escrow Funds */}
+                   {results.escrowFunds > 0 && (
+                     <div className="flex justify-between text-blue-600">
+                       <span>Escrow Funds Returned</span>
+                       <span>+{formatCurrency(results.escrowFunds)}</span>
+                     </div>
+                   )}
                   
                   <div className="flex justify-between border-t pt-2 font-bold">
-                    <span>Net Proceeds</span>
+                    <span>Estimated Net Proceeds</span>
                     <span className="text-green-600">{formatCurrency(results.netProceeds)}</span>
                   </div>
                   
