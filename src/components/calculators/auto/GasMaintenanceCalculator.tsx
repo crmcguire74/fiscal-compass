@@ -110,14 +110,14 @@ const GasMaintenanceCalculator = () => {
 
   return (
     <Card className="w-full shadow-md border-gray-200">
-      <CardHeader className="bg-gradient-to-r from-green-600 to-green-500 text-white">
+      <CardHeader className="bg-gradient-to-r from-finance-primary to-finance-primary/80 text-white">
          <div className="flex justify-between items-center">
            <div>
              <CardTitle className="text-2xl flex items-center gap-2">
                <Fuel className="h-6 w-6" /> <Wrench className="h-6 w-6" />
                Gas & Maintenance Calculator
              </CardTitle>
-             <CardDescription className="text-green-100 mt-2">
+             <CardDescription className="text-gray-100 mt-2">
                Estimate your annual and monthly vehicle running costs.
              </CardDescription>
            </div>
@@ -190,7 +190,7 @@ const GasMaintenanceCalculator = () => {
                  
                  <div className="text-center">
                    <p className="text-sm text-muted-foreground">Total Estimated Monthly Cost</p>
-                   <p className="text-4xl font-bold text-green-600">{formatCurrency(results.totalMonthlyCost)}</p>
+                   <p className="text-4xl font-bold text-finance-primary">{formatCurrency(results.totalMonthlyCost)}</p>
                  </div>
                  <div className="text-center mb-4">
                    <p className="text-sm text-muted-foreground">Total Estimated Annual Cost: {formatCurrency(results.totalAnnualCost)}</p>

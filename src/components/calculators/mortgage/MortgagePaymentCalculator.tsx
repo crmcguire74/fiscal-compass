@@ -206,16 +206,35 @@ const MortgagePaymentCalculator = () => {
     }
 
     const annualRate = (loanType === 'fixed' ? interestRate : armInitialRate) / 100; // Convert to decimal
+    
+    // Bi-weekly payments (26 per year) pay off the loan faster than monthly (12 per year)
+    // because you end up making 13 monthly-equivalent payments per year instead of 12
     const periodsPerYear = paymentFrequency === 'monthly' ? 12 : 26;
     const ratePerPeriod = annualRate / periodsPerYear;
+    
+    // This calculates the total number of periods differently for monthly vs bi-weekly
     const totalNumberOfPayments = loanTerm * periodsPerYear;
 
     // Calculate base payment using standard mortgage amortization formula
     let basePaymentPerPeriod = 0;
     if (ratePerPeriod > 0) {
-      const numerator = loanAmount * ratePerPeriod * Math.pow(1 + ratePerPeriod, totalNumberOfPayments);
-      const denominator = Math.pow(1 + ratePerPeriod, totalNumberOfPayments) - 1;
-      basePaymentPerPeriod = numerator / denominator;
+      // For bi-weekly payments, we need to adjust how the payment is calculated
+      // We calculate a monthly payment equivalent first, then for bi-weekly we divide by 2
+      if (paymentFrequency === 'monthly') {
+        const numerator = loanAmount * ratePerPeriod * Math.pow(1 + ratePerPeriod, totalNumberOfPayments);
+        const denominator = Math.pow(1 + ratePerPeriod, totalNumberOfPayments) - 1;
+        basePaymentPerPeriod = numerator / denominator;
+      } else {
+        // For bi-weekly, we first calculate what a monthly payment would be on a loan of the same amount and rate
+        const monthlyRatePerPeriod = annualRate / 12;
+        const monthlyTotalPayments = loanTerm * 12;
+        const monthlyNumerator = loanAmount * monthlyRatePerPeriod * Math.pow(1 + monthlyRatePerPeriod, monthlyTotalPayments);
+        const monthlyDenominator = Math.pow(1 + monthlyRatePerPeriod, monthlyTotalPayments) - 1;
+        const monthlyPayment = monthlyNumerator / monthlyDenominator;
+        
+        // Then divide by 2 to get bi-weekly payment (NOT by 2.17, which would just spread monthly payment)
+        basePaymentPerPeriod = monthlyPayment / 2;
+      }
     } else {
       basePaymentPerPeriod = loanAmount / totalNumberOfPayments;
     }

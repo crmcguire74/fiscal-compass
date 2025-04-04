@@ -127,14 +127,14 @@ const AutoLeaseCalculator = () => {
 
   return (
     <Card className="w-full shadow-md border-gray-200">
-      <CardHeader className="bg-gradient-to-r from-teal-600 to-teal-500 text-white">
+      <CardHeader className="bg-gradient-to-r from-finance-primary to-finance-primary/80 text-white">
          <div className="flex justify-between items-center">
            <div>
              <CardTitle className="text-2xl flex items-center gap-2">
                <Car className="h-6 w-6" />
                Auto Lease Calculator
              </CardTitle>
-             <CardDescription className="text-teal-100 mt-2">
+             <CardDescription className="text-gray-100 mt-2">
                Estimate your monthly lease payment and understand the costs involved.
              </CardDescription>
            </div>
@@ -240,7 +240,7 @@ const AutoLeaseCalculator = () => {
                  
                  <div className="text-center">
                    <p className="text-sm text-muted-foreground">Estimated Monthly Payment</p>
-                   <p className="text-4xl font-bold text-teal-600">{formatCurrency(results.totalMonthlyPayment)}</p>
+                   <p className="text-4xl font-bold text-finance-primary">{formatCurrency(results.totalMonthlyPayment)}</p>
                    <p className="text-xs text-muted-foreground">(Including tax)</p>
                  </div>
 
