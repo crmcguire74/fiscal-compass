@@ -9,14 +9,15 @@ export interface BlogPost {
   publishedAt?: string;
   author: string;
   authorTitle?: string;
+  avatar?: string;
   image?: string;
   coverImage?: string;
   categories?: string[];
-  category?: string;
+  category: string; // Make category required
   tags: string[];
   relatedPosts?: string[];
   featured?: boolean;
-  readingTime?: number;
+  readingTime: number; // Make readingTime required
 }
 
 export interface BlogCategory {

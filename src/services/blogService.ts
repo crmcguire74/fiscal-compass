@@ -1,4 +1,3 @@
-
 import { ADDITIONAL_BLOG_POSTS } from './blogServiceExtension';
 import { investingBlogPosts } from './blogServiceInvesting';
 import { retirementBlogPosts } from './blogServiceRetirement';
@@ -7,9 +6,26 @@ import { realEstateBlogPosts } from './blogServiceRealEstate';
 import { lifeEventsPosts } from './blogServiceLifeEvents';
 import { healthBlogPosts } from './blogServiceHealth';
 import { BLOG_POSTS } from './blogServiceAddition';
-// Import any other blog services you might have
 
 import { BlogPost, BlogCategory, BlogTag } from '../types/blog';
+
+// Define default images for each category
+const DEFAULT_IMAGES = {
+  Budgeting: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80',
+  Investing: 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80',
+  'Real Estate': 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80',
+  Retirement: 'https://images.unsplash.com/photo-1514395462725-fb4566210144?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80',
+  'Life Events': 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80',
+  Credit: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80',
+  Health: 'https://images.unsplash.com/photo-1505576399279-565b52d4ac71?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80',
+  'Financial Planning': 'https://images.unsplash.com/photo-1554224155-1696413565d3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80',
+  default: 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80'
+} as const;
+
+export const getDefaultImage = (category?: string): string => {
+  if (!category) return DEFAULT_IMAGES.default;
+  return DEFAULT_IMAGES[category as keyof typeof DEFAULT_IMAGES] || DEFAULT_IMAGES.default;
+};
 
 export const getBlogCategories = (): BlogCategory[] => {
   // Get all posts
@@ -70,14 +86,25 @@ export const getAllBlogPosts = (): BlogPost[] => {
     ...BLOG_POSTS,
   ];
 
-  // Set the author for all posts to Christopher R McGuire
-  allPosts = allPosts.map(post => ({
-    ...post,
-    author: "Christopher R McGuire",
-    // TypeScript safe way to handle optional authorTitle
-    authorTitle: "Senior Vice President of Software Engineering at Mesirow",
-    avatar: "/lovable-uploads/61f9246e-544a-4f54-a156-a5374baed0c1.png"
-  }));
+  // Set the author and ensure each post has a valid image
+  allPosts = allPosts.map(post => {
+    // Normalize category case to match DEFAULT_IMAGES keys
+    const normalizedCategory = post.category ? 
+      post.category.charAt(0).toUpperCase() + post.category.slice(1) : '';
+    const defaultImage = getDefaultImage(normalizedCategory);
+    
+    const postWithDefaults: BlogPost = {
+      ...post,
+      category: normalizedCategory || 'General', // Ensure category is always set
+      readingTime: post.readingTime || Math.ceil(post.content.length / 1500), // Estimate reading time if not provided
+      author: "Christopher R McGuire",
+      authorTitle: "Senior Vice President of Software Engineering at Mesirow",
+      avatar: "/lovable-uploads/61f9246e-544a-4f54-a156-a5374baed0c1.png",
+      coverImage: (post as any).coverImage || (post as any).image || defaultImage,
+      image: (post as any).coverImage || (post as any).image || defaultImage
+    };
+    return postWithDefaults;
+  });
 
   // Sort posts by date (newest first)
   allPosts.sort((a, b) => {

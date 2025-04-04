@@ -9,21 +9,41 @@ import { Clock, Calendar, ArrowLeft, ChevronLeft, ChevronRight, Tag } from 'luci
 import BlogRecommendations from '@/components/blog/BlogRecommendations';
 import { toast } from '@/hooks/use-toast';
 
-const renderMarkdown = (markdown: string) => {
-  const html = markdown
-    // Headers
-    .replace(/^# (.*$)/gm, '<h1 class="text-4xl lg:text-5xl font-bold mt-12 mb-6 tracking-tight">$1</h1>')
-    .replace(/^## (.*$)/gm, '<h2 class="text-3xl lg:text-4xl font-semibold mt-10 mb-4 tracking-tight">$1</h2>')
-    .replace(/^### (.*$)/gm, '<h3 class="text-2xl lg:text-3xl font-medium mt-8 mb-4">$1</h3>')
-    .replace(/^#### (.*$)/gm, '<h4 class="text-xl lg:text-2xl font-medium mt-6 mb-3">$1</h4>')
+const renderMarkdown = (markdown: string, postTitle: string) => {
+  // Remove the first h1 header if it matches the post title to avoid duplication
+  const contentWithoutTitle = markdown.replace(new RegExp(`^# ${postTitle}$`, 'gm'), '');
+
+  const html = contentWithoutTitle
+    // Headers - skip h1 as it's handled in the page header
+    .replace(/^# (.*$)/gm, '') // Remove all h1 headers
+    .replace(/^## (.*$)/gm, '<h2 class="text-3xl font-semibold mt-10 mb-4 tracking-tight text-foreground/90">$1</h2>')
+    .replace(/^### (.*$)/gm, '<h3 class="text-2xl font-medium mt-8 mb-3 tracking-tight text-foreground/90">$1</h3>')
+    .replace(/^#### (.*$)/gm, '<h4 class="text-xl font-medium mt-6 mb-2 tracking-tight text-foreground/90">$1</h4>')
     
     // Lists
-    .replace(/^(\s*)\* (.*$)/gm, (_, spaces, content) => 
-      `${spaces}<li class="ml-6 list-disc mb-3 text-base text-muted-foreground leading-relaxed pl-2">${content}</li>`)
-    .replace(/^(\s*)- (.*$)/gm, (_, spaces, content) => 
-      `${spaces}<li class="ml-6 list-disc mb-3 text-base text-muted-foreground leading-relaxed pl-2">${content}</li>`)
-    .replace(/^(\s*)([0-9]+)\. (.*$)/gm, (_, spaces, num, content) => 
-      `${spaces}<li class="ml-6 list-decimal mb-3 text-base text-muted-foreground leading-relaxed pl-2">${content}</li>`)
+    // Lists - with proper spacing and nesting
+    .replace(/(?:(^|\n)(\s*)[*-] [\s\S]*?)(?=(\n\s*[^*\s-]|$))/gm, (match) => {
+      const items = match.split('\n').filter(line => line.trim());
+      const list = items.map(item => {
+        const spaces = item.match(/^\s*/)[0];
+        const content = item.replace(/^\s*[*-] /, '');
+        const depth = Math.floor(spaces.length / 2);
+        const indentClass = depth === 0 ? 'ml-6' : depth === 1 ? 'ml-10' : 'ml-14';
+        return `<li class="relative ${indentClass} list-disc mb-2 text-base text-muted-foreground/90 leading-relaxed pl-2">${content}</li>`;
+      }).join('\n');
+      return `<ul class="my-6 space-y-1">\n${list}\n</ul>`;
+    })
+    .replace(/(?:(^|\n)(\s*)\d+\. [\s\S]*?)(?=(\n\s*[^\d\s.]|$))/gm, (match) => {
+      const items = match.split('\n').filter(line => line.trim());
+      const list = items.map(item => {
+        const spaces = item.match(/^\s*/)[0];
+        const content = item.replace(/^\s*\d+\. /, '');
+        const depth = Math.floor(spaces.length / 2);
+        const indentClass = depth === 0 ? 'ml-6' : depth === 1 ? 'ml-10' : 'ml-14';
+        return `<li class="relative ${indentClass} list-decimal mb-2 text-base text-muted-foreground/90 leading-relaxed pl-2">${content}</li>`;
+      }).join('\n');
+      return `<ol class="my-6 space-y-1">\n${list}\n</ol>`;
+    })
     
     // Emphasis
     .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold">$1</strong>')
@@ -166,80 +186,97 @@ const BlogPostPage = () => {
   
   return (
     <Layout>
-      <div className="container max-w-4xl py-8 px-4 sm:px-6 lg:px-8">
-        <div className="mb-6">
-          <Link to="/blog" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors">
-            <ArrowLeft className="mr-1 h-4 w-4" />
-            Back to Blog
-          </Link>
-        </div>
-        
-        <article className="max-w-3xl mx-auto">
-          <div className="space-y-6 md:space-y-8 mb-10">
-            <div>
-              <Link to={`/blog/related/category/${post.category}`}>
-                <Badge 
-                  className="capitalize bg-primary/5 hover:bg-primary/10 text-primary hover:text-primary/80" 
-                  variant="outline"
-                >
-                  {post.category}
-                </Badge>
-              </Link>
+      <div className="relative min-h-screen bg-gradient-to-b from-background to-background/80">
+        <div className="container relative z-10 max-w-4xl py-8 px-4 sm:px-6 lg:px-8">
+          <div className="mb-8">
+            <Link to="/blog" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors">
+              <ArrowLeft className="mr-1 h-4 w-4" />
+              Back to Blog
+            </Link>
+          </div>
+          
+          <article className="max-w-3xl mx-auto pb-16">
+          <div className="relative mb-12 rounded-2xl bg-card/30 backdrop-blur-sm border border-border/50 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-primary/2 to-transparent"></div>
+            
+            <div className="relative z-20 px-6 py-10 sm:py-12 md:py-16 mx-auto max-w-3xl">
+              <div className="space-y-6 md:space-y-8 text-center">
+                <div>
+                  <Link to={`/blog/related/category/${post.category}`}>
+                    <Badge 
+                      className="capitalize bg-primary/10 hover:bg-primary/20 text-primary hover:text-primary/80" 
+                      variant="outline"
+                    >
+                      {post.category}
+                    </Badge>
+                  </Link>
+                </div>
+                
+                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight">
+                  {post.title}
+                </h1>
+
+                {post.excerpt && (
+                  <p className="text-lg text-muted-foreground/90 leading-relaxed max-w-2xl mx-auto">
+                    {post.excerpt}
+                  </p>
+                )}
+
+                <div className="flex flex-wrap gap-2 items-center justify-center text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1.5">
+                    <Calendar className="h-4 w-4" />
+                    {formattedDate}
+                  </div>
+                  <span className="text-muted-foreground/40">•</span>
+                  <div className="flex items-center gap-1.5">
+                    <Clock className="h-4 w-4" />
+                    {post.readingTime} min read
+                  </div>
+                  <span className="text-muted-foreground/40">•</span>
+                  <div className="flex items-center gap-1.5">
+                    By {post.author}
+                    {post.authorTitle && (
+                      <span className="text-xs text-muted-foreground/60">
+                        {post.authorTitle}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {post.tags.slice(0, 5).map((tag, index) => (
+                    <Link key={index} to={`/blog/related/tag/${tag}`}>
+                      <Badge 
+                        variant="secondary" 
+                        className="bg-secondary/20 hover:bg-secondary/30 transition-colors"
+                      >
+                        {tag}
+                      </Badge>
+                    </Link>
+                  ))}
+                </div>
+              </div>
             </div>
             
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight">
-              {post.title}
-            </h1>
-
-            <div className="flex flex-wrap gap-2 items-center text-sm text-muted-foreground">
-              <div className="flex items-center gap-1.5">
-                <Calendar className="h-4 w-4" />
-                {formattedDate}
-              </div>
-              <span className="text-muted-foreground/40">•</span>
-              <div className="flex items-center gap-1.5">
-                <Clock className="h-4 w-4" />
-                {post.readingTime} min read
-              </div>
-              <span className="text-muted-foreground/40">•</span>
-              <div className="flex items-center gap-1.5">
-                By {post.author}
-                {post.authorTitle && (
-                  <span className="text-xs text-muted-foreground/60">
-                    {post.authorTitle}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              {post.tags.slice(0, 5).map((tag, index) => (
-                <Link key={index} to={`/blog/related/tag/${tag}`}>
-                  <Badge 
-                    variant="secondary" 
-                    className="bg-secondary/20 hover:bg-secondary/30 transition-colors"
-                  >
-                    {tag}
-                  </Badge>
-                </Link>
-              ))}
+            <div className="relative mt-8 overflow-hidden aspect-[2/1] max-h-[28rem] rounded-b-2xl">
+              <img 
+                src={post.coverImage || '/placeholder.svg'} 
+                alt={post.title}
+                className="w-full h-full object-cover shadow-lg" 
+                onError={(e) => {
+                  e.currentTarget.src = '/placeholder.svg';
+                }}
+              />
             </div>
           </div>
           
-          {post.coverImage && (
-            <div className="my-8 overflow-hidden rounded-xl">
-              <img 
-                src={post.coverImage} 
-                alt={post.title}
-                className="w-full object-cover" 
-              />
-            </div>
-          )}
-          
-          <div 
-            className="
-              prose prose-gray 
-              prose-headings:text-foreground prose-headings:font-semibold prose-headings:tracking-tight
+          <div className="relative z-10 bg-card/40 backdrop-blur-sm rounded-xl border border-border/50 p-6 sm:p-8 md:p-10 my-12 shadow-md hover:shadow-lg transition-shadow">
+            <div className="absolute inset-0 bg-gradient-to-b from-primary/2 to-transparent rounded-xl"></div>
+            <div
+              className="
+                relative z-10 prose prose-gray max-w-none
+                prose-pre:backdrop-blur-sm
+                prose-headings:text-foreground prose-headings:font-semibold prose-headings:tracking-tight
               prose-p:text-muted-foreground prose-p:leading-7
               prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-a:transition-colors
               prose-blockquote:border-l-primary/20 prose-blockquote:text-muted-foreground prose-blockquote:not-italic
@@ -251,7 +288,6 @@ const BlogPostPage = () => {
               prose-table:shadow-sm
               prose-th:bg-secondary/10 prose-th:text-foreground prose-th:p-3
               prose-td:p-3
-              max-w-none
               [&>*:first-child]:mt-0
               [&_pre>code]:!bg-transparent [&_pre>code]:!p-0
               [&_pre]:!px-4 [&_pre]:!py-3
@@ -260,8 +296,9 @@ const BlogPostPage = () => {
               [&_blockquote]:!border-l-2 [&_blockquote]:!pl-6 [&_blockquote]:!py-1 [&_blockquote]:border-primary/30
               [&_figure]:!my-8 [&_figcaption]:!text-center [&_figcaption]:!text-sm [&_figcaption]:!text-muted-foreground/80
             "
-            dangerouslySetInnerHTML={{ __html: renderMarkdown(post.content) }}
-          />
+              dangerouslySetInnerHTML={{ __html: renderMarkdown(post.content, post.title) }}
+            />
+          </div>
           
           {relatedPosts.length > 0 && (
             <div className="mt-16">
@@ -305,7 +342,8 @@ const BlogPostPage = () => {
               ))}
             </div>
           </div>
-        </article>
+          </article>
+        </div>
       </div>
     </Layout>
   );
