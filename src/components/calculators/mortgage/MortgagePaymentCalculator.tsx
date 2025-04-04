@@ -332,20 +332,15 @@ const MortgagePaymentCalculator = () => {
     extraPayments: ExtraPayment[] = []
   ): any[] => {
     const periodsPerYear = frequency === 'monthly' ? 12 : 26;
-    const totalNumberOfPayments = loanTermYears * periodsPerYear;
+    // Keep totalNumberOfPayments for loop termination and ARM remaining period calculation
+    const totalNumberOfPayments = loanTermYears * periodsPerYear; 
     
-    // Calculate base monthly payment using standard amortization formula
     let currentAnnualRate = armOptions ? armOptions.initialRate : initialAnnualRate; // initialAnnualRate is already decimal
     let currentRatePerPeriod = currentAnnualRate / periodsPerYear;
     
-    let currentPiPayment;
-    if (currentRatePerPeriod > 0) {
-      currentPiPayment = initialLoanAmount * 
-        (currentRatePerPeriod * Math.pow(1 + currentRatePerPeriod, totalNumberOfPayments)) / 
-        (Math.pow(1 + currentRatePerPeriod, totalNumberOfPayments) - 1);
-    } else {
-      currentPiPayment = initialLoanAmount / totalNumberOfPayments;
-    }
+    // Use the passed-in basePaymentPerPeriod directly. This is the core fix.
+    // This value is already calculated correctly in calculateMortgage for both monthly and accelerated bi-weekly.
+    let currentPiPayment = basePaymentPerPeriod; 
 
     let balance = initialLoanAmount;
     const schedule = [];
