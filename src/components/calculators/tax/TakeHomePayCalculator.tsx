@@ -84,10 +84,6 @@ const TakeHomePayCalculator = () => {
   };
   return <Card className="w-full">
       <CardHeader>
-        <CardTitle>{isBonus ? "Bonus Tax Calculator" : "Take-Home Pay Calculator"}</CardTitle>
-        <CardDescription>
-          {isBonus ? "Calculate your net bonus after taxes and deductions" : "Estimate your take-home pay after taxes, retirement, and other deductions"}
-        </CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="annual" value={activeTab} onValueChange={setActiveTab}>
