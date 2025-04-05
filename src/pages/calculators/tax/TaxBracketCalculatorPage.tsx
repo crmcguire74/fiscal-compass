@@ -10,30 +10,53 @@ const TaxBracketCalculatorPage = () => {
     <Layout>
       <div className="container py-8 max-w-7xl">
         <div className="mb-6">
-          <Link to="/calculators/tax">
-            <Button variant="ghost" size="sm" className="mb-4">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Tax Calculators
-            </Button>
-          </Link>
-          
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-                <BarChart3 className="h-6 w-6 text-finance-primary" />
-                Tax Bracket Calculator
-              </h1>
-              <p className="text-muted-foreground mt-1">
-                Visualize how progressive tax brackets apply to your income.
-              </p>
-            </div>
-          </div>
+          <a
+            className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors"
+            href="/calculators/tax"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              className="lucide lucide-arrow-left mr-1 h-4 w-4"
+            >
+              <path d="m12 19-7-7 7-7"></path>
+              <path d="M19 12H5"></path>
+            </svg>
+            Back to Tax Calculators
+          </a>
         </div>
 
-        <div className="grid grid-cols-1 gap-6">
-          <TaxBracketVisualization />
-          
-          <div className="bg-blue-50 border border-blue-100 rounded-lg p-6 mt-4">
+        <div className="max-w-5xl mx-auto mb-6">
+          <div className="rounded-lg border bg-card text-card-foreground w-full shadow-md border-gray-200">
+            
+            
+            <div className="flex flex-col space-y-1.5 p-6 bg-gradient-to-r from-finance-primary to-finance-primary/80 text-white">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="font-semibold tracking-tight text-2xl flex items-center gap-2">
+                  <BarChart3 className="h-6 w-6 text-white" />
+                  Tax Bracket Calculator
+                  </h3>
+                  <p className="text-sm text-gray-100 mt-2">
+                     Visualize how progressive tax brackets apply to your income.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <TaxBracketVisualization />
+            
+          </div>
+        </div>     
+
+        <div className="bg-blue-50 border border-blue-100 rounded-lg p-6 mt-4">
             <h2 className="text-xl font-semibold mb-3">Understanding Tax Brackets</h2>
             <p className="mb-4">
               The U.S. uses a progressive tax system, which means your income is taxed at different rates as it crosses certain thresholds. This visualization helps you understand how your income is taxed across these different brackets.
@@ -61,8 +84,8 @@ const TaxBracketCalculatorPage = () => {
               </div>
             </div>
           </div>
-        </div>
       </div>
+
     </Layout>
   );
 };
