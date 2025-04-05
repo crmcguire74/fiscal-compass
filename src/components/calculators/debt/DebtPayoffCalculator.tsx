@@ -1,20 +1,24 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Toggle } from '@/components/ui/toggle';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Trash2, PlusCircle, ArrowDownUp } from 'lucide-react';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Trash2, PlusCircle, TrendingDown, DollarSign, Percent, ListChecks, Info, BarChart3, ListOrdered, Save } from 'lucide-react'; // Consolidated icons
 import { toast } from '@/hooks/use-toast';
-import { formatCurrency } from '@/utils/calculatorUtils';
+import { formatCurrency, formatPercentage } from '@/utils/calculatorUtils';
 import { saveCalculatorData, getCalculatorData } from '@/services/storageService';
+import {
+  Tooltip as UITooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const CALCULATOR_ID = 'debt-payoff-calculator';
 
+// Base Debt Item Interface
 interface DebtItem {
   id: string;
   name: string;
@@ -23,6 +27,13 @@ interface DebtItem {
   minimumPayment: number;
 }
 
+// Extended type for calculations within the payoff plan
+interface WorkingDebtItem extends DebtItem {
+  currentBalance: number;
+  totalInterestPaid: number;
+}
+
+// Result structure for a payoff plan
 interface PayoffResult {
   method: 'snowball' | 'avalanche';
   totalInterest: number;
@@ -33,6 +44,7 @@ interface PayoffResult {
     remainingBalance: number;
     interestPaid: number;
     principalPaid: number;
+    totalPaidThisMonth: number; // Added for clarity
   }>;
   debtDetails: Array<{
     id: string;
@@ -43,460 +55,479 @@ interface PayoffResult {
 }
 
 const DebtPayoffCalculator = () => {
+  // --- State ---
   const [debts, setDebts] = useState<DebtItem[]>([
-    { id: '1', name: 'Credit Card', balance: 5000, interestRate: 18, minimumPayment: 150 },
-    { id: '2', name: 'Car Loan', balance: 12000, interestRate: 6, minimumPayment: 300 },
-    { id: '3', name: 'Student Loan', balance: 20000, interestRate: 4.5, minimumPayment: 200 }
+    // Default example debts
+    { id: 'debt-1', name: 'Credit Card', balance: 5000, interestRate: 18, minimumPayment: 150 },
+    { id: 'debt-2', name: 'Car Loan', balance: 12000, interestRate: 6, minimumPayment: 300 },
+    { id: 'debt-3', name: 'Student Loan', balance: 20000, interestRate: 4.5, minimumPayment: 200 }
   ]);
   const [extraPayment, setExtraPayment] = useState<number>(200);
   const [snowballResult, setSnowballResult] = useState<PayoffResult | null>(null);
   const [avalancheResult, setAvalancheResult] = useState<PayoffResult | null>(null);
   const [activeTab, setActiveTab] = useState<'snowball' | 'avalanche'>('snowball');
-  const [showAdvancedOptions, setShowAdvancedOptions] = useState<boolean>(false);
+  const [dataStored, setDataStored] = useState(false);
 
+  // --- Effects ---
+  // Load data on initial mount
   useEffect(() => {
-    // Load saved data if available
     const savedData = getCalculatorData(CALCULATOR_ID);
     if (savedData) {
-      if (savedData.debts) setDebts(savedData.debts);
-      if (savedData.extraPayment) setExtraPayment(savedData.extraPayment);
-      if (savedData.showAdvancedOptions) setShowAdvancedOptions(savedData.showAdvancedOptions);
+      if (savedData.debts) {
+        setDebts((savedData.debts || []).map((d: any, index: number) => ({
+            id: d.id || `saved-debt-${index}-${Date.now()}`,
+            name: d.name || '',
+            balance: Number(d.balance || 0),
+            interestRate: Number(d.interestRate || 0),
+            minimumPayment: Number(d.minimumPayment || 0)
+        })));
+      }
+      if (savedData.extraPayment !== undefined) setExtraPayment(Number(savedData.extraPayment || 0));
+      setDataStored(true);
+      // Optionally restore previous results if saved
+      if (savedData.snowballResult && savedData.avalancheResult) {
+          setSnowballResult(savedData.snowballResult);
+          setAvalancheResult(savedData.avalancheResult);
+      }
+    } else {
+       // Ensure initial debts have IDs
+       setDebts(debts.map((d, index) => ({ ...d, id: d.id || `initial-debt-${index}-${Date.now()}` })));
     }
   }, []);
 
+  // Auto-recalculate if results exist and inputs change
   useEffect(() => {
-    // Auto-calculate when inputs change if we already have results
     if (snowballResult || avalancheResult) {
-      calculatePayoff();
+      calculatePayoff(false); // No toast on auto-recalc
     }
   }, [debts, extraPayment]);
 
+  // --- Data Handling ---
   const saveData = () => {
     saveCalculatorData(CALCULATOR_ID, {
       debts,
       extraPayment,
-      showAdvancedOptions,
       lastCalculated: new Date().toISOString(),
-      snowballResult,
+      snowballResult, // Save results to restore state
       avalancheResult
     });
+    setDataStored(true);
   };
 
+  // --- Debt List Management ---
   const handleAddDebt = () => {
-    const newId = String(Math.max(0, ...debts.map(d => Number(d.id))) + 1);
-    setDebts([...debts, { 
-      id: newId, 
-      name: `Debt ${debts.length + 1}`, 
-      balance: 1000, 
-      interestRate: 10, 
-      minimumPayment: 50 
+    setDebts([...debts, {
+      id: `debt-${Date.now()}`,
+      name: '', balance: 0, interestRate: 0, minimumPayment: 0
     }]);
   };
 
   const handleRemoveDebt = (id: string) => {
-    if (debts.length <= 1) {
-      toast({
-        title: "Cannot Remove All Debts",
-        description: "You need at least one debt for the calculation.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
     setDebts(debts.filter(debt => debt.id !== id));
   };
 
   const handleDebtChange = (id: string, field: keyof DebtItem, value: number | string) => {
-    setDebts(debts.map(debt => 
+    setDebts(debts.map(debt =>
       debt.id === id ? { ...debt, [field]: typeof value === 'string' ? value : Number(value) } : debt
     ));
   };
 
-  const sortDebtsByMethod = (method: 'snowball' | 'avalanche') => {
-    const sortedDebts = [...debts];
-    
+  // --- Calculation Logic ---
+  // Sort function for payoff strategies (accepts WorkingDebtItem)
+  const sortDebtsByMethod = (method: 'snowball' | 'avalanche', currentDebts: WorkingDebtItem[]) => {
+    const sortedDebts = [...currentDebts];
     if (method === 'snowball') {
-      // Sort by balance (smallest first)
-      sortedDebts.sort((a, b) => a.balance - b.balance);
+      sortedDebts.sort((a, b) => {
+          if (a.currentBalance !== b.currentBalance) return a.currentBalance - b.currentBalance;
+          return b.interestRate - a.interestRate; // Tie-breaker: higher rate first
+      });
     } else {
-      // Sort by interest rate (highest first)
-      sortedDebts.sort((a, b) => b.interestRate - a.interestRate);
+      sortedDebts.sort((a, b) => {
+           if (b.interestRate !== a.interestRate) return b.interestRate - a.interestRate;
+           return a.currentBalance - b.currentBalance; // Tie-breaker: lower balance first
+      });
     }
-    
     return sortedDebts;
   };
 
-  const calculatePayoff = () => {
-    // Validate inputs first
-    if (debts.some(debt => debt.balance <= 0 || debt.interestRate < 0 || debt.minimumPayment <= 0)) {
-      toast({
-        title: "Invalid Input",
-        description: "All debts must have positive balances and minimum payments. Interest rates cannot be negative.",
-        variant: "destructive"
-      });
-      return;
+  // Main calculation function
+  const calculatePayoff = (showToast = true) => {
+    // Validation
+    if (debts.some(debt => debt.balance < 0 || debt.interestRate < 0 || debt.minimumPayment < 0)) {
+      toast({ title: "Invalid Input", description: "Debt values cannot be negative.", variant: "destructive" }); return;
     }
-
+    if (debts.some(debt => debt.minimumPayment <= 0 && debt.balance > 0)) {
+      toast({ title: "Missing Minimum Payment", description: "Please enter a minimum payment (>0) for all debts with a balance.", variant: "destructive" }); return;
+    }
     if (extraPayment < 0) {
-      toast({
-        title: "Invalid Extra Payment",
-        description: "Extra payment cannot be negative.",
-        variant: "destructive"
-      });
-      return;
+      toast({ title: "Invalid Extra Payment", description: "Extra payment cannot be negative.", variant: "destructive" }); return;
+    }
+    if (debts.length === 0) {
+      toast({ title: "No Debts", description: "Please add at least one debt.", variant: "destructive" });
+      setSnowballResult(null); setAvalancheResult(null); return;
     }
 
-    // Calculate for snowball method
-    const snowballResult = calculatePayoffPlan('snowball');
-    setSnowballResult(snowballResult);
+    const snowball = calculatePayoffPlan('snowball');
+    const avalanche = calculatePayoffPlan('avalanche');
 
-    // Calculate for avalanche method
-    const avalancheResult = calculatePayoffPlan('avalanche');
-    setAvalancheResult(avalancheResult);
-
-    // Save calculation to storage
+    setSnowballResult(snowball);
+    setAvalancheResult(avalanche);
     saveData();
 
-    // Display toast with results summary
-    const difference = Math.abs(snowballResult.totalInterest - avalancheResult.totalInterest);
-    const betterMethod = avalancheResult.totalInterest < snowballResult.totalInterest ? 'Avalanche' : 'Snowball';
-    
-    toast({
-      title: "Calculation Complete",
-      description: `${betterMethod} method saves ${formatCurrency(difference)} in interest.`,
-    });
+    if (showToast) {
+        const interestDiff = Math.abs(snowball.totalInterest - avalanche.totalInterest);
+        const timeDiff = Math.abs(snowball.monthsToPayoff - avalanche.monthsToPayoff);
+        let description = `Snowball: ${snowball.monthsToPayoff} mo, ${formatCurrency(snowball.totalInterest)} interest. Avalanche: ${avalanche.monthsToPayoff} mo, ${formatCurrency(avalanche.totalInterest)} interest.`;
+        if (interestDiff > 1 || timeDiff > 0) {
+             const betterMethod = avalanche.totalInterest < snowball.totalInterest ? 'Avalanche' : 'Snowball';
+             const timeComparison = timeDiff === 0 ? 'the same time' : `${timeDiff} ${timeDiff === 1 ? 'month' : 'months'} ${avalanche.monthsToPayoff < snowball.monthsToPayoff ? 'less' : 'more'}`;
+             description = `${betterMethod} saves ${formatCurrency(interestDiff)} interest and takes ${timeComparison}.`;
+        }
+        toast({ title: "Payoff Plans Calculated", description: description, duration: 7000 });
+    }
   };
 
+  // Core payoff simulation logic
   const calculatePayoffPlan = (method: 'snowball' | 'avalanche'): PayoffResult => {
-    // Make a deep copy of debts and sort them by the selected method
-    let workingDebts = sortDebtsByMethod(method).map(debt => ({...debt}));
-    
+    let workingDebts: WorkingDebtItem[] = debts.map(debt => ({
+        ...debt, currentBalance: debt.balance, totalInterestPaid: 0
+    }));
     let month = 0;
-    let totalInterestPaid = 0;
-    let totalPaid = 0;
+    let totalInterestOverall = 0;
+    let totalPaidOverall = 0;
     const payoffSchedule = [];
     const debtDetails = workingDebts.map(debt => ({
-      id: debt.id,
-      name: debt.name,
-      payoffMonth: 0,
-      totalInterestPaid: 0
+        id: debt.id, name: debt.name, payoffMonth: 0, totalInterestPaid: 0
     }));
-    
-    // Calculate total minimum payment
-    const totalMinPayment = workingDebts.reduce((sum, debt) => sum + debt.minimumPayment, 0);
-    
-    // Pay off all debts month by month
-    while (workingDebts.length > 0) {
-      month++;
-      let monthlyRemainingBalance = 0;
-      let monthlyInterestPaid = 0;
-      let monthlyPrincipalPaid = 0;
-      let extraRemaining = extraPayment;
-      
-      // Pay minimum on all debts
-      for (let i = 0; i < workingDebts.length; i++) {
-        const debt = workingDebts[i];
-        
-        // Calculate interest for this month
-        const monthlyInterest = (debt.balance * (debt.interestRate / 100)) / 12;
-        const availableForPrincipal = debt.minimumPayment - monthlyInterest;
-        
-        // Update balance with minimum payment
-        debt.balance = Math.max(0, debt.balance - availableForPrincipal);
-        
-        // Track interest paid
-        totalInterestPaid += monthlyInterest;
-        monthlyInterestPaid += monthlyInterest;
-        monthlyPrincipalPaid += Math.min(availableForPrincipal, workingDebts[i].balance + availableForPrincipal);
-        
-        // Update debt-specific tracking
-        const debtIndex = debtDetails.findIndex(d => d.id === debt.id);
-        if (debtIndex >= 0) {
-          debtDetails[debtIndex].totalInterestPaid += monthlyInterest;
-        }
-      }
-      
-      // Apply extra payment to first debt in the list (either smallest balance or highest interest)
-      if (extraRemaining > 0 && workingDebts.length > 0) {
-        const principalPayment = Math.min(workingDebts[0].balance, extraRemaining);
-        workingDebts[0].balance -= principalPayment;
-        extraRemaining -= principalPayment;
-        monthlyPrincipalPaid += principalPayment;
-      }
-      
-      // Check if any debts are paid off
-      for (let i = workingDebts.length - 1; i >= 0; i--) {
-        if (workingDebts[i].balance <= 0.01) { // Account for floating-point errors
-          // Record payoff month
-          const debtIndex = debtDetails.findIndex(d => d.id === workingDebts[i].id);
-          if (debtIndex >= 0) {
-            debtDetails[debtIndex].payoffMonth = month;
-          }
-          
-          // Remove the debt from active list
-          workingDebts.splice(i, 1);
-        }
-      }
-      
-      // Calculate total remaining balance across all debts
-      monthlyRemainingBalance = workingDebts.reduce((sum, debt) => sum + debt.balance, 0);
-      
-      // Update payoff schedule
-      payoffSchedule.push({
-        month,
-        remainingBalance: monthlyRemainingBalance,
-        interestPaid: monthlyInterestPaid,
-        principalPaid: monthlyPrincipalPaid
-      });
-      
-      // Update total paid
-      totalPaid += monthlyInterestPaid + monthlyPrincipalPaid;
-      
-      // Sort the working debts again (important for snowball as balances change)
-      workingDebts = sortDebtsByMethod(method).filter(d => 
-        workingDebts.some(wd => wd.id === d.id)
-      );
-    }
-    
-    return {
-      method,
-      totalInterest: totalInterestPaid,
-      totalPaid,
-      monthsToPayoff: month,
-      payoffSchedule,
-      debtDetails
-    };
-  };
+    const originalTotalMinimums = debts.reduce((sum, d) => sum + d.minimumPayment, 0);
 
+    while (workingDebts.some(d => d.currentBalance > 0.01)) {
+        month++;
+        let monthlyInterestPaid = 0;
+        let monthlyPrincipalPaid = 0;
+        let totalMinimumsPaidThisMonth = 0;
+        let snowballAmount = 0;
+
+        // Sort debts for payment order *at the start of each month*
+        workingDebts = sortDebtsByMethod(method, workingDebts);
+
+        // 1. Calculate interest and apply minimum payments
+        workingDebts.forEach(debt => {
+            if (debt.currentBalance <= 0.01) return;
+
+            const monthlyInterest = (debt.currentBalance * (debt.interestRate / 100)) / 12;
+            debt.totalInterestPaid += monthlyInterest;
+            monthlyInterestPaid += monthlyInterest;
+            totalInterestOverall += monthlyInterest;
+
+            let paymentTowardsThisDebt = debt.minimumPayment;
+            paymentTowardsThisDebt = Math.min(paymentTowardsThisDebt, debt.currentBalance + monthlyInterest); // Cap payment at amount needed
+
+            const principalPaid = Math.max(0, paymentTowardsThisDebt - monthlyInterest); // Ensure principal isn't negative
+            debt.currentBalance -= principalPaid;
+            monthlyPrincipalPaid += principalPaid;
+            totalMinimumsPaidThisMonth += paymentTowardsThisDebt;
+        });
+
+        // 2. Determine snowball amount (freed-up minimums)
+        const currentTotalMinimumsRequired = workingDebts
+            .filter(d => d.currentBalance > 0.01)
+            .reduce((sum, d) => sum + d.minimumPayment, 0);
+        snowballAmount = originalTotalMinimums - currentTotalMinimumsRequired;
+
+        // 3. Apply extra payment + snowball amount
+        let paymentPool = extraPayment + snowballAmount;
+        workingDebts.forEach(debt => {
+            if (paymentPool <= 0 || debt.currentBalance <= 0.01) return;
+            const amountToPay = Math.min(paymentPool, debt.currentBalance);
+            debt.currentBalance -= amountToPay;
+            monthlyPrincipalPaid += amountToPay;
+            paymentPool -= amountToPay;
+        });
+
+        // Record payoff month if balance hits zero
+        workingDebts.forEach(debt => {
+            const detail = debtDetails.find(d => d.id === debt.id);
+            if (detail && detail.payoffMonth === 0 && debt.currentBalance <= 0.01) {
+                detail.payoffMonth = month;
+                detail.totalInterestPaid = debt.totalInterestPaid; // Record final interest when paid off
+            }
+        });
+
+        // Update totals and schedule
+        const totalPaidThisMonth = totalMinimumsPaidThisMonth + extraPayment + snowballAmount - paymentPool;
+        totalPaidOverall += totalPaidThisMonth;
+        const remainingBalanceOverall = workingDebts.reduce((sum, d) => sum + d.currentBalance, 0);
+
+        payoffSchedule.push({
+            month,
+            remainingBalance: remainingBalanceOverall < 0.01 ? 0 : remainingBalanceOverall, // Ensure final is 0
+            interestPaid: monthlyInterestPaid,
+            principalPaid: monthlyPrincipalPaid,
+            totalPaidThisMonth: totalPaidThisMonth
+        });
+
+        // Filter out paid-off debts for the next iteration's check
+        workingDebts = workingDebts.filter(d => d.currentBalance > 0.01);
+
+        if (month > 1200) { console.error("Calculation exceeded 100 years."); break; } // Safety break
+    }
+
+    // Ensure final interest is captured for debts paid off on the last month
+     debtDetails.forEach(detail => {
+         if (detail.payoffMonth === month) {
+             const finalDebtState = debts.map(d => ({...d, currentBalance: 0, totalInterestPaid: 0}))
+                                         .find(d => d.id === detail.id); // Find original debt
+             const calculatedDebt = calculatePayoffPlan(method).debtDetails.find(d => d.id === detail.id); // Re-run needed to get final interest state accurately
+             if (calculatedDebt) {
+                 detail.totalInterestPaid = calculatedDebt.totalInterestPaid;
+             }
+         }
+     });
+
+
+    return {
+        method,
+        totalInterest: totalInterestOverall,
+        totalPaid: totalPaidOverall,
+        monthsToPayoff: month,
+        payoffSchedule,
+        debtDetails
+    };
+};
+
+  // --- Render Logic ---
   const activeResult = activeTab === 'snowball' ? snowballResult : avalancheResult;
-  
-  // Generate chart data
-  const chartData = activeResult?.payoffSchedule.filter((_, i) => i % 3 === 0 || i === 0 || i === activeResult.payoffSchedule.length - 1)
-    .map(item => ({
+  const chartData = activeResult?.payoffSchedule.map(item => ({
       month: item.month,
-      balance: item.remainingBalance
-    }));
+      balance: item.remainingBalance < 0.01 ? 0 : item.remainingBalance
+  }));
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Debt Payoff Calculator</CardTitle>
-        <CardDescription>
-          Compare snowball and avalanche debt payoff strategies to find the best approach for your situation.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Extra Payment */}
-        <div className="space-y-2">
-          <Label htmlFor="extraPayment">Monthly Extra Payment</Label>
-          <div className="flex items-center space-x-4">
-            <Input
-              id="extraPayment"
-              type="number"
-              min="0"
-              value={extraPayment}
-              onChange={(e) => setExtraPayment(Number(e.target.value))}
-              className="flex-1"
-            />
-            <div className="text-sm text-muted-foreground w-24">
-              {formatCurrency(extraPayment)}
+    <Card className="w-full shadow-lg border-gray-200">
+      {/* Header */}
+      <CardHeader className="bg-gradient-to-r from-finance-primary to-finance-primary/80 text-white rounded-t-lg">
+         <div className="flex justify-between items-center">
+            <div>
+                <CardTitle className="text-2xl flex items-center gap-2">
+                <TrendingDown className="h-6 w-6" /> Debt Payoff Calculator
+                </CardTitle>
+                <CardDescription className="text-finance-primary-foreground/90 mt-1">
+                Compare Snowball vs. Avalanche strategies.
+                </CardDescription>
             </div>
-          </div>
+             {dataStored && (
+                <TooltipProvider>
+                    <UITooltip delayDuration={100}>
+                    <TooltipTrigger asChild>
+                        <div className="bg-white/20 px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 cursor-default">
+                            <Save size={12}/> Saved
+                        </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Your inputs are saved locally.</p>
+                    </TooltipContent>
+                    </UITooltip>
+                </TooltipProvider>
+            )}
+         </div>
+      </CardHeader>
+
+      {/* Content */}
+      <CardContent className="pt-6 space-y-6">
+        {/* Inputs */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-1">
+                 {/* Extra Payment Card */}
+                 <Card className="border-dashed border-blue-300 h-full">
+                    <CardHeader>
+                        <CardTitle className="text-lg flex items-center gap-2 text-blue-700">
+                            <DollarSign className="h-5 w-5" /> Extra Payment
+                        </CardTitle>
+                         <CardDescription>Additional amount paid monthly.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-2">
+                            <Label htmlFor="extraPayment" className="flex items-center">Amount</Label>
+                            <div className="flex items-center">
+                                <span className="input-prefix">$</span>
+                                <Input id="extraPayment" type="number" min="0" value={extraPayment}
+                                    onChange={(e) => setExtraPayment(Number(e.target.value) || 0)}
+                                    className="input-field rounded-l-none" placeholder="e.g., 100"
+                                />
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+            <div className="lg:col-span-2">
+                 {/* Debts Card */}
+                 <Card className="border-dashed border-green-300 h-full">
+                    <CardHeader>
+                        <div className="flex justify-between items-center">
+                            <CardTitle className="text-lg flex items-center gap-2 text-green-700">
+                                <ListChecks className="h-5 w-5" /> Your Debts
+                            </CardTitle>
+                            <Button onClick={handleAddDebt} variant="outline" size="sm">
+                                <PlusCircle size={16} className="mr-2"/> Add Debt
+                            </Button>
+                        </div>
+                         <CardDescription>List all debts to include in the plan.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 -mr-2">
+                            {debts.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">No debts added.</p>}
+                            {debts.map((debt) => (
+                            <Card key={debt.id} className="p-3 bg-gray-50/50">
+                                <div className="flex justify-between items-start mb-2">
+                                    <Input value={debt.name} onChange={(e) => handleDebtChange(debt.id, 'name', e.target.value)}
+                                        className="flex-1 mr-2 h-9 font-medium" placeholder="Debt name" />
+                                    <TooltipProvider>
+                                        <UITooltip delayDuration={100}>
+                                            <TooltipTrigger asChild>
+                                                <Button onClick={() => handleRemoveDebt(debt.id)} variant="ghost" size="icon"
+                                                    className="text-red-500 hover:bg-red-100 h-9 w-9"> <Trash2 className="h-4 w-4" /> </Button>
+                                            </TooltipTrigger> <TooltipContent><p>Remove Debt</p></TooltipContent>
+                                        </UITooltip>
+                                    </TooltipProvider>
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                    <div className="space-y-1">
+                                        <Label htmlFor={`balance-${debt.id}`} className="text-xs">Balance</Label>
+                                        <div className="flex items-center"><span className="input-prefix h-9">$</span>
+                                            <Input id={`balance-${debt.id}`} type="number" min="0" value={debt.balance}
+                                                onChange={(e) => handleDebtChange(debt.id, 'balance', Number(e.target.value))}
+                                                className="input-field rounded-l-none h-9" placeholder="0" />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <Label htmlFor={`interest-${debt.id}`} className="text-xs">Rate</Label>
+                                        <div className="flex items-center">
+                                            <Input id={`interest-${debt.id}`} type="number" min="0" step="0.1" value={debt.interestRate}
+                                                onChange={(e) => handleDebtChange(debt.id, 'interestRate', Number(e.target.value))}
+                                                className="input-field rounded-r-none h-9" placeholder="0" />
+                                            <span className="input-suffix h-9">%</span>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <Label htmlFor={`minimum-${debt.id}`} className="text-xs">Min. Pymt</Label>
+                                        <div className="flex items-center"><span className="input-prefix h-9">$</span>
+                                            <Input id={`minimum-${debt.id}`} type="number" min="0" value={debt.minimumPayment}
+                                                onChange={(e) => handleDebtChange(debt.id, 'minimumPayment', Number(e.target.value))}
+                                                className="input-field rounded-l-none h-9" placeholder="0" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </Card>
+                            ))}
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
         </div>
 
-        {/* Debts Section */}
-        <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-medium">Your Debts</h3>
-            <Button onClick={handleAddDebt} size="sm" variant="outline">
-              <PlusCircle className="mr-2 h-4 w-4" /> Add Debt
-            </Button>
-          </div>
-          
-          <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
-            {debts.map((debt) => (
-              <div key={debt.id} className="space-y-2 border rounded-lg p-4">
-                <div className="flex justify-between items-center">
-                  <Input
-                    value={debt.name}
-                    onChange={(e) => handleDebtChange(debt.id, 'name', e.target.value)}
-                    className="flex-1 mr-2"
-                    placeholder="Debt name"
-                  />
-                  <Button 
-                    onClick={() => handleRemoveDebt(debt.id)} 
-                    variant="ghost" 
-                    size="icon"
-                    className="text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
-                  <div className="space-y-2">
-                    <Label htmlFor={`balance-${debt.id}`}>Current Balance</Label>
-                    <Input
-                      id={`balance-${debt.id}`}
-                      type="number"
-                      min="0"
-                      value={debt.balance}
-                      onChange={(e) => handleDebtChange(debt.id, 'balance', Number(e.target.value))}
-                      placeholder="Current balance"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor={`interest-${debt.id}`}>Interest Rate (%)</Label>
-                    <Input
-                      id={`interest-${debt.id}`}
-                      type="number"
-                      min="0"
-                      step="0.1"
-                      value={debt.interestRate}
-                      onChange={(e) => handleDebtChange(debt.id, 'interestRate', Number(e.target.value))}
-                      placeholder="Interest rate"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor={`minimum-${debt.id}`}>Minimum Payment</Label>
-                    <Input
-                      id={`minimum-${debt.id}`}
-                      type="number"
-                      min="0"
-                      value={debt.minimumPayment}
-                      onChange={(e) => handleDebtChange(debt.id, 'minimumPayment', Number(e.target.value))}
-                      placeholder="Minimum payment"
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          
-          <Button 
-            onClick={calculatePayoff}
-            className="w-full bg-finance-primary hover:bg-finance-accent hover:text-white" 
-          >
-            Calculate Payoff Plan
-          </Button>
-        </div>
+        {/* Calculate Button */}
+        <Button onClick={() => calculatePayoff(true)} className="w-full" size="lg" disabled={debts.length === 0}>
+            Calculate Payoff Plans
+        </Button>
 
-        {/* Results Section - show only if calculated */}
+        {/* Results Section */}
         {snowballResult && avalancheResult && (
-          <div className="pt-4 border-t">
+          <div className="pt-6 border-t space-y-6">
+             <h2 className="text-xl font-semibold text-center text-finance-primary">Payoff Plan Comparison</h2>
             <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'snowball' | 'avalanche')}>
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="snowball">Snowball Method</TabsTrigger>
-                <TabsTrigger value="avalanche">Avalanche Method</TabsTrigger>
+                <TabsTrigger value="snowball">Snowball</TabsTrigger>
+                <TabsTrigger value="avalanche">Avalanche</TabsTrigger>
               </TabsList>
-              
-              <TabsContent value="snowball" className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <div className="text-sm text-muted-foreground">Total Interest</div>
-                    <div className="text-2xl font-semibold">{formatCurrency(snowballResult.totalInterest)}</div>
-                  </div>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <div className="text-sm text-muted-foreground">Time to Debt-Free</div>
-                    <div className="text-2xl font-semibold">{snowballResult.monthsToPayoff} months</div>
-                  </div>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <div className="text-sm text-muted-foreground">Total Paid</div>
-                    <div className="text-2xl font-semibold">{formatCurrency(snowballResult.totalPaid)}</div>
-                  </div>
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="avalanche" className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <div className="text-sm text-muted-foreground">Total Interest</div>
-                    <div className="text-2xl font-semibold">{formatCurrency(avalancheResult.totalInterest)}</div>
-                  </div>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <div className="text-sm text-muted-foreground">Time to Debt-Free</div>
-                    <div className="text-2xl font-semibold">{avalancheResult.monthsToPayoff} months</div>
-                  </div>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <div className="text-sm text-muted-foreground">Total Paid</div>
-                    <div className="text-2xl font-semibold">{formatCurrency(avalancheResult.totalPaid)}</div>
-                  </div>
-                </div>
-              </TabsContent>
+
+              {/* Shared Result Display Structure */}
+              { [snowballResult, avalancheResult].map(result => (
+                  <TabsContent key={result.method} value={result.method} className="space-y-4 mt-4">
+                     <Card className="bg-gray-50 border-gray-200">
+                         <CardHeader className="pb-2 pt-3">
+                             <CardTitle className="text-base">{result.method === 'snowball' ? 'Snowball' : 'Avalanche'} Summary</CardTitle>
+                         </CardHeader>
+                         <CardContent className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
+                             <div className="p-2 border rounded bg-white"><div className="text-xs text-muted-foreground">Total Interest</div><div className="text-lg font-semibold">{formatCurrency(result.totalInterest)}</div></div>
+                             <div className="p-2 border rounded bg-white"><div className="text-xs text-muted-foreground">Time to Debt-Free</div><div className="text-lg font-semibold">{result.monthsToPayoff} mo</div></div>
+                             <div className="p-2 border rounded bg-white"><div className="text-xs text-muted-foreground">Total Paid</div><div className="text-lg font-semibold">{formatCurrency(result.totalPaid)}</div></div>
+                         </CardContent>
+                     </Card>
+                  </TabsContent>
+              ))}
             </Tabs>
-            
-            {/* Comparison Chart */}
+
+            {/* Chart Card */}
             {chartData && chartData.length > 0 && (
-              <div className="mt-6">
-                <h3 className="text-lg font-medium mb-4">Balance Over Time</h3>
-                <div className="h-[300px] w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      data={chartData}
-                      margin={{
-                        top: 5,
-                        right: 30,
-                        left: 20,
-                        bottom: 5,
-                      }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis 
-                        dataKey="month" 
-                        label={{ value: 'Month', position: 'insideBottom', offset: -5 }} 
-                      />
-                      <YAxis 
-                        tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
-                        label={{ value: 'Balance ($)', angle: -90, position: 'insideLeft' }} 
-                      />
-                      <Tooltip formatter={(value) => [`$${Number(value).toLocaleString()}`, 'Balance']} />
-                      <Legend />
-                      <Bar dataKey="balance" fill="#8884d8" name="Remaining Balance" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            )}
-            
-            {/* Debt Payoff Order */}
-            <div className="mt-6">
-              <h3 className="text-lg font-medium mb-4">Debt Payoff Order</h3>
-              <div className="border rounded-lg divide-y">
-                {activeResult.debtDetails
-                  .sort((a, b) => a.payoffMonth - b.payoffMonth)
-                  .map((debt, index) => (
-                    <div key={debt.id} className="p-3 flex justify-between items-center">
-                      <div>
-                        <span className="font-medium">{index + 1}.</span> {debt.name}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        Paid off in month {debt.payoffMonth} 
-                        <span className="ml-2">({formatCurrency(debt.totalInterestPaid)} interest)</span>
-                      </div>
+              <Card>
+                <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                        <BarChart3 className="h-5 w-5" /> Balance Over Time ({activeTab === 'snowball' ? 'Snowball' : 'Avalanche'})
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="h-[300px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={chartData} margin={{ top: 5, right: 5, left: 15, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="month" label={{ value: 'Month', position: 'insideBottom', offset: -5 }} tick={{ fontSize: 10 }} interval="preserveStartEnd" tickFormatter={(tick) => tick % 12 === 0 ? `Yr ${tick/12}` : (tick % 6 === 0 ? `M${tick}`: '')}/>
+                        <YAxis tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`} label={{ value: 'Balance', angle: -90, position: 'insideLeft', offset: 0 }} tick={{ fontSize: 10 }} width={60}/>
+                        <Tooltip formatter={(value) => [formatCurrency(Number(value)), 'Balance']} labelFormatter={(label) => `Month ${label}`} contentStyle={{ fontSize: '12px' }}/>
+                        <Bar dataKey="balance" fill="#3b82f6" name="Remaining Balance" radius={[4, 4, 0, 0]}/>
+                        </BarChart>
+                    </ResponsiveContainer>
                     </div>
-                  ))}
-              </div>
-            </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Payoff Order Card */}
+            {activeResult && activeResult.debtDetails.length > 0 && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-lg flex items-center gap-2">
+                            <ListOrdered className="h-5 w-5" /> Debt Payoff Order ({activeTab === 'snowball' ? 'Snowball' : 'Avalanche'})
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="border rounded-lg divide-y max-h-[300px] overflow-y-auto">
+                            {activeResult.debtDetails
+                            .sort((a, b) => a.payoffMonth - b.payoffMonth)
+                            .map((debt, index) => (
+                                <div key={debt.id} className="p-3 flex flex-wrap justify-between items-center text-sm">
+                                <div className="font-medium mr-2"><span className="inline-block text-center w-5 mr-1">{index + 1}.</span> {debt.name}</div>
+                                <div className="text-xs text-muted-foreground text-right ml-auto">Paid off mo {debt.payoffMonth} ({formatCurrency(debt.totalInterestPaid)} int.)</div>
+                                </div>
+                            ))}
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
           </div>
         )}
       </CardContent>
-      <CardFooter className="flex flex-col text-sm text-muted-foreground border-t pt-4">
-        <div className="space-y-2">
-          <p>
-            <strong>Snowball Method:</strong> Pays off smallest balances first for psychological wins.
-          </p>
-          <p>
-            <strong>Avalanche Method:</strong> Pays off highest interest rates first to minimize interest costs.
-          </p>
-          <p className="italic mt-2">
-            Both methods assume you make all minimum payments plus the extra amount each month.
-          </p>
-        </div>
+
+      {/* Footer */}
+      <CardFooter className="flex flex-col text-sm text-muted-foreground border-t pt-4 text-center space-y-1">
+        <p><strong>Snowball:</strong> Pay off smallest balances first. <strong>Avalanche:</strong> Pay off highest interest rates first.</p>
+        <p className="italic">Both methods assume minimum payments on all debts + extra payment applied according to the strategy.</p>
       </CardFooter>
     </Card>
   );
 };
+
+// Input styling classes
+const inputPrefixSuffixBase = "flex items-center justify-center text-sm text-muted-foreground px-3 bg-gray-100 border";
+const inputPrefixStyle = `${inputPrefixSuffixBase} border-r-0 rounded-l-md h-9`;
+const inputSuffixStyle = `${inputPrefixSuffixBase} border-l-0 rounded-r-md h-9`;
+const inputFieldStyle = "flex-1 min-w-0 rounded-none h-9";
+
+// Add these styles to your global CSS or component-specific CSS:
+/*
+.input-prefix { @apply flex items-center justify-center text-sm text-muted-foreground px-3 bg-gray-100 border border-r-0 rounded-l-md h-9; }
+.input-suffix { @apply flex items-center justify-center text-sm text-muted-foreground px-3 bg-gray-100 border border-l-0 rounded-r-md h-9; }
+.input-field { @apply flex-1 min-w-0 rounded-none h-9; }
+*/
 
 export default DebtPayoffCalculator;
