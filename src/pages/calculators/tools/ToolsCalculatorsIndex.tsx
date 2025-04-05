@@ -1,8 +1,21 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Calculator, Clock, Ruler, Globe, ChevronRight } from "lucide-react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  ArrowRight,
+  Calculator,
+  Clock,
+  Ruler,
+  Globe,
+  ChevronRight,
+} from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/layout/Layout";
 
@@ -11,7 +24,8 @@ const ToolsCalculatorsIndex = () => {
     {
       id: "currency-converter",
       title: "Currency Converter",
-      description: "Convert between different currencies with up-to-date exchange rates.",
+      description:
+        "Convert between different currencies with up-to-date exchange rates.",
       icon: <Globe className="h-8 w-8 text-primary" />,
       path: "/calculators/tools/currency-converter",
       comingSoon: false,
@@ -19,7 +33,8 @@ const ToolsCalculatorsIndex = () => {
     {
       id: "measurement-converter",
       title: "Measurement Converter",
-      description: "Convert between different units of length, weight, volume, temperature, and more.",
+      description:
+        "Convert between different units of length, weight, volume, temperature, and more.",
       icon: <Ruler className="h-8 w-8 text-primary" />,
       path: "/calculators/tools/measurement-converter",
       comingSoon: false,
@@ -27,7 +42,8 @@ const ToolsCalculatorsIndex = () => {
     {
       id: "time-calculator",
       title: "Time Calculator",
-      description: "Calculate time differences, add or subtract time from dates, and more.",
+      description:
+        "Calculate time differences, add or subtract time from dates, and more.",
       icon: <Clock className="h-8 w-8 text-primary" />,
       path: "/calculators/tools/time-calculator",
       comingSoon: false,
@@ -35,10 +51,11 @@ const ToolsCalculatorsIndex = () => {
     {
       id: "scientific-calculator",
       title: "Scientific Calculator",
-      description: "Perform advanced scientific calculations with mathematical functions.",
+      description:
+        "Perform advanced scientific calculations with mathematical functions.",
       icon: <Calculator className="h-8 w-8 text-primary" />,
       path: "/calculators/tools/scientific-calculator",
-      comingSoon: true,
+      comingSoon: false, // Changed to false
     },
   ];
 
@@ -48,15 +65,22 @@ const ToolsCalculatorsIndex = () => {
         <div className="container">
           <div className="max-w-3xl">
             <div className="flex items-center text-sm mb-3 text-white/80">
-              <Link to="/calculators" className="hover:text-white">Home</Link>
+              <Link to="/calculators" className="hover:text-white">
+                Home
+              </Link>
               <ChevronRight className="h-4 w-4 mx-1" />
-              <Link to="/calculators" className="hover:text-white">Calculators</Link>
+              <Link to="/calculators" className="hover:text-white">
+                Calculators
+              </Link>
               <ChevronRight className="h-4 w-4 mx-1" />
               <span>Practical Tools</span>
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold font-heading mb-4">Practical Tools & Converters</h1>
+            <h1 className="text-3xl md:text-4xl font-bold font-heading mb-4">
+              Practical Tools & Converters
+            </h1>
             <p className="text-xl text-white/90">
-              Everyday calculators and converters for quick reference and practical problem-solving
+              Everyday calculators and converters for quick reference and
+              practical problem-solving
             </p>
           </div>
         </div>
@@ -66,7 +90,8 @@ const ToolsCalculatorsIndex = () => {
         <div className="mb-8">
           <h2 className="text-2xl font-semibold mb-2">Available Tools</h2>
           <p className="text-muted-foreground">
-            Use these calculators and converters for everyday practical calculations
+            Use these calculators and converters for everyday practical
+            calculations
           </p>
         </div>
 
