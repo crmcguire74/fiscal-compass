@@ -268,8 +268,8 @@ const ScientificCalculator: React.FC = () => {
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto shadow-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
-      <CardContent className="p-6">
+    <Card className="w-full max-w-md mx-auto shadow-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 sm:mt-4 sm:mb-4">
+      <CardContent className="p-2 sm:p-6">
         {/* Display */}
         <div className="relative mb-6">
           <Input
@@ -294,7 +294,7 @@ const ScientificCalculator: React.FC = () => {
         </div>
 
         {/* Buttons Grid */}
-        <div className="grid grid-cols-6 gap-2.5 p-3 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 rounded-xl shadow-inner">
+        <div className="grid grid-cols-6 gap-1.5 sm:gap-2.5 p-2 sm:p-3 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 rounded-xl shadow-inner">
           {buttonLayout.flat().map((label) => (
             <Button
               key={label}
@@ -307,11 +307,11 @@ const ScientificCalculator: React.FC = () => {
                   : "outline"
               }
               className={`
-                text-lg h-14 flex items-center justify-center rounded-lg 
+                text-sm sm:text-lg h-14 flex items-center justify-center rounded-lg 
                 transition-all duration-150 ease-in-out
                 transform hover:scale-[1.02] active:scale-95
                 shadow hover:shadow-lg active:shadow-sm
-                font-medium tracking-wide
+                font-medium tracking-wide text-[0.8rem] sm:text-base
                 backdrop-blur-sm backdrop-saturate-150
                 ${label === "0" ? "col-span-2" : ""}
                 ${

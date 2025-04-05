@@ -12,8 +12,8 @@ import {
 const ScientificCalculatorPage: React.FC = () => {
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-8">
-        <Card className="w-full max-w-4xl mx-auto">
+      <div className="container mx-auto px-0 sm:px-4 py-2 sm:py-8">
+        <Card className="w-full max-w-4xl mx-auto border-0 sm:border shadow-none sm:shadow">
           <CardHeader>
             <CardTitle className="text-2xl font-bold text-center">
               Scientific Calculator
