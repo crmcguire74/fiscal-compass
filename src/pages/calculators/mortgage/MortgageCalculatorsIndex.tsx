@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/layout/Layout";
-import { ArrowRight, Home, Percent, Calculator, DollarSign, BadgeDollarSign, Building, LineChart, ChevronRight } from "lucide-react";
+import { ArrowRight, Home, Percent, Calculator, DollarSign, BadgeDollarSign, Building, LineChart, ChevronRight, PiggyBank } from "lucide-react";
 
 const MortgageCalculatorsIndex = () => {
   const calculators = [
@@ -49,6 +49,13 @@ const MortgageCalculatorsIndex = () => {
       description: "Calculate how much equity you'll have after paying all selling costs and fees.",
       icon: <DollarSign className="h-8 w-8 text-primary" />,
       path: "/calculators/real-estate/home-equity-calculator",
+    },
+    {
+      id: "cost-to-close",
+      title: "Cost to Close Calculator",
+      description: "Estimate all closing costs associated with buying a home, including fees and prepaid items.",
+      icon: <PiggyBank className="h-8 w-8 text-primary" />,
+      path: "/calculators/mortgage/cost-to-close",
     }
   ];
 

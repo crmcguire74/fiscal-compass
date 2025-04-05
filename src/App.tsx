@@ -62,6 +62,7 @@ import GasMaintenancePage from "./pages/calculators/auto/GasMaintenancePage";
 import AutoCalculatorsIndex from "./pages/calculators/auto/AutoCalculatorsIndex";
 import RentVsBuyPage from "./pages/calculators/mortgage/RentVsBuyPage";
 import RealEstateCalculatorsIndex from "./pages/calculators/real-estate/RealEstateCalculatorsIndex";
+import CostToClosePage from "./pages/calculators/mortgage/CostToClosePage";
 
 const queryClient = new QueryClient();
 
@@ -133,6 +134,7 @@ const App = () => {
 
             {/* Mortgage Calculator Routes */}
             <Route path="/calculators/mortgage/rent-vs-buy" element={<RentVsBuyPage />} />
+            <Route path="/calculators/mortgage/cost-to-close" element={<CostToClosePage />} />
             
             {/* Debt Management Calculator Routes */}
             <Route path="/calculators/debt" element={<DebtCalculatorsIndex />} />

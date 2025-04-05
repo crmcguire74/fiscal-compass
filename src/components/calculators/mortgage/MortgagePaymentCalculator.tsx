@@ -820,11 +820,18 @@ const MortgagePaymentCalculator = () => {
                 onValueChange={(value) => handleDownPaymentPercentChange(value[0])}
                 className="py-4"
               />
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>0%</span>
-                <span>20%</span>
-                <span>50%</span>
-                <span>100%</span>
+              <div className="grid grid-cols-11 text-xs text-muted-foreground">
+                <span className="text-left">0%</span>
+                <span className="text-center">10%</span>
+                <span className="text-center">20%</span>
+                <span className="text-center">30%</span>
+                <span className="text-center">40%</span>
+                <span className="text-center">50%</span>
+                <span className="text-center">60%</span>
+                <span className="text-center">70%</span>
+                <span className="text-center">80%</span>
+                <span className="text-center">90%</span>
+                <span className="text-right">100%</span>
               </div>
             </div>
             

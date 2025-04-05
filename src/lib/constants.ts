@@ -2,7 +2,7 @@ export const CALCULATOR_CATEGORIES = [
   {
     id: 'home-mortgage',
     name: 'Home & Mortgage',
-    description: 'Calculators for home buying, mortgage payments, and refinancing',
+    description: 'Calculators for home buying, mortgage payments, closing costs, and refinancing',
     icon: 'home',
   },
   {
