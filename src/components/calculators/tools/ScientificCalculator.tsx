@@ -8,25 +8,37 @@ const ScientificCalculator: React.FC = () => {
   const [currentValue, setCurrentValue] = useState<number | null>(null);
   const [operator, setOperator] = useState<string | null>(null);
   const [waitingForOperand, setWaitingForOperand] = useState<boolean>(false);
-  const [memory, setMemory] = useState<number>(0); // Basic memory function example
+  const [memory, setMemory] = useState<number>(0);
+  const [isRadianMode, setIsRadianMode] = useState<boolean>(true);
+  const [formula, setFormula] = useState<string>("");
+  const [parenCount, setParenCount] = useState<number>(0);
 
   const inputDigit = (digit: string) => {
     if (waitingForOperand) {
       setDisplayValue(digit);
+      setFormula((prev) => prev + digit);
       setWaitingForOperand(false);
     } else {
-      setDisplayValue(displayValue === "0" ? digit : displayValue + digit);
+      const newValue = displayValue === "0" ? digit : displayValue + digit;
+      setDisplayValue(newValue);
+      if (displayValue === "0") {
+        setFormula((prev) => prev.slice(0, -1) + digit);
+      } else {
+        setFormula((prev) => prev + digit);
+      }
     }
   };
 
   const inputDecimal = () => {
     if (waitingForOperand) {
       setDisplayValue("0.");
+      setFormula((prev) => prev + "0.");
       setWaitingForOperand(false);
       return;
     }
     if (!displayValue.includes(".")) {
       setDisplayValue(displayValue + ".");
+      setFormula((prev) => prev + ".");
     }
   };
 
@@ -35,11 +47,15 @@ const ScientificCalculator: React.FC = () => {
     setCurrentValue(null);
     setOperator(null);
     setWaitingForOperand(false);
+    setFormula("");
+    setParenCount(0);
   };
 
   const clearEntry = () => {
     setDisplayValue("0");
-    // Note: More sophisticated clear entry might revert to previous state if needed
+    if (!operator) {
+      setFormula("");
+    }
   };
 
   const performOperation = (nextOperator: string) => {
@@ -55,6 +71,33 @@ const ScientificCalculator: React.FC = () => {
 
     setWaitingForOperand(true);
     setOperator(nextOperator);
+
+    // Update formula
+    const opDisplay =
+      {
+        "*": "×",
+        "/": "÷",
+        "+": "+",
+        "-": "-",
+        "^": "^",
+      }[nextOperator] || nextOperator;
+
+    setFormula((prev) => prev + " " + opDisplay + " ");
+  };
+
+  const handleParenthesis = (paren: "(" | ")") => {
+    if (paren === "(") {
+      setParenCount((prev) => prev + 1);
+      if (!waitingForOperand && displayValue !== "0") {
+        setFormula((prev) => prev + " × (");
+      } else {
+        setFormula((prev) => prev + "(");
+      }
+      setWaitingForOperand(true);
+    } else if (paren === ")" && parenCount > 0) {
+      setParenCount((prev) => prev - 1);
+      setFormula((prev) => prev + ")");
+    }
   };
 
   const calculate = (left: number, right: number, op: string): number => {
@@ -66,65 +109,113 @@ const ScientificCalculator: React.FC = () => {
       case "*":
         return left * right;
       case "/":
-        return right === 0 ? NaN : left / right; // Handle division by zero
+        return right === 0 ? NaN : left / right;
       case "^":
         return Math.pow(left, right);
       default:
-        return right; // Should not happen with binary ops
+        return right;
     }
   };
 
   const handleUnaryOperation = (op: string) => {
     const inputValue = parseFloat(displayValue);
     let result: number;
+    let formulaOp = "";
 
     switch (op) {
       case "sqrt":
         result = Math.sqrt(inputValue);
+        formulaOp = "√";
         break;
       case "sin":
-        result = Math.sin(degreesToRadians(inputValue));
+        result = isRadianMode
+          ? Math.sin(inputValue)
+          : Math.sin(degreesToRadians(inputValue));
+        formulaOp = "sin";
         break;
       case "cos":
-        result = Math.cos(degreesToRadians(inputValue));
+        result = isRadianMode
+          ? Math.cos(inputValue)
+          : Math.cos(degreesToRadians(inputValue));
+        formulaOp = "cos";
         break;
       case "tan":
-        result = Math.tan(degreesToRadians(inputValue));
+        result = isRadianMode
+          ? Math.tan(inputValue)
+          : Math.tan(degreesToRadians(inputValue));
+        formulaOp = "tan";
+        break;
+      case "sinh":
+        result = Math.sinh(inputValue);
+        formulaOp = "sinh";
+        break;
+      case "cosh":
+        result = Math.cosh(inputValue);
+        formulaOp = "cosh";
+        break;
+      case "tanh":
+        result = Math.tanh(inputValue);
+        formulaOp = "tanh";
         break;
       case "log":
         result = Math.log10(inputValue);
-        break; // Base 10 log
+        formulaOp = "log";
+        break;
       case "ln":
         result = Math.log(inputValue);
-        break; // Natural log
+        formulaOp = "ln";
+        break;
       case "1/x":
         result = inputValue === 0 ? NaN : 1 / inputValue;
+        formulaOp = "1/";
         break;
       case "+/-":
-        result = inputValue * -1;
+        result = -inputValue;
+        formulaOp = "-";
         break;
       case "!":
         result = factorial(inputValue);
+        formulaOp = "!";
         break;
-      case "deg": // Placeholder for degree/radian mode switch
-      case "rad": // Placeholder for degree/radian mode switch
-        console.warn("Degree/Radian mode switch not implemented yet.");
-        return; // Don't change display for mode switch yet
+      case "sqr":
+        result = inputValue * inputValue;
+        formulaOp = "²";
+        break;
+      case "cube":
+        result = inputValue * inputValue * inputValue;
+        formulaOp = "³";
+        break;
+      case "exp":
+        result = Math.exp(inputValue);
+        formulaOp = "e^";
+        break;
+      case "pow10":
+        result = Math.pow(10, inputValue);
+        formulaOp = "10^";
+        break;
+      case "cbrt":
+        result = Math.cbrt(inputValue);
+        formulaOp = "∛";
+        break;
       default:
         result = inputValue;
+        formulaOp = "";
     }
 
     if (isNaN(result) || !isFinite(result)) {
       setDisplayValue("Error");
+      setFormula("Error");
     } else {
-      // Format result nicely if needed, e.g., limit decimal places
       setDisplayValue(String(result));
+      if (["!", "²", "³"].includes(formulaOp)) {
+        setFormula((prev) => prev + formulaOp);
+      } else if (formulaOp) {
+        setFormula((prev) => `${formulaOp}(${prev})`);
+      }
     }
-    // Decide if unary operations should reset the state or allow chaining
-    // For now, let's assume it finalizes the current number
-    setCurrentValue(result); // Update currentValue after unary op
-    setWaitingForOperand(true); // Ready for next number or operator
-    setOperator(null); // Clear operator after unary op
+    setCurrentValue(result);
+    setWaitingForOperand(true);
+    setOperator(null);
   };
 
   const degreesToRadians = (degrees: number): number => {
@@ -132,7 +223,7 @@ const ScientificCalculator: React.FC = () => {
   };
 
   const factorial = (n: number): number => {
-    if (n < 0 || !Number.isInteger(n)) return NaN; // Factorial is not defined for negative numbers or non-integers
+    if (n < 0 || !Number.isInteger(n)) return NaN;
     if (n === 0 || n === 1) return 1;
     let result = 1;
     for (let i = 2; i <= n; i++) {
@@ -148,50 +239,44 @@ const ScientificCalculator: React.FC = () => {
       const result = calculate(currentValue, inputValue, operator);
       if (isNaN(result) || !isFinite(result)) {
         setDisplayValue("Error");
+        setFormula("Error");
       } else {
         setDisplayValue(String(result));
+        setFormula(String(result));
       }
-      setCurrentValue(null); // Reset after equals
+      setCurrentValue(null);
       setOperator(null);
-      setWaitingForOperand(false); // Allow new number input
+      setWaitingForOperand(false);
     }
-    // If no operator or currentValue, just keep the displayed value
   };
 
-  // --- Memory Functions ---
   const memoryClear = () => setMemory(0);
   const memoryRecall = () => {
     setDisplayValue(String(memory));
-    setWaitingForOperand(false); // Allow editing recalled value
+    setFormula((prev) => prev + memory);
+    setWaitingForOperand(false);
   };
   const memoryAdd = () => {
     const currentDisplay = parseFloat(displayValue);
     if (!isNaN(currentDisplay)) {
       setMemory(memory + currentDisplay);
-      setWaitingForOperand(true); // After M+, usually wait for next input
+      setWaitingForOperand(true);
     }
   };
   const memorySubtract = () => {
     const currentDisplay = parseFloat(displayValue);
     if (!isNaN(currentDisplay)) {
       setMemory(memory - currentDisplay);
-      setWaitingForOperand(true); // After M-, usually wait for next input
+      setWaitingForOperand(true);
     }
   };
 
-  // Layout structure
   const buttonLayout = [
-    // Scientific functions row 1
     ["(", ")", "mc", "m+", "m-", "mr"],
-    // Scientific functions row 2
     ["2nd", "x²", "x³", "xʸ", "eˣ", "10ˣ"],
-    // Scientific functions row 3
     ["1/x", "√x", "³√x", "ʸ√x", "ln", "log₁₀"],
-    // Scientific functions row 4
     ["x!", "sin", "cos", "tan", "e", "EE"],
-    // Scientific functions row 5
     ["Rad", "sinh", "cosh", "tanh", "π", "Rand"],
-    // Standard calculator rows
     ["AC", "C", "+/-", "/"],
     ["7", "8", "9", "*"],
     ["4", "5", "6", "-"],
@@ -204,16 +289,14 @@ const ScientificCalculator: React.FC = () => {
       if (label === "AC") {
         clearAll();
       }
-      return; // Ignore other buttons if in error state until AC
+      return;
     }
 
     if (!isNaN(parseInt(label))) {
-      // Digit
       inputDigit(label);
     } else if (label === ".") {
       inputDecimal();
     } else if (["+", "-", "*", "/", "^"].includes(label)) {
-      // Binary operators
       performOperation(label);
     } else if (label === "=") {
       handleEquals();
@@ -221,26 +304,6 @@ const ScientificCalculator: React.FC = () => {
       clearAll();
     } else if (label === "C") {
       clearEntry();
-    } else if (
-      ["sqrt", "sin", "cos", "tan", "log", "ln", "1/x", "+/-", "!"].includes(
-        label
-      )
-    ) {
-      // Unary operators
-      // Map UI labels to internal function names if needed
-      const opMap: { [key: string]: string } = {
-        "√x": "sqrt",
-        "log₁₀": "log",
-        "x!": "!",
-        "x²": "sqr",
-        "x³": "cube",
-        xʸ: "^",
-        eˣ: "exp",
-        "10ˣ": "pow10",
-        "³√x": "cbrt",
-        "ʸ√x": "ythrt",
-      };
-      handleUnaryOperation(opMap[label] || label);
     } else if (label === "mc") {
       memoryClear();
     } else if (label === "mr") {
@@ -249,28 +312,62 @@ const ScientificCalculator: React.FC = () => {
       memoryAdd();
     } else if (label === "m-") {
       memorySubtract();
-    }
-    // Add handlers for other scientific buttons (π, e, Rand, etc.)
-    else if (label === "π") {
+    } else if (label === "π") {
       setDisplayValue(String(Math.PI));
+      setFormula((prev) => prev + "π");
       setWaitingForOperand(false);
     } else if (label === "e") {
       setDisplayValue(String(Math.E));
+      setFormula((prev) => prev + "e");
       setWaitingForOperand(false);
     } else if (label === "Rand") {
-      setDisplayValue(String(Math.random()));
+      const rand = Math.random();
+      setDisplayValue(String(rand));
+      setFormula((prev) => prev + rand.toFixed(8));
       setWaitingForOperand(false);
-    }
-    // Placeholder for other functions like 2nd, EE, Rad/Deg, etc.
-    else {
-      console.warn(`Button "${label}" functionality not implemented yet.`);
+    } else if (label === "Rad") {
+      setIsRadianMode(!isRadianMode);
+    } else if (label === "(") {
+      handleParenthesis("(");
+    } else if (label === ")") {
+      handleParenthesis(")");
+    } else if (label === "xʸ") {
+      performOperation("^");
+    } else {
+      // Handle all other scientific operations
+      const opMap: { [key: string]: string } = {
+        "√x": "sqrt",
+        "log₁₀": "log",
+        "x!": "!",
+        "x²": "sqr",
+        "x³": "cube",
+        eˣ: "exp",
+        "10ˣ": "pow10",
+        "³√x": "cbrt",
+        sin: "sin",
+        cos: "cos",
+        tan: "tan",
+        sinh: "sinh",
+        cosh: "cosh",
+        tanh: "tanh",
+        ln: "ln",
+        "1/x": "1/x",
+        "+/-": "+/-",
+      };
+
+      const operation = opMap[label];
+      if (operation) {
+        handleUnaryOperation(operation);
+      } else if (label === "2nd" || label === "EE") {
+        // These functions are not implemented yet
+        console.warn(`Button "${label}" functionality not implemented yet.`);
+      }
     }
   };
 
   return (
     <Card className="w-full max-w-md mx-auto shadow-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 sm:mt-4 sm:mb-4">
       <CardContent className="p-2 sm:p-6">
-        {/* Display */}
         <div className="relative mb-6">
           <Input
             type="text"
@@ -279,21 +376,22 @@ const ScientificCalculator: React.FC = () => {
             className="text-right pr-4 text-3xl h-20 bg-gradient-to-r from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg shadow-inner font-mono tracking-wider"
             aria-label="Calculator Display"
           />
-          {operator && (
-            <span className="absolute left-3 top-2 text-sm text-gray-500 dark:text-gray-400">
-              {currentValue} {operator}
+          {formula && (
+            <span className="absolute left-3 top-2 text-sm text-gray-500 dark:text-gray-400 font-mono overflow-hidden overflow-ellipsis whitespace-nowrap max-w-[90%]">
+              {formula}
             </span>
           )}
         </div>
 
-        {/* Memory Display */}
-        <div className="flex justify-end mb-2">
+        <div className="flex justify-between mb-2">
+          <span className="text-xs text-gray-500 dark:text-gray-400">
+            {isRadianMode ? "RAD" : "DEG"}
+          </span>
           <span className="text-xs text-gray-500 dark:text-gray-400">
             {memory !== 0 && `M = ${memory}`}
           </span>
         </div>
 
-        {/* Buttons Grid */}
         <div className="grid grid-cols-6 gap-1.5 sm:gap-2.5 p-2 sm:p-3 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 rounded-xl shadow-inner">
           {buttonLayout.flat().map((label) => (
             <Button
@@ -368,7 +466,6 @@ const ScientificCalculator: React.FC = () => {
               `}
               aria-label={`Calculator button ${label}`}
             >
-              {/* Special display for some buttons */}
               {label === "x²" ? (
                 <>
                   x<sup>2</sup>
