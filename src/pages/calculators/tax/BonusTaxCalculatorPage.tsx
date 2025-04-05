@@ -8,32 +8,57 @@ import TakeHomePayCalculator from '@/components/calculators/tax/TakeHomePayCalcu
 const BonusTaxCalculatorPage = () => {
   return (
     <Layout>
-      <div className="container py-8 max-w-7xl">
+
+<div className="container py-8 max-w-7xl">
         <div className="mb-6">
-          <Link to="/calculators/tax">
-            <Button variant="ghost" size="sm" className="mb-4">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Tax Calculators
-            </Button>
-          </Link>
-          
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-                <Gift className="h-6 w-6 text-finance-primary" />
-                Bonus Tax Calculator
-              </h1>
-              <p className="text-muted-foreground mt-1">
-                Calculate how much of your bonus you'll actually receive after taxes.
-              </p>
-            </div>
-          </div>
+          <a
+            className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors"
+            href="/calculators/tax"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              className="lucide lucide-arrow-left mr-1 h-4 w-4"
+            >
+              <path d="m12 19-7-7 7-7"></path>
+              <path d="M19 12H5"></path>
+            </svg>
+            Back to Tax Calculators
+          </a>
         </div>
 
-        <div className="grid grid-cols-1 gap-6">
-          <TakeHomePayCalculator />
-          
-          <div className="bg-blue-50 border border-blue-100 rounded-lg p-6 mt-4">
+        <div className="max-w-5xl mx-auto mb-6">
+          <div className="rounded-lg border bg-card text-card-foreground w-full shadow-md border-gray-200">
+            
+            
+            <div className="flex flex-col space-y-1.5 p-6 bg-gradient-to-r from-finance-primary to-finance-primary/80 text-white">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="font-semibold tracking-tight text-2xl flex items-center gap-2">
+                  <Gift className="h-6 w-6 text-white" />
+                  Bonus Tax Calculator
+                  </h3>
+                  <p className="text-sm text-gray-100 mt-2">
+                  Calculate how much of your bonus you'll actually receive after taxes.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <TakeHomePayCalculator />
+            
+            
+          </div>
+        </div>     
+
+        <div className="bg-blue-50 border border-blue-100 rounded-lg p-6 mt-4">
             <h2 className="text-xl font-semibold mb-3">Understanding Bonus Taxation</h2>
             <p className="mb-4">
               Bonuses are typically considered "supplemental wages" by the IRS and are often subject to different withholding rules than your regular paycheck.
@@ -61,8 +86,8 @@ const BonusTaxCalculatorPage = () => {
               </div>
             </div>
           </div>
-        </div>
       </div>
+
     </Layout>
   );
 };
