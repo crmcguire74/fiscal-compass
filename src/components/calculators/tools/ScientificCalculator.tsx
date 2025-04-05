@@ -268,19 +268,33 @@ const ScientificCalculator: React.FC = () => {
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto shadow-lg">
-      <CardContent className="p-4">
+    <Card className="w-full max-w-md mx-auto shadow-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
+      <CardContent className="p-6">
         {/* Display */}
-        <Input
-          type="text"
-          value={displayValue}
-          readOnly
-          className="mb-4 text-right text-3xl h-16 bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 rounded-md px-3"
-          aria-label="Calculator Display"
-        />
+        <div className="relative mb-6">
+          <Input
+            type="text"
+            value={displayValue}
+            readOnly
+            className="text-right pr-4 text-3xl h-20 bg-gradient-to-r from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg shadow-inner font-mono tracking-wider"
+            aria-label="Calculator Display"
+          />
+          {operator && (
+            <span className="absolute left-3 top-2 text-sm text-gray-500 dark:text-gray-400">
+              {currentValue} {operator}
+            </span>
+          )}
+        </div>
+
+        {/* Memory Display */}
+        <div className="flex justify-end mb-2">
+          <span className="text-xs text-gray-500 dark:text-gray-400">
+            {memory !== 0 && `M = ${memory}`}
+          </span>
+        </div>
 
         {/* Buttons Grid */}
-        <div className={`grid grid-cols-${buttonLayout[0].length} gap-2`}>
+        <div className="grid grid-cols-6 gap-2.5 p-3 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 rounded-xl shadow-inner">
           {buttonLayout.flat().map((label) => (
             <Button
               key={label}
@@ -292,57 +306,66 @@ const ScientificCalculator: React.FC = () => {
                   ? "secondary"
                   : "outline"
               }
-              className={`text-lg p-4 h-14 flex items-center justify-center rounded-md ${
-                label === "0" ? "col-span-2" : "" // Make 0 button wider
-              } ${
-                ["=", "+", "-", "*", "/", "^"].includes(label)
-                  ? "bg-blue-500 hover:bg-blue-600 text-white"
-                  : ""
-              } ${
-                ["AC", "C"].includes(label)
-                  ? "bg-red-500 hover:bg-red-600 text-white"
-                  : ""
-              } ${
-                !isNaN(parseInt(label)) || label === "."
-                  ? "bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600"
-                  : ""
-              } ${
-                // Style scientific buttons differently
-                [
-                  "(",
-                  ")",
-                  "mc",
-                  "m+",
-                  "m-",
-                  "mr",
-                  "2nd",
-                  "x²",
-                  "x³",
-                  "xʸ",
-                  "eˣ",
-                  "10ˣ",
-                  "1/x",
-                  "√x",
-                  "³√x",
-                  "ʸ√x",
-                  "ln",
-                  "log₁₀",
-                  "x!",
-                  "sin",
-                  "cos",
-                  "tan",
-                  "e",
-                  "EE",
-                  "Rad",
-                  "sinh",
-                  "cosh",
-                  "tanh",
-                  "π",
-                  "Rand",
-                ].includes(label)
-                  ? "bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500"
-                  : ""
-              }`}
+              className={`
+                text-lg h-14 flex items-center justify-center rounded-lg 
+                transition-all duration-150 ease-in-out
+                transform hover:scale-[1.02] active:scale-95
+                shadow hover:shadow-lg active:shadow-sm
+                font-medium tracking-wide
+                backdrop-blur-sm backdrop-saturate-150
+                ${label === "0" ? "col-span-2" : ""}
+                ${
+                  ["=", "+", "-", "*", "/", "^"].includes(label)
+                    ? "bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold"
+                    : ""
+                }
+                ${
+                  ["AC", "C"].includes(label)
+                    ? "bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white"
+                    : ""
+                }
+                ${
+                  !isNaN(parseInt(label)) || label === "."
+                    ? "bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700"
+                    : ""
+                }
+                ${
+                  [
+                    "(",
+                    ")",
+                    "mc",
+                    "m+",
+                    "m-",
+                    "mr",
+                    "2nd",
+                    "x²",
+                    "x³",
+                    "xʸ",
+                    "eˣ",
+                    "10ˣ",
+                    "1/x",
+                    "√x",
+                    "³√x",
+                    "ʸ√x",
+                    "ln",
+                    "log₁₀",
+                    "x!",
+                    "sin",
+                    "cos",
+                    "tan",
+                    "e",
+                    "EE",
+                    "Rad",
+                    "sinh",
+                    "cosh",
+                    "tanh",
+                    "π",
+                    "Rand",
+                  ].includes(label)
+                    ? "bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 hover:from-gray-200 hover:to-gray-300 dark:hover:from-gray-600 dark:hover:to-gray-500 text-gray-700 dark:text-gray-200"
+                    : ""
+                }
+              `}
               aria-label={`Calculator button ${label}`}
             >
               {/* Special display for some buttons */}
