@@ -563,7 +563,7 @@ const ScientificCalculator: React.FC = () => {
                 <Button
                   key={label}
                   onClick={() => handleButtonClick(label)}
-                  className="rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm h-12"
+                  className="rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm h-[3.8rem]"
                 >
                   {label}
                 </Button>
@@ -575,7 +575,7 @@ const ScientificCalculator: React.FC = () => {
                   key={label}
                   onClick={() => handleButtonClick(label)}
                   className={`
-                    text-sm h-12 flex items-center justify-center
+                    text-sm h-[3.8rem] flex items-center justify-center
                     ${
                       ["Bksp", "+/-", "%", "/"].includes(label)
                         ? "rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700"
