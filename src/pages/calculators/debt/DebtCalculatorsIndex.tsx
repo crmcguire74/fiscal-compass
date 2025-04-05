@@ -23,7 +23,7 @@ const calculators = [
     title: "Debt-to-Income Ratio Calculator",
     description:
       "Calculate your debt-to-income ratio, a key metric lenders use to evaluate loan eligibility.",
-    icon: <BarChart3 className="h-12 w-12 text-primary" />,
+    icon: <BarChart3 className="h-8 w-8 text-primary" />,
     url: "/calculators/debt/dti-calculator",
     comingSoon: false,
   },
@@ -73,6 +73,37 @@ const DebtCalculatorsIndex = () => {
         </div>
       </div>
 
+      <div className="container px-4 py-12 mx-auto max-w-6xl">
+        <div className="mb-8">
+          <h2 className="text-2xl font-semibold mb-2">Available Calculators</h2>
+          <p className="text-muted-foreground">
+            Use these tools to understand your debt situation and create
+            strategies to improve it.
+          </p>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {calculators.map((calculator) => (
+            <Card className="flex flex-col h-full">
+              <CardHeader>
+                <div className="rounded-full w-12 h-12 flex items-center justify-center bg-primary/10 mb-2">
+                  {calculator.icon}
+                </div>
+                <CardTitle>{calculator.title}</CardTitle>
+                <CardDescription>{calculator.description}</CardDescription>
+              </CardHeader>
+              <CardFooter className="mt-auto justify-end">
+                <Button asChild>
+                  <Link to={calculator.url}>
+                    Use Calculator <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+      </div>
+
       <div className="container py-8">
         <div className="max-w-3xl mx-auto">
           <div className="mb-8">
@@ -83,36 +114,6 @@ const DebtCalculatorsIndex = () => {
               Use these tools to understand your debt situation and create
               strategies to improve it.
             </p>
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {calculators.map((calculator, index) => (
-              <Card
-                key={index}
-                className={calculator.comingSoon ? "opacity-70" : ""}
-              >
-                <CardHeader>
-                  <div className="mb-2">{calculator.icon}</div>
-                  <CardTitle className="text-xl">{calculator.title}</CardTitle>
-                  <CardDescription>{calculator.description}</CardDescription>
-                </CardHeader>
-                <CardFooter>
-                  <div className="flex justify-end w-full">
-                    {calculator.comingSoon ? (
-                      <Button variant="outline" disabled>
-                        Coming Soon
-                      </Button>
-                    ) : (
-                      <Button asChild>
-                        <Link to={calculator.url}>
-                          Use Calculator <ArrowRight className="ml-1 h-4 w-4" />
-                        </Link>
-                      </Button>
-                    )}
-                  </div>
-                </CardFooter>
-              </Card>
-            ))}
           </div>
 
           <div className="mt-12 bg-gray-50 rounded-lg p-6 border">

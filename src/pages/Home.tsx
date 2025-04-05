@@ -60,13 +60,16 @@ const Home = () => {
                 </span>
               </h1>
               <p
-                className="text-lg md:text-xl text-white/90 max-w-md animate-fade-in"
+                className="text-lg md:text-xl text-white/90 max-w-lg animate-fade-in" // Increased max-w
                 style={{
                   animationDelay: "100ms",
                 }}
               >
-                Make better financial decisions with our suite of easy-to-use
-                calculators that respect your privacy.
+                Navigate your financial journey with confidence. Our
+                comprehensive suite of free, easy-to-use financial calculators
+                helps you plan for retirement, manage debt, understand
+                mortgages, and make smarter investment decisions—all while
+                respecting your privacy.
               </p>
               <div
                 className="flex flex-col sm:flex-row gap-4 pt-4 animate-fade-in"
@@ -237,49 +240,175 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Calculator Categories Section */}
-      {/* <section className="py-16">
+      {/* Calculator Categories Section - Restored and Enhanced */}
+      <section className="py-16">
         <div className="container">
           <div className="text-center max-w-3xl mx-auto mb-12">
-            <h2 className="text-3xl font-bold font-heading text-finance-primary mb-4">Explore Our Calculators</h2>
+            <h2 className="text-3xl font-bold font-heading text-finance-primary mb-4">
+              Explore Our Calculators
+            </h2>
             <p className="text-lg text-muted-foreground">
-              From retirement planning to mortgage payments, we have tools for all your financial decisions
+              From retirement planning to mortgage payments, we have tools for
+              all your financial decisions
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredCategories.map(category => <div key={category.id} className="group bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-all">
+            {featuredCategories.map((category) => (
+              <div
+                key={category.id}
+                className="group bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-all"
+              >
                 <div className="p-6">
                   <div className="w-12 h-12 rounded-full bg-finance-primary/10 flex items-center justify-center mb-4">
-                    {category.id === 'home-mortgage' && <HomeIcon className="h-6 w-6 text-finance-primary" />}
-                    {category.id === 'auto' && <CarFront className="h-6 w-6 text-finance-primary" />}
-                    {category.id === 'retirement' && <PiggyBank className="h-6 w-6 text-finance-primary" />}
-                    {category.id === 'investment' && <TrendingUp className="h-6 w-6 text-finance-primary" />}
-                    {category.id === 'debt' && <CreditCard className="h-6 w-6 text-finance-primary" />}
-                    {category.id === 'tax' && <Calculator className="h-6 w-6 text-finance-primary" />}
-                    {category.id === 'education' && <Book className="h-6 w-6 text-finance-primary" />}
-                    {category.id === 'insurance' && <Search className="h-6 w-6 text-finance-primary" />}
+                    {category.id === "home-mortgage" && (
+                      <HomeIcon className="h-6 w-6 text-finance-primary" />
+                    )}
+                    {category.id === "auto" && (
+                      <CarFront className="h-6 w-6 text-finance-primary" />
+                    )}
+                    {category.id === "retirement" && (
+                      <PiggyBank className="h-6 w-6 text-finance-primary" />
+                    )}
+                    {category.id === "investment" && (
+                      <TrendingUp className="h-6 w-6 text-finance-primary" />
+                    )}
+                    {category.id === "debt" && (
+                      <CreditCard className="h-6 w-6 text-finance-primary" />
+                    )}
+                    {category.id === "tax" && (
+                      <Calculator className="h-6 w-6 text-finance-primary" />
+                    )}
+                    {category.id === "education" && (
+                      <Book className="h-6 w-6 text-finance-primary" />
+                    )}
+                    {category.id === "insurance" && (
+                      <Search className="h-6 w-6 text-finance-primary" />
+                    )}
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">{category.name}</h3>
+                  <h3 className="text-xl font-semibold mb-2">
+                    {category.name}
+                  </h3>
                   <p className="text-muted-foreground mb-4">
                     {category.description}
                   </p>
-                  <Button variant="outline" className="group-hover:bg-finance-primary group-hover:text-white transition-colors" onClick={() => navigate(`/calculators/${category.id}`)}>
+                  <Button
+                    variant="outline"
+                    className="group-hover:bg-finance-primary group-hover:text-white transition-colors"
+                    onClick={() => navigate(`/calculators/${category.id}`)}
+                  >
                     Explore Calculators
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </div>
-              </div>)}
+              </div>
+            ))}
           </div>
-          
+
           <div className="text-center mt-10">
-            <Button variant="default" size="lg" onClick={() => navigate('/calculators')} className="bg-finance-primary hover:bg-finance-primary/90">
+            <Button
+              variant="default"
+              size="lg"
+              onClick={() => navigate("/calculators")}
+              className="bg-finance-primary hover:bg-finance-primary/90"
+            >
               View All Categories
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
         </div>
-      </section> */}
+      </section>
+
+      {/* Financial Insights Section - New Section */}
+      <section className="py-16 bg-white">
+        <div className="container">
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <h2 className="text-3xl font-bold font-heading text-finance-primary mb-4">
+              Unlock Financial Wisdom
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              Quick tips and insights to help you manage your money better.
+              Explore our blog for more in-depth articles.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Insight 1: Compound Interest */}
+            <div className="bg-gray-50 p-6 rounded-lg border border-gray-100 shadow-sm">
+              <div className="w-12 h-12 rounded-full bg-finance-secondary/10 flex items-center justify-center mb-4">
+                <TrendingUp className="h-6 w-6 text-finance-secondary" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">
+                The Power of Compounding
+              </h3>
+              <p className="text-muted-foreground mb-4">
+                Starting early allows your investments to grow exponentially
+                over time. Even small, consistent contributions can make a big
+                difference.
+              </p>
+              <Button
+                variant="link"
+                className="p-0 h-auto text-finance-primary"
+                onClick={() =>
+                  navigate("/calculators/investment/compound-interest")
+                }
+              >
+                See it in action <ArrowRight className="ml-1 h-4 w-4" />
+              </Button>
+            </div>
+
+            {/* Insight 2: Budgeting */}
+            <div className="bg-gray-50 p-6 rounded-lg border border-gray-100 shadow-sm">
+              <div className="w-12 h-12 rounded-full bg-finance-accent/10 flex items-center justify-center mb-4">
+                <PiggyBank className="h-6 w-6 text-finance-accent" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Budgeting Basics</h3>
+              <p className="text-muted-foreground mb-4">
+                Track your income and expenses to understand where your money
+                goes. A simple budget is key to achieving financial goals.
+              </p>
+              {/* Link to a potential future budgeting tool or blog post */}
+              <Button
+                variant="link"
+                className="p-0 h-auto text-finance-primary"
+                onClick={() => navigate("/blog")}
+              >
+                Learn budgeting tips <ArrowRight className="ml-1 h-4 w-4" />
+              </Button>
+            </div>
+
+            {/* Insight 3: Debt Management */}
+            <div className="bg-gray-50 p-6 rounded-lg border border-gray-100 shadow-sm">
+              <div className="w-12 h-12 rounded-full bg-finance-primary/10 flex items-center justify-center mb-4">
+                <CreditCard className="h-6 w-6 text-finance-primary" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Tackling Debt</h3>
+              <p className="text-muted-foreground mb-4">
+                Prioritize paying down high-interest debt. Strategies like the
+                snowball or avalanche method can help you become debt-free
+                faster.
+              </p>
+              <Button
+                variant="link"
+                className="p-0 h-auto text-finance-primary"
+                onClick={() => navigate("/calculators/debt")}
+              >
+                Explore debt tools <ArrowRight className="ml-1 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+          <div className="text-center mt-10">
+            <Button
+              variant="default"
+              size="lg"
+              onClick={() => navigate("/blog")}
+              className="bg-finance-primary hover:bg-finance-primary/90"
+            >
+              Visit Our Blog
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </section>
 
       {/* Testimonial/Security Section */}
       <section className="py-16 bg-gray-50">
