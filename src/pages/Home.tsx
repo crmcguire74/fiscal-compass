@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Calculator, TrendingUp, PiggyBank, Home as HomeIcon, CreditCard, Search, ArrowRight, Book } from 'lucide-react';
+import { Calculator, TrendingUp, PiggyBank, Home as HomeIcon, CreditCard, Search, ArrowRight, Book, CarFront } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CALCULATOR_CATEGORIES } from '@/lib/constants';
 import Logo from '@/components/ui/logo';
@@ -157,6 +157,7 @@ const Home = () => {
                 <div className="p-6">
                   <div className="w-12 h-12 rounded-full bg-finance-primary/10 flex items-center justify-center mb-4">
                     {category.id === 'home-mortgage' && <HomeIcon className="h-6 w-6 text-finance-primary" />}
+                    {category.id === 'auto' && <CarFront className="h-6 w-6 text-finance-primary" />}
                     {category.id === 'retirement' && <PiggyBank className="h-6 w-6 text-finance-primary" />}
                     {category.id === 'investment' && <TrendingUp className="h-6 w-6 text-finance-primary" />}
                     {category.id === 'debt' && <CreditCard className="h-6 w-6 text-finance-primary" />}
