@@ -37,8 +37,8 @@ export const CALCULATOR_CATEGORIES = [
   },
   {
     id: 'tax',
-    name: 'Tax Planning',
-    description: 'Estimate taxes and plan for tax-efficient strategies',
+    name: 'Income & Tax Planning',
+    description: 'Estimate income and taxes, planning for tax-efficient strategies',
     icon: 'dollar-sign',
   },
   {
