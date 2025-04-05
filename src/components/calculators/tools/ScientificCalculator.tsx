@@ -84,8 +84,14 @@ const ScientificCalculator: React.FC = () => {
             handleButtonClick("AC");
             break;
           case "Backspace":
-            // Handle backspace by removing last character from formula
-            setFormula((prev) => prev.slice(0, -1));
+            if (displayValue === "0" && formula === "") {
+              clearAll();
+            } else {
+              setDisplayValue((prev) =>
+                prev.length > 1 ? prev.slice(0, -1) : "0"
+              );
+              setFormula((prev) => prev.slice(0, -1));
+            }
             break;
         }
       }
@@ -392,7 +398,7 @@ const ScientificCalculator: React.FC = () => {
   ];
 
   const basicButtonLayout = [
-    ["AC", "+/-", "%", "/"],
+    ["Bksp", "+/-", "%", "/"],
     ["7", "8", "9", "*"],
     ["4", "5", "6", "-"],
     ["1", "2", "3", "+"],
@@ -446,12 +452,27 @@ const ScientificCalculator: React.FC = () => {
       inputDigit(label);
     } else if (label === ".") {
       inputDecimal();
-    } else if (["+", "-", "*", "/", "^"].includes(label)) {
-      performOperation(label);
+    } else if (["+", "-", "*", "×", "/", "^"].includes(label)) {
+      performOperation(label === "×" ? "*" : label);
     } else if (label === "=") {
       handleEquals();
-    } else if (label === "AC") {
+    } else if (
+      label === "AC" ||
+      (label === "Bksp" && displayValue === "0" && formula === "")
+    ) {
       clearAll();
+    } else if (label === "Bksp") {
+      console.log("Backspace pressed:", { displayValue, formula });
+      if (displayValue === "0" && formula === "") {
+        clearAll();
+      } else {
+        const newDisplayValue =
+          displayValue.length > 1 ? displayValue.slice(0, -1) : "0";
+        const newFormula = formula.slice(0, -1);
+        console.log("New values:", { newDisplayValue, newFormula });
+        setDisplayValue(newDisplayValue);
+        setFormula(newFormula);
+      }
     } else if (label === "C") {
       clearEntry();
     } else if (label === "mc") {
@@ -565,7 +586,9 @@ const ScientificCalculator: React.FC = () => {
                   onClick={() => handleButtonClick(label)}
                   className="rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm h-[3.8rem]"
                 >
-                  {label}
+                  {label === "Bksp" && displayValue === "0" && formula === ""
+                    ? "AC"
+                    : label}
                 </Button>
               ))}
             </div>
@@ -587,7 +610,9 @@ const ScientificCalculator: React.FC = () => {
                     }
                   `}
                 >
-                  {label}
+                  {label === "Bksp" && displayValue === "0" && formula === ""
+                    ? "AC"
+                    : label}
                 </Button>
               ))}
             </div>
@@ -640,7 +665,9 @@ const ScientificCalculator: React.FC = () => {
                 `}
                 aria-label={`Calculator button ${label}`}
               >
-                {label === "calc" ? (
+                {label === "Bksp" && displayValue === "0" && formula === "" ? (
+                  "AC"
+                ) : label === "calc" ? (
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
