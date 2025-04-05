@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { pageview } from "./utils/analytics";
+import ScrollToTop from "./components/shared/ScrollToTop";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import CalculatorsIndex from "./pages/calculators/CalculatorsIndex";
@@ -84,6 +85,7 @@ const App = () => {
       <TooltipProvider>
         <BrowserRouter>
           <AnalyticsWrapper>
+            <ScrollToTop />
             <Toaster />
             <Sonner />
             <Routes>

@@ -71,6 +71,10 @@ const CalculatorsIndex = () => {
       path: "/calculators/tax/take-home-pay-calculator",
       name: "Take-Home Pay",
     },
+    {
+      path: "/calculators/tools/scientific-calculator",
+      name: "Scientific Calculator",
+    },
   ];
 
   return (
