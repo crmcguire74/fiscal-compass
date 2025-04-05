@@ -604,6 +604,8 @@ const ScientificCalculator: React.FC = () => {
                         ? "rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700"
                         : ["×", "+", "-", "="].includes(label)
                         ? "rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-bold"
+                        : label === "Mode"
+                        ? "rounded-lg bg-purple-500 hover:bg-purple-600 text-white font-bold"
                         : !isNaN(parseInt(label)) || label === "."
                         ? "rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800"
                         : "rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700"
@@ -653,12 +655,16 @@ const ScientificCalculator: React.FC = () => {
                       ? "bg-blue-500 hover:bg-blue-600 text-white font-bold"
                       : ["AC", "C"].includes(label)
                       ? "bg-red-500 hover:bg-red-600 text-white"
+                      : label === "Mode"
+                      ? "bg-purple-500 hover:bg-purple-600 text-white font-bold"
                       : !isNaN(parseInt(label)) || label === "."
                       ? "bg-gray-100 hover:bg-gray-200 text-gray-800"
                       : "bg-gray-200 hover:bg-gray-300 text-gray-700"
                   }
                   ${
-                    label === "0" && calculatorMode !== "graphing"
+                    label === "0" &&
+                    calculatorMode !== "scientific" &&
+                    calculatorMode !== "basic"
                       ? "col-span-2"
                       : ""
                   }
