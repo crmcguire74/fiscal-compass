@@ -12,6 +12,12 @@ const ScientificCalculator: React.FC = () => {
   const [isRadianMode, setIsRadianMode] = useState<boolean>(true);
   const [formula, setFormula] = useState<string>("");
   const [parenCount, setParenCount] = useState<number>(0);
+  const [calculatorMode, setCalculatorMode] = useState<
+    "scientific" | "basic" | "graphing"
+  >("scientific");
+  const [orientation, setOrientation] = useState<"portrait" | "landscape">(
+    "portrait"
+  );
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   // Handle keyboard input
@@ -348,20 +354,87 @@ const ScientificCalculator: React.FC = () => {
     }
   };
 
-  const buttonLayout = [
-    ["(", ")", "mc", "m+", "m-", "mr"],
-    ["2nd", "x²", "x³", "xʸ", "eˣ", "10ˣ"],
-    ["1/x", "√x", "³√x", "ʸ√x", "ln", "log₁₀"],
-    ["x!", "sin", "cos", "tan", "e", "EE"],
-    ["Rad", "sinh", "cosh", "tanh", "π", "Rand"],
-    ["AC", "C", "+/-", "/"],
+  // Update orientation based on window width
+  React.useEffect(() => {
+    const handleResize = () => {
+      setOrientation(
+        window.innerWidth > window.innerHeight ? "landscape" : "portrait"
+      );
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const scientificButtonLayoutPortrait = {
+    scientific: [
+      ["(", ")", "mc", "m+", "m-", "mr"],
+      ["2nd", "x²", "x³", "xʸ", "eˣ", "10ˣ"],
+      ["¹/ₓ", "³√ₓ", "∛ₓ", "ⁿ√ₓ", "ln", "log₁₀"],
+      ["x!", "sin", "cos", "tan", "e", "EE"],
+      ["Rand", "sinh", "cosh", "tanh", "π", "Rad"],
+    ],
+    controls: [
+      ["Bksp", "+/-", "%", "/"],
+      ["7", "8", "9", "×"],
+      ["4", "5", "6", "-"],
+      ["1", "2", "3", "+"],
+      ["Mode", "0", ".", "="],
+    ],
+  };
+
+  const scientificButtonLayoutLandscape = [
+    ["(", ")", "mc", "m+", "m-", "mr", "AC", "+/-", "%", "/"],
+    ["2nd", "x²", "x³", "xʸ", "eˣ", "10ˣ", "7", "8", "9", "*"],
+    ["1/x", "³√x", "⁴√x", "ⁿ√x", "ln", "log₁₀", "4", "5", "6", "-"],
+    ["x!", "sin", "cos", "tan", "e", "EE", "1", "2", "3", "+"],
+    ["Rad", "sinh", "cosh", "tanh", "π", "Rand", "Mode", "0", ".", "="],
+  ];
+
+  const basicButtonLayout = [
+    ["AC", "+/-", "%", "/"],
     ["7", "8", "9", "*"],
     ["4", "5", "6", "-"],
     ["1", "2", "3", "+"],
-    ["0", ".", "="],
+    ["Mode", "0", ".", "="],
   ];
 
+  const graphingButtonLayout = [
+    ["f1", "f2", "f3", "f4", "f5"],
+    ["y=", "window", "zoom", "trace", "graph"],
+    ["←", "→", "↑", "↓", "enter"],
+    ["2nd", "mode", "del", "alpha"],
+    ["sin", "cos", "tan", "^", "÷"],
+    ["7", "8", "9", "(", ")"],
+    ["4", "5", "6", "*", "+"],
+    ["1", "2", "3", "-", "="],
+    ["Mode", "0", ".", ",", "π"],
+  ];
+
+  const getButtonLayout = () => {
+    if (calculatorMode === "basic") return basicButtonLayout;
+    if (calculatorMode === "graphing") return graphingButtonLayout;
+    if (orientation === "portrait") {
+      return [
+        ...scientificButtonLayoutPortrait.scientific,
+        ...scientificButtonLayoutPortrait.controls,
+      ];
+    }
+    return scientificButtonLayoutLandscape;
+  };
+
+  const buttonLayout = getButtonLayout();
+
   const handleButtonClick = (label: string) => {
+    if (label === "Mode") {
+      setCalculatorMode((current) => {
+        if (current === "scientific") return "basic";
+        if (current === "basic") return "graphing";
+        return "scientific";
+      });
+      return;
+    }
+
     if (displayValue === "Error") {
       if (label === "AC") {
         clearAll();
@@ -435,7 +508,29 @@ const ScientificCalculator: React.FC = () => {
       const operation = opMap[label];
       if (operation) {
         handleUnaryOperation(operation);
-      } else if (label === "2nd" || label === "EE") {
+      } else if (
+        [
+          "2nd",
+          "EE",
+          "f1",
+          "f2",
+          "f3",
+          "f4",
+          "f5",
+          "y=",
+          "window",
+          "zoom",
+          "trace",
+          "graph",
+          "←",
+          "→",
+          "↑",
+          "↓",
+          "enter",
+          "alpha",
+          "del",
+        ].includes(label)
+      ) {
         // These functions are not implemented yet
         console.warn(`Button "${label}" functionality not implemented yet.`);
       }
@@ -443,143 +538,144 @@ const ScientificCalculator: React.FC = () => {
   };
 
   return (
-    <Card className="w-full h-full shadow-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex flex-col">
-      <CardContent className="flex-1 p-1.5 sm:p-6 flex flex-col min-h-0">
-        <div className="relative mb-4">
+    <Card className="w-full h-full shadow-xl bg-white flex flex-col overflow-hidden">
+      <CardContent className="flex-1 p-1 flex flex-col overflow-y-auto">
+        <div className="relative mb-1">
           <Input
             type="text"
             value={displayValue}
             readOnly
             ref={inputRef}
-            className="text-right pr-4 text-2xl sm:text-3xl h-16 sm:h-20 bg-gradient-to-r from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg shadow-inner font-mono tracking-wider"
+            className="text-right pr-4 text-2xl h-14 bg-gradient-to-r from-gray-50 to-white border-2 border-gray-200 rounded-lg shadow-inner font-mono tracking-wider"
             aria-label="Calculator Display"
           />
           {formula && (
-            <span className="absolute left-3 top-2 text-sm text-gray-500 dark:text-gray-400 font-mono overflow-hidden overflow-ellipsis whitespace-nowrap max-w-[90%]">
+            <span className="absolute left-3 top-2 text-sm text-gray-500 font-mono overflow-hidden overflow-ellipsis whitespace-nowrap max-w-[90%]">
               {formula}
             </span>
           )}
         </div>
 
-        <div className="flex justify-between mb-2">
-          <span className="text-xs text-gray-500 dark:text-gray-400">
-            {isRadianMode ? "RAD" : "DEG"}
-          </span>
-          <span className="text-xs text-gray-500 dark:text-gray-400">
-            {memory !== 0 && `M = ${memory}`}
-          </span>
-        </div>
-
-        <div className="flex-1 grid grid-cols-6 gap-[0.2rem] sm:gap-2 p-1 sm:p-2 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 rounded-xl shadow-inner min-h-0">
-          {buttonLayout.flat().map((label) => (
-            <Button
-              key={label}
-              onClick={() => handleButtonClick(label)}
-              variant={
-                ["AC", "C"].includes(label)
-                  ? "destructive"
-                  : ["=", "+", "-", "*", "/", "^"].includes(label)
-                  ? "secondary"
-                  : "outline"
-              }
-              className={`
-                text-xs sm:text-sm h-12 sm:h-14 flex items-center justify-center rounded-lg 
-                transition-all duration-150 ease-in-out
-                transform hover:scale-[1.02] active:scale-95
-                shadow hover:shadow-lg active:shadow-sm
-                font-medium tracking-wide text-[0.8rem] sm:text-base
-                backdrop-blur-sm backdrop-saturate-150
-                ${label === "0" ? "col-span-2" : ""}
-                ${
-                  ["=", "+", "-", "*", "/", "^"].includes(label)
-                    ? "bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold"
-                    : ""
-                }
-                ${
+        {calculatorMode === "scientific" && orientation === "portrait" ? (
+          <div className="flex-1 flex flex-col gap-0.5">
+            <div className="grid grid-cols-6 gap-1">
+              {scientificButtonLayoutPortrait.scientific.flat().map((label) => (
+                <Button
+                  key={label}
+                  onClick={() => handleButtonClick(label)}
+                  className="rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm h-12"
+                >
+                  {label}
+                </Button>
+              ))}
+            </div>
+            <div className="grid grid-cols-4 gap-1">
+              {scientificButtonLayoutPortrait.controls.flat().map((label) => (
+                <Button
+                  key={label}
+                  onClick={() => handleButtonClick(label)}
+                  className={`
+                    text-sm h-12 flex items-center justify-center
+                    ${
+                      ["Bksp", "+/-", "%", "/"].includes(label)
+                        ? "rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700"
+                        : ["×", "+", "-", "="].includes(label)
+                        ? "rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-bold"
+                        : !isNaN(parseInt(label)) || label === "."
+                        ? "rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800"
+                        : "rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700"
+                    }
+                  `}
+                >
+                  {label}
+                </Button>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div
+            className={`
+            flex-1 grid gap-2 
+            ${
+              calculatorMode === "graphing"
+                ? "grid-cols-5"
+                : calculatorMode === "basic"
+                ? "grid-cols-4"
+                : "grid-cols-10"
+            }
+          `}
+          >
+            {buttonLayout.flat().map((label) => (
+              <Button
+                key={label}
+                onClick={() => handleButtonClick(label)}
+                variant={
                   ["AC", "C"].includes(label)
-                    ? "bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white"
-                    : ""
+                    ? "destructive"
+                    : ["=", "+", "-", "*", "/", "^"].includes(label)
+                    ? "secondary"
+                    : "outline"
                 }
-                ${
-                  !isNaN(parseInt(label)) || label === "."
-                    ? "bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700"
-                    : ""
-                }
-                ${
-                  [
-                    "(",
-                    ")",
-                    "mc",
-                    "m+",
-                    "m-",
-                    "mr",
-                    "2nd",
-                    "x²",
-                    "x³",
-                    "xʸ",
-                    "eˣ",
-                    "10ˣ",
-                    "1/x",
-                    "√x",
-                    "³√x",
-                    "ʸ√x",
-                    "ln",
-                    "log₁₀",
-                    "x!",
-                    "sin",
-                    "cos",
-                    "tan",
-                    "e",
-                    "EE",
-                    "Rad",
-                    "sinh",
-                    "cosh",
-                    "tanh",
-                    "π",
-                    "Rand",
-                  ].includes(label)
-                    ? "bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 hover:from-gray-200 hover:to-gray-300 dark:hover:from-gray-600 dark:hover:to-gray-500 text-gray-700 dark:text-gray-200"
-                    : ""
-                }
-              `}
-              aria-label={`Calculator button ${label}`}
-            >
-              {label === "x²" ? (
-                <>
-                  x<sup>2</sup>
-                </>
-              ) : label === "x³" ? (
-                <>
-                  x<sup>3</sup>
-                </>
-              ) : label === "xʸ" ? (
-                <>
-                  x<sup>y</sup>
-                </>
-              ) : label === "eˣ" ? (
-                <>
-                  e<sup>x</sup>
-                </>
-              ) : label === "10ˣ" ? (
-                <>
-                  10<sup>x</sup>
-                </>
-              ) : label === "√x" ? (
-                <>√x</>
-              ) : label === "³√x" ? (
-                <>³√x</>
-              ) : label === "ʸ√x" ? (
-                <>ʸ√x</>
-              ) : label === "log₁₀" ? (
-                <>
-                  log<sub>10</sub>
-                </>
-              ) : (
-                label
-              )}
-            </Button>
-          ))}
-        </div>
+                className={`
+                  text-sm h-14 flex items-center justify-center
+                  transition-all duration-150 ease-in-out
+                  transform hover:scale-[1.02] active:scale-95
+                  shadow hover:shadow-lg active:shadow-sm
+                  font-medium tracking-wide
+                  rounded-lg
+                  ${
+                    ["=", "+", "-", "*", "/", "^"].includes(label)
+                      ? "bg-blue-500 hover:bg-blue-600 text-white font-bold"
+                      : ["AC", "C"].includes(label)
+                      ? "bg-red-500 hover:bg-red-600 text-white"
+                      : !isNaN(parseInt(label)) || label === "."
+                      ? "bg-gray-100 hover:bg-gray-200 text-gray-800"
+                      : "bg-gray-200 hover:bg-gray-300 text-gray-700"
+                  }
+                  ${
+                    label === "0" && calculatorMode !== "graphing"
+                      ? "col-span-2"
+                      : ""
+                  }
+                `}
+                aria-label={`Calculator button ${label}`}
+              >
+                {label === "calc" ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="w-6 h-6"
+                  >
+                    <path d="M4 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H4zm1 3h14v3H5V5zm0 4h3v3H5V9zm5 0h4v3h-4V9zm6 0h3v3h-3V9zM5 14h3v3H5v-3zm5 0h4v3h-4v-3zm6 0h3v7h-3v-7zM5 19h9v2H5v-2z" />
+                  </svg>
+                ) : label === "x²" ? (
+                  "x²"
+                ) : label === "x³" ? (
+                  "x³"
+                ) : label === "xʸ" ? (
+                  "xʸ"
+                ) : label === "eˣ" ? (
+                  "eˣ"
+                ) : label === "10ˣ" ? (
+                  "10ˣ"
+                ) : label === "¹/ₓ" ? (
+                  "¹/ₓ"
+                ) : label === "³√ₓ" ? (
+                  "³√ₓ"
+                ) : label === "∛ₓ" ? (
+                  "∛ₓ"
+                ) : label === "ⁿ√ₓ" ? (
+                  "ⁿ√ₓ"
+                ) : label === "log₁₀" ? (
+                  "log₁₀"
+                ) : (
+                  label
+                )}
+              </Button>
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
