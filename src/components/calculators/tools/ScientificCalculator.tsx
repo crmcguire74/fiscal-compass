@@ -12,6 +12,83 @@ const ScientificCalculator: React.FC = () => {
   const [isRadianMode, setIsRadianMode] = useState<boolean>(true);
   const [formula, setFormula] = useState<string>("");
   const [parenCount, setParenCount] = useState<number>(0);
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
+  // Handle keyboard input
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Prevent default on calculator keys to avoid double input
+      if (
+        [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          ".",
+          "+",
+          "-",
+          "*",
+          "/",
+          "(",
+          ")",
+          "Enter",
+          "Escape",
+          "Backspace",
+        ].includes(e.key)
+      ) {
+        e.preventDefault();
+      }
+
+      // Handle numeric and operator keys
+      if (!isNaN(parseInt(e.key))) {
+        handleButtonClick(e.key);
+      } else {
+        switch (e.key) {
+          case ".":
+            handleButtonClick(".");
+            break;
+          case "+":
+            performOperation("+");
+            break;
+          case "-":
+            performOperation("-");
+            break;
+          case "*":
+            performOperation("*");
+            break;
+          case "/":
+            performOperation("/");
+            break;
+          case "(":
+            handleParenthesis("(");
+            break;
+          case ")":
+            handleParenthesis(")");
+            break;
+          case "Enter":
+            handleButtonClick("=");
+            break;
+          case "Escape":
+            handleButtonClick("AC");
+            break;
+          case "Backspace":
+            // Handle backspace by removing last character from formula
+            setFormula((prev) => prev.slice(0, -1));
+            break;
+        }
+      }
+    };
+
+    // Add keyboard listener
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [displayValue, operator, currentValue]); // Dependencies for calculation state
 
   const inputDigit = (digit: string) => {
     if (waitingForOperand) {
@@ -366,14 +443,15 @@ const ScientificCalculator: React.FC = () => {
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto shadow-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 sm:mt-4 sm:mb-4">
-      <CardContent className="p-2 sm:p-6">
-        <div className="relative mb-6">
+    <Card className="w-full h-full shadow-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex flex-col">
+      <CardContent className="flex-1 p-1.5 sm:p-6 flex flex-col min-h-0">
+        <div className="relative mb-4">
           <Input
             type="text"
             value={displayValue}
             readOnly
-            className="text-right pr-4 text-3xl h-20 bg-gradient-to-r from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg shadow-inner font-mono tracking-wider"
+            ref={inputRef}
+            className="text-right pr-4 text-2xl sm:text-3xl h-16 sm:h-20 bg-gradient-to-r from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg shadow-inner font-mono tracking-wider"
             aria-label="Calculator Display"
           />
           {formula && (
@@ -392,7 +470,7 @@ const ScientificCalculator: React.FC = () => {
           </span>
         </div>
 
-        <div className="grid grid-cols-6 gap-1.5 sm:gap-2.5 p-2 sm:p-3 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 rounded-xl shadow-inner">
+        <div className="flex-1 grid grid-cols-6 gap-[0.2rem] sm:gap-2 p-1 sm:p-2 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 rounded-xl shadow-inner min-h-0">
           {buttonLayout.flat().map((label) => (
             <Button
               key={label}
@@ -405,7 +483,7 @@ const ScientificCalculator: React.FC = () => {
                   : "outline"
               }
               className={`
-                text-sm sm:text-lg h-14 flex items-center justify-center rounded-lg 
+                text-xs sm:text-sm h-12 sm:h-14 flex items-center justify-center rounded-lg 
                 transition-all duration-150 ease-in-out
                 transform hover:scale-[1.02] active:scale-95
                 shadow hover:shadow-lg active:shadow-sm
