@@ -1,55 +1,66 @@
-import * as React from "react"
-import { cn } from "@/lib/utils"
+import * as React from "react";
+import { cn } from "@/lib/utils";
 
-interface InputProps extends Omit<React.ComponentProps<"input">, "onChange"> {
+interface InputProps extends React.ComponentProps<"input"> {
   className?: string;
-  type?: string;
-  onChange?: (value: any) => void;
+  onValueChange?: (value: any) => void;
   onClear?: () => void;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, onChange, onClear, value, ...props }, ref) => {
+  (
+    { className, type, onChange, onValueChange, onClear, value, ...props },
+    ref
+  ) => {
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (type === "number") {
         // Allow backspace and delete keys
         if (e.key === "Backspace" || e.key === "Delete") {
           return;
         }
-        
+
         // Clear on 'c' key for calculator-like clear functionality
         if (e.key.toLowerCase() === "c") {
           e.preventDefault();
           if (onClear) {
             onClear();
-          } else if (onChange) {
-            onChange("");
+          } else if (onValueChange) {
+            onValueChange("");
           }
           return;
         }
 
         // Prevent non-numeric input (allow decimal point and minus for negative numbers)
-        if (!/^[0-9.\-]$/.test(e.key) && !["ArrowLeft", "ArrowRight", "Tab"].includes(e.key)) {
+        if (
+          !/^[0-9.\-]$/.test(e.key) &&
+          !["ArrowLeft", "ArrowRight", "Tab"].includes(e.key)
+        ) {
           e.preventDefault();
         }
       }
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      // Always call the original onChange handler
       if (onChange) {
+        onChange(e);
+      }
+
+      // Call our custom value handler if provided
+      if (onValueChange) {
         if (type === "number") {
           // Handle empty or invalid input
           if (e.target.value === "" || e.target.value === "-") {
-            onChange(e.target.value);
+            onValueChange(e.target.value);
             return;
           }
-          
+
           const num = parseFloat(e.target.value);
           if (!isNaN(num)) {
-            onChange(num);
+            onValueChange(num);
           }
         } else {
-          onChange(e.target.value);
+          onValueChange(e.target.value);
         }
       }
     };
@@ -67,9 +78,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         onKeyDown={handleKeyDown}
         {...props}
       />
-    )
+    );
   }
-)
-Input.displayName = "Input"
+);
+Input.displayName = "Input";
 
-export { Input }
+export { Input };
