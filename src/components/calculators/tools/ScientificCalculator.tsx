@@ -405,21 +405,37 @@ const ScientificCalculator: React.FC = () => {
     ["Mode", "0", ".", "="],
   ];
 
-  const graphingButtonLayout = [
-    ["f1", "f2", "f3", "f4", "f5"],
-    ["y=", "window", "zoom", "trace", "graph"],
-    ["←", "→", "↑", "↓", "enter"],
-    ["2nd", "mode", "del", "alpha"],
-    ["sin", "cos", "tan", "^", "÷"],
-    ["7", "8", "9", "(", ")"],
-    ["4", "5", "6", "*", "+"],
-    ["1", "2", "3", "-", "="],
-    ["Mode", "0", ".", ",", "π"],
+  const graphingButtonLayoutPortrait = [
+    // Graphing functions (6 columns)
+    ["f1", "f2", "f3", "f4", "f5", "graph"],
+    ["y=", "window", "zoom", "trace", "2nd", "mode"],
+    ["←", "→", "↑", "↓", "enter", "del"],
+    ["sin", "cos", "tan", "(", ")", "alpha"],
+    ["ln", "log", "e", "π", "^", "EE"],
+    // Number pad (4 columns)
+    ["AC", "+/-", "%", "÷"],
+    ["7", "8", "9", "*"],
+    ["4", "5", "6", "-"],
+    ["1", "2", "3", "+"],
+    ["Mode", "0", ".", "="],
+  ];
+
+  const graphingButtonLayoutLandscape = [
+    ["f1", "f2", "f3", "f4", "f5", "graph", "7", "8", "9", "÷"],
+    ["y=", "window", "zoom", "trace", "2nd", "mode", "4", "5", "6", "*"],
+    ["←", "→", "↑", "↓", "enter", "del", "1", "2", "3", "-"],
+    ["sin", "cos", "tan", "(", ")", "alpha", "0", ".", "π", "+"],
+    ["ln", "log", "e", "^", "√", "Mode", "Bksp", ",", "EE", "="],
   ];
 
   const getButtonLayout = () => {
     if (calculatorMode === "basic") return basicButtonLayout;
-    if (calculatorMode === "graphing") return graphingButtonLayout;
+    if (calculatorMode === "graphing") {
+      if (orientation === "portrait") {
+        return graphingButtonLayoutPortrait;
+      }
+      return graphingButtonLayoutLandscape;
+    }
     if (orientation === "portrait") {
       return [
         ...scientificButtonLayoutPortrait.scientific,
@@ -566,9 +582,22 @@ const ScientificCalculator: React.FC = () => {
     >
       <CardContent
         className={`flex-1 flex flex-col overflow-y-auto ${
-          calculatorMode === "basic" ? "p-4 gap-4" : "p-1"
+          calculatorMode === "basic"
+            ? "p-4 gap-4"
+            : calculatorMode === "graphing"
+            ? "p-1 pb-4"
+            : "p-1"
         }`}
       >
+        {calculatorMode === "graphing" && (
+          <div
+            className={`flex-1 min-h-[300px] ${
+              orientation === "landscape" ? "min-h-[400px]" : ""
+            } bg-black rounded-lg mb-4 mx-1`}
+          >
+            {/* Graphing output window */}
+          </div>
+        )}
         <div className="relative mb-1">
           <Input
             type="text"
@@ -629,17 +658,64 @@ const ScientificCalculator: React.FC = () => {
               ))}
             </div>
           </div>
+        ) : calculatorMode === "graphing" && orientation === "portrait" ? (
+          <div className="flex-1 flex flex-col gap-0.5">
+            <div className="grid grid-cols-6 gap-1">
+              {graphingButtonLayoutPortrait
+                .slice(0, 5)
+                .flat()
+                .map((label) => (
+                  <Button
+                    key={label}
+                    onClick={() => handleButtonClick(label)}
+                    className="rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm h-[3.8rem]"
+                  >
+                    {label}
+                  </Button>
+                ))}
+            </div>
+            <div className="grid grid-cols-4 gap-1">
+              {graphingButtonLayoutPortrait
+                .slice(5)
+                .flat()
+                .map((label) => (
+                  <Button
+                    key={label}
+                    onClick={() => handleButtonClick(label)}
+                    className={`
+                    text-sm h-[3.8rem] flex items-center justify-center
+                    ${
+                      ["AC", "+/-", "%", "÷"].includes(label)
+                        ? "rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700"
+                        : ["*", "+", "-", "="].includes(label)
+                        ? "rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-bold"
+                        : label === "Mode"
+                        ? "rounded-lg bg-sky-500 hover:bg-sky-600 text-white font-bold"
+                        : !isNaN(parseInt(label)) || label === "."
+                        ? "rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800"
+                        : "rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700"
+                    }
+                  `}
+                  >
+                    {label}
+                  </Button>
+                ))}
+            </div>
+          </div>
         ) : (
           <div
             className={`
             flex-1 grid
             ${
               calculatorMode === "graphing"
-                ? "gap-2 grid-cols-5"
+                ? orientation === "portrait"
+                  ? "grid-cols-6"
+                  : "grid-cols-10"
                 : calculatorMode === "basic"
                 ? "gap-2 grid-cols-4 h-full"
                 : "gap-2 grid-cols-10"
             }
+            ${calculatorMode === "graphing" ? "gap-1" : "gap-2"}
           `}
           >
             {buttonLayout.flat().map((label) => (
