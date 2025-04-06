@@ -656,7 +656,7 @@ const ScientificCalculator: React.FC = () => {
                       : ["AC", "C"].includes(label)
                       ? "bg-red-500 hover:bg-red-600 text-white"
                       : label === "Mode"
-                      ? "bg-purple-500 hover:bg-purple-600 text-white font-bold"
+                      ? "bg-sky-500 hover:bg-sky-600 text-white font-bold"
                       : !isNaN(parseInt(label)) || label === "."
                       ? "bg-gray-100 hover:bg-gray-200 text-gray-800"
                       : "bg-gray-200 hover:bg-gray-300 text-gray-700"
