@@ -844,6 +844,7 @@ const ScientificCalculator: React.FC = () => {
           <Input
             type="text"
             value={displayValue}
+            onValueChange={setDisplayValue}
             readOnly
             ref={inputRef}
             className={`text-right pr-4 text-2xl ${
