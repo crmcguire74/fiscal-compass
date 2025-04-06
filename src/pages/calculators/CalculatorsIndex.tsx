@@ -130,7 +130,7 @@ const CalculatorsIndex = () => {
       </div>
 
       <div className="container max-w-6xl">
-        <h2 className="text-2xl font-semibold mb-8 mt-8 text-center">
+        <h2 className="text-5xl font-semibold mb-12 mt-24 text-center text-blue-800">
           Calculator Categories
         </h2>
 

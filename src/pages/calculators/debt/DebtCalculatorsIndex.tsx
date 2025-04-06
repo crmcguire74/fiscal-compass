@@ -106,15 +106,7 @@ const DebtCalculatorsIndex = () => {
 
       <div className="container py-8">
         <div className="max-w-3xl mx-auto">
-          <div className="mb-8">
-            <h2 className="text-2xl font-semibold mb-2">
-              Available Calculators
-            </h2>
-            <p className="text-muted-foreground">
-              Use these tools to understand your debt situation and create
-              strategies to improve it.
-            </p>
-          </div>
+          
 
           <div className="mt-12 bg-gray-50 rounded-lg p-6 border">
             <h2 className="text-xl font-semibold mb-4">
