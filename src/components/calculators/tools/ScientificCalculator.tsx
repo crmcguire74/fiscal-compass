@@ -991,13 +991,7 @@ const ScientificCalculator: React.FC = () => {
                       ? "bg-gray-100 hover:bg-gray-200 text-gray-800"
                       : "bg-gray-200 hover:bg-gray-300 text-gray-700"
                   }
-                  ${
-                    label === "0" &&
-                    calculatorMode !== "scientific" &&
-                    calculatorMode !== "basic"
-                      ? "col-span-2"
-                      : ""
-                  }
+                  
                 `}
                 aria-label={`Calculator button ${label}`}
               >
