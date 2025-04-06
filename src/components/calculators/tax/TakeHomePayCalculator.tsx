@@ -98,7 +98,13 @@ const TakeHomePayCalculator = () => {
                 <Label htmlFor="income">Annual {isBonus ? "Bonus" : "Income"}</Label>
                 <div className="flex items-center mt-1">
                   <span className="text-gray-500 mr-2">$</span>
-                  <Input id="income" type="number" value={income} onChange={e => setIncome(Number(e.target.value))} />
+                  <Input 
+                    id="income" 
+                    type="number" 
+                    value={income} 
+                    onChange={val => setIncome(typeof val === 'string' ? 0 : val)}
+                    onClear={() => setIncome(0)}
+                  />
                 </div>
               </div>
               
@@ -169,7 +175,13 @@ const TakeHomePayCalculator = () => {
                       <span className="w-16 text-right">{retirement401kPercent}%</span>
                     </div> : <div className="flex items-center mt-1">
                       <span className="text-gray-500 mr-2">$</span>
-                      <Input id="401kAmount" type="number" value={retirement401kAmount} onChange={e => setRetirement401kAmount(Number(e.target.value))} />
+                      <Input 
+                        id="401kAmount" 
+                        type="number" 
+                        value={retirement401kAmount}
+                        onChange={val => setRetirement401kAmount(typeof val === 'string' ? 0 : val)}
+                        onClear={() => setRetirement401kAmount(0)}
+                      />
                     </div>}
                 </div>
                 
@@ -177,7 +189,13 @@ const TakeHomePayCalculator = () => {
                   <Label htmlFor="otherDeferrals">Other Pre-Tax Deductions (HSA, FSA, etc.)</Label>
                   <div className="flex items-center mt-1">
                     <span className="text-gray-500 mr-2">$</span>
-                    <Input id="otherDeferrals" type="number" value={otherTaxDeferred} onChange={e => setOtherTaxDeferred(Number(e.target.value))} />
+                    <Input 
+                      id="otherDeferrals" 
+                      type="number" 
+                      value={otherTaxDeferred}
+                      onChange={val => setOtherTaxDeferred(typeof val === 'string' ? 0 : val)}
+                      onClear={() => setOtherTaxDeferred(0)}
+                    />
                   </div>
                 </div>
                 
@@ -192,7 +210,13 @@ const TakeHomePayCalculator = () => {
                     <Label htmlFor="itemizedDeductions">Itemized Deductions</Label>
                     <div className="flex items-center mt-1">
                       <span className="text-gray-500 mr-2">$</span>
-                      <Input id="itemizedDeductions" type="number" value={itemizedDeductions} onChange={e => setItemizedDeductions(Number(e.target.value))} />
+                      <Input 
+                        id="itemizedDeductions" 
+                        type="number" 
+                        value={itemizedDeductions}
+                        onChange={val => setItemizedDeductions(typeof val === 'string' ? 0 : val)}
+                        onClear={() => setItemizedDeductions(0)}
+                      />
                     </div>
                   </div>}
               </div>
