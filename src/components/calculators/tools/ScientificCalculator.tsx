@@ -559,15 +559,25 @@ const ScientificCalculator: React.FC = () => {
   };
 
   return (
-    <Card className="w-full h-full shadow-xl bg-white flex flex-col overflow-hidden">
-      <CardContent className="flex-1 p-1 flex flex-col overflow-y-auto">
+    <Card
+      className={`w-full h-full shadow-xl bg-white flex flex-col overflow-hidden ${
+        calculatorMode === "basic" ? "min-h-[600px]" : ""
+      }`}
+    >
+      <CardContent
+        className={`flex-1 flex flex-col overflow-y-auto ${
+          calculatorMode === "basic" ? "p-4 gap-4" : "p-1"
+        }`}
+      >
         <div className="relative mb-1">
           <Input
             type="text"
             value={displayValue}
             readOnly
             ref={inputRef}
-            className="text-right pr-4 text-2xl h-14 bg-gradient-to-r from-gray-50 to-white border-2 border-gray-200 rounded-lg shadow-inner font-mono tracking-wider"
+            className={`text-right pr-4 text-2xl ${
+              calculatorMode === "basic" ? "h-24" : "h-14"
+            } bg-gradient-to-r from-gray-50 to-white border-2 border-gray-200 rounded-lg shadow-inner font-mono tracking-wider mb-4`}
             aria-label="Calculator Display"
           />
           {formula && (
@@ -605,7 +615,7 @@ const ScientificCalculator: React.FC = () => {
                         : ["×", "+", "-", "="].includes(label)
                         ? "rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-bold"
                         : label === "Mode"
-                        ? "rounded-lg bg-purple-500 hover:bg-purple-600 text-white font-bold"
+                        ? "rounded-lg bg-sky-500 hover:bg-sky-600 text-white font-bold"
                         : !isNaN(parseInt(label)) || label === "."
                         ? "rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800"
                         : "rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700"
@@ -622,13 +632,13 @@ const ScientificCalculator: React.FC = () => {
         ) : (
           <div
             className={`
-            flex-1 grid gap-2 
+            flex-1 grid
             ${
               calculatorMode === "graphing"
-                ? "grid-cols-5"
+                ? "gap-2 grid-cols-5"
                 : calculatorMode === "basic"
-                ? "grid-cols-4"
-                : "grid-cols-10"
+                ? "gap-2 grid-cols-4 h-full"
+                : "gap-2 grid-cols-10"
             }
           `}
           >
@@ -644,7 +654,9 @@ const ScientificCalculator: React.FC = () => {
                     : "outline"
                 }
                 className={`
-                  text-sm h-14 flex items-center justify-center
+                  text-sm flex items-center justify-center ${
+                    calculatorMode === "basic" ? "h-full text-lg" : "h-14"
+                  }
                   transition-all duration-150 ease-in-out
                   transform hover:scale-[1.02] active:scale-95
                   shadow hover:shadow-lg active:shadow-sm
