@@ -568,7 +568,7 @@ const ScientificCalculator: React.FC = () => {
       ["Rand", "sinh", "cosh", "tanh", "π", "Rad"],
     ],
     controls: [
-      ["Bksp", "+/-", "%", "/"],
+      ["Bksp", "+/-", "%", "÷"],
       ["7", "8", "9", "×"],
       ["4", "5", "6", "-"],
       ["1", "2", "3", "+"],
@@ -577,7 +577,7 @@ const ScientificCalculator: React.FC = () => {
   };
 
   const scientificButtonLayoutLandscape = [
-    ["(", ")", "mc", "m+", "m-", "mr", "AC", "+/-", "%", "/"],
+    ["(", ")", "mc", "m+", "m-", "mr", "AC", "+/-", "%", "÷"],
     ["2nd", "x²", "x³", "xʸ", "eˣ", "10ˣ", "7", "8", "9", "*"],
     ["1/x", "³√x", "⁴√x", "ⁿ√x", "ln", "log₁₀", "4", "5", "6", "-"],
     ["x!", "sin", "cos", "tan", "e", "EE", "1", "2", "3", "+"],
@@ -585,7 +585,7 @@ const ScientificCalculator: React.FC = () => {
   ];
 
   const basicButtonLayout = [
-    ["Bksp", "+/-", "%", "/"],
+    ["Bksp", "+/-", "%", "÷"],
     ["7", "8", "9", "*"],
     ["4", "5", "6", "-"],
     ["1", "2", "3", "+"],
@@ -655,8 +655,8 @@ const ScientificCalculator: React.FC = () => {
       inputDigit(label);
     } else if (label === ".") {
       inputDecimal();
-    } else if (["+", "-", "*", "×", "/", "^"].includes(label)) {
-      performOperation(label === "×" ? "*" : label);
+    } else if (["+", "-", "*", "×", "/", "÷", "^"].includes(label)) {
+      performOperation(label === "×" ? "*" : label === "÷" ? "/" : label);
     } else if (label === "=") {
       handleEquals();
     } else if (
@@ -830,7 +830,7 @@ const ScientificCalculator: React.FC = () => {
               style={{ background: "#000" }}
             />
             {traceMode && graphFunctions[activeFunction] && (
-              <div className="absolute bottom-2 left-2 bg-gray-800 text-white p-2 rounded text-sm">
+              <div className="absolute bottom-2 left-2 bg-gray-800 text-white p-2 rounded text-base">
                 x: {traceX.toFixed(2)}, y:{" "}
                 {evaluateExpression(
                   graphFunctions[activeFunction],
@@ -852,7 +852,7 @@ const ScientificCalculator: React.FC = () => {
             aria-label="Calculator Display"
           />
           {formula && (
-            <span className="absolute left-3 top-2 text-sm text-gray-500 font-mono overflow-hidden overflow-ellipsis whitespace-nowrap max-w-[90%]">
+            <span className="absolute left-3 top-2 text-base text-gray-500 font-mono overflow-hidden overflow-ellipsis whitespace-nowrap max-w-[90%]">
               {formula}
             </span>
           )}
@@ -865,7 +865,7 @@ const ScientificCalculator: React.FC = () => {
                 <Button
                   key={label}
                   onClick={() => handleButtonClick(label)}
-                  className="rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm h-[3.8rem]"
+                  className="rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 text-lg h-[3.8rem]"
                 >
                   {label === "Bksp" && displayValue === "0" && formula === ""
                     ? "AC"
@@ -879,11 +879,11 @@ const ScientificCalculator: React.FC = () => {
                   key={label}
                   onClick={() => handleButtonClick(label)}
                   className={`
-                    text-sm h-[3.8rem] flex items-center justify-center
+                    text-base h-[3.8rem] flex items-center justify-center
                     ${
                       ["Bksp", "+/-", "%", "/"].includes(label)
                         ? "rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700"
-                        : ["×", "+", "-", "="].includes(label)
+                        : ["×", "+", "-", "=", "÷"].includes(label)
                         ? "rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-bold"
                         : label === "Mode"
                         ? "rounded-lg bg-sky-500 hover:bg-sky-600 text-white font-bold"
@@ -910,7 +910,7 @@ const ScientificCalculator: React.FC = () => {
                   <Button
                     key={label}
                     onClick={() => handleButtonClick(label)}
-                    className="rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm h-[3.8rem]"
+                    className="rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 text-base h-[3.8rem]"
                   >
                     {label}
                   </Button>
@@ -927,9 +927,9 @@ const ScientificCalculator: React.FC = () => {
                     className={`
                     text-sm h-[3.8rem] flex items-center justify-center
                     ${
-                      ["AC", "+/-", "%", "÷"].includes(label)
+                      ["AC", "+/-", "%"].includes(label)
                         ? "rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700"
-                        : ["*", "+", "-", "="].includes(label)
+                        : ["*", "+", "-", "=", "÷"].includes(label)
                         ? "rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-bold"
                         : label === "Mode"
                         ? "rounded-lg bg-sky-500 hover:bg-sky-600 text-white font-bold"
@@ -972,7 +972,7 @@ const ScientificCalculator: React.FC = () => {
                     : "outline"
                 }
                 className={`
-                  text-sm flex items-center justify-center ${
+                  text-base flex items-center justify-center ${
                     calculatorMode === "basic" ? "h-full text-lg" : "h-14"
                   }
                   transition-all duration-150 ease-in-out
@@ -981,7 +981,7 @@ const ScientificCalculator: React.FC = () => {
                   font-medium tracking-wide
                   rounded-lg
                   ${
-                    ["=", "+", "-", "*", "/", "^"].includes(label)
+                    ["=", "+", "-", "*", "/", "÷", "^"].includes(label)
                       ? "bg-blue-500 hover:bg-blue-600 text-white font-bold"
                       : ["AC", "C"].includes(label)
                       ? "bg-red-500 hover:bg-red-600 text-white"
