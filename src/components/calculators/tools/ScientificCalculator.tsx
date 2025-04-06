@@ -18,7 +18,192 @@ const ScientificCalculator: React.FC = () => {
   const [orientation, setOrientation] = useState<"portrait" | "landscape">(
     "portrait"
   );
+  const [graphFunctions, setGraphFunctions] = useState<string[]>(
+    Array(5).fill("")
+  );
+  const [graphWindow, setGraphWindow] = useState({
+    xMin: -10,
+    xMax: 10,
+    yMin: -10,
+    yMax: 10,
+    xScale: 1,
+    yScale: 1,
+  });
+  const [traceMode, setTraceMode] = useState(false);
+  const [traceX, setTraceX] = useState(0);
+  const [activeFunction, setActiveFunction] = useState(0);
+  const [editingFunction, setEditingFunction] = useState(false);
+  const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
+
+  // Function to evaluate mathematical expressions
+  const evaluateExpression = (expr: string, x: number): number => {
+    try {
+      // Replace common mathematical functions and constants
+      const expression = expr
+        .replace(/sin\(/g, `Math.sin(`)
+        .replace(/cos\(/g, `Math.cos(`)
+        .replace(/tan\(/g, `Math.tan(`)
+        .replace(/log\(/g, `Math.log10(`)
+        .replace(/ln\(/g, `Math.log(`)
+        .replace(/√\(/g, `Math.sqrt(`)
+        .replace(/\^/g, `**`)
+        .replace(/π/g, `Math.PI`)
+        .replace(/e/g, `Math.E`)
+        .replace(/x/g, `${x}`);
+      return Function(`return ${expression}`)();
+    } catch (error) {
+      console.error("Error evaluating expression:", error);
+      return NaN;
+    }
+  };
+
+  // Function to plot the graph
+  const plotGraph = React.useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    // Set canvas size to match container
+    const container = canvas.parentElement;
+    if (container) {
+      canvas.width = container.clientWidth;
+      canvas.height = container.clientHeight;
+    }
+
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw grid
+    ctx.strokeStyle = "#333";
+    ctx.lineWidth = 0.5;
+
+    // Draw grid lines
+    const xStep =
+      canvas.width /
+      ((graphWindow.xMax - graphWindow.xMin) / graphWindow.xScale);
+    const yStep =
+      canvas.height /
+      ((graphWindow.yMax - graphWindow.yMin) / graphWindow.yScale);
+
+    // Vertical grid lines
+    for (
+      let x = graphWindow.xMin;
+      x <= graphWindow.xMax;
+      x += graphWindow.xScale
+    ) {
+      const px =
+        ((x - graphWindow.xMin) / (graphWindow.xMax - graphWindow.xMin)) *
+        canvas.width;
+      ctx.beginPath();
+      ctx.moveTo(px, 0);
+      ctx.lineTo(px, canvas.height);
+      ctx.stroke();
+    }
+
+    // Horizontal grid lines
+    for (
+      let y = graphWindow.yMin;
+      y <= graphWindow.yMax;
+      y += graphWindow.yScale
+    ) {
+      const py =
+        canvas.height -
+        ((y - graphWindow.yMin) / (graphWindow.yMax - graphWindow.yMin)) *
+          canvas.height;
+      ctx.beginPath();
+      ctx.moveTo(0, py);
+      ctx.lineTo(canvas.width, py);
+      ctx.stroke();
+    }
+
+    // Draw axes
+    ctx.strokeStyle = "#fff";
+    ctx.lineWidth = 2;
+
+    // X-axis
+    const yAxis =
+      canvas.height -
+      ((0 - graphWindow.yMin) / (graphWindow.yMax - graphWindow.yMin)) *
+        canvas.height;
+    ctx.beginPath();
+    ctx.moveTo(0, yAxis);
+    ctx.lineTo(canvas.width, yAxis);
+    ctx.stroke();
+
+    // Y-axis
+    const xAxis =
+      ((0 - graphWindow.xMin) / (graphWindow.xMax - graphWindow.xMin)) *
+      canvas.width;
+    ctx.beginPath();
+    ctx.moveTo(xAxis, 0);
+    ctx.lineTo(xAxis, canvas.height);
+    ctx.stroke();
+
+    // Plot functions
+    const colors = ["#ff0000", "#00ff00", "#0000ff", "#ff00ff", "#00ffff"];
+    graphFunctions.forEach((func, index) => {
+      if (!func) return;
+
+      ctx.strokeStyle = colors[index];
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+
+      let firstPoint = true;
+      for (let px = 0; px < canvas.width; px++) {
+        const x =
+          graphWindow.xMin +
+          (px / canvas.width) * (graphWindow.xMax - graphWindow.xMin);
+        const y = evaluateExpression(func, x);
+        const py =
+          canvas.height -
+          ((y - graphWindow.yMin) / (graphWindow.yMax - graphWindow.yMin)) *
+            canvas.height;
+
+        if (firstPoint) {
+          ctx.moveTo(px, py);
+          firstPoint = false;
+        } else {
+          ctx.lineTo(px, py);
+        }
+      }
+      ctx.stroke();
+    });
+
+    // Draw trace point if in trace mode
+    if (traceMode && graphFunctions[activeFunction]) {
+      const px =
+        ((traceX - graphWindow.xMin) / (graphWindow.xMax - graphWindow.xMin)) *
+        canvas.width;
+      const y = evaluateExpression(graphFunctions[activeFunction], traceX);
+      const py =
+        canvas.height -
+        ((y - graphWindow.yMin) / (graphWindow.yMax - graphWindow.yMin)) *
+          canvas.height;
+
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.arc(px, py, 5, 0, 2 * Math.PI);
+      ctx.fill();
+    }
+  }, [graphFunctions, graphWindow, traceMode, traceX, activeFunction]);
+
+  // Update graph when relevant state changes
+  React.useEffect(() => {
+    if (calculatorMode === "graphing") {
+      plotGraph();
+    }
+  }, [
+    calculatorMode,
+    graphFunctions,
+    graphWindow,
+    traceMode,
+    traceX,
+    activeFunction,
+    plotGraph,
+  ]);
 
   // Handle keyboard input
   React.useEffect(() => {
@@ -199,6 +384,8 @@ const ScientificCalculator: React.FC = () => {
         return left * right;
       case "/":
         return right === 0 ? NaN : left / right;
+      case "%":
+        return (left * right) / 100;
       case "^":
         return Math.pow(left, right);
       default:
@@ -545,31 +732,73 @@ const ScientificCalculator: React.FC = () => {
       const operation = opMap[label];
       if (operation) {
         handleUnaryOperation(operation);
-      } else if (
-        [
-          "2nd",
-          "EE",
-          "f1",
-          "f2",
-          "f3",
-          "f4",
-          "f5",
-          "y=",
-          "window",
-          "zoom",
-          "trace",
-          "graph",
-          "←",
-          "→",
-          "↑",
-          "↓",
-          "enter",
-          "alpha",
-          "del",
-        ].includes(label)
-      ) {
-        // These functions are not implemented yet
-        console.warn(`Button "${label}" functionality not implemented yet.`);
+      } else if (calculatorMode === "graphing") {
+        switch (label) {
+          case "y=":
+            setEditingFunction(true);
+            break;
+          case "f1":
+          case "f2":
+          case "f3":
+          case "f4":
+          case "f5":
+            const functionIndex = parseInt(label[1]) - 1;
+            if (editingFunction) {
+              setGraphFunctions((prev) => {
+                const newFunctions = [...prev];
+                newFunctions[functionIndex] = formula || displayValue;
+                return newFunctions;
+              });
+              setEditingFunction(false);
+              clearAll();
+            } else {
+              setActiveFunction(functionIndex);
+              setDisplayValue(graphFunctions[functionIndex] || "0");
+              setFormula(graphFunctions[functionIndex] || "");
+            }
+            break;
+          case "graph":
+            setEditingFunction(false);
+            break;
+          case "trace":
+            setTraceMode((prev) => !prev);
+            break;
+          case "←":
+            if (traceMode) {
+              setTraceX((x) =>
+                Math.max(graphWindow.xMin, x - graphWindow.xScale)
+              );
+            }
+            break;
+          case "→":
+            if (traceMode) {
+              setTraceX((x) =>
+                Math.min(graphWindow.xMax, x + graphWindow.xScale)
+              );
+            }
+            break;
+          case "zoom":
+            setGraphWindow((prev) => ({
+              xMin: prev.xMin * 0.5,
+              xMax: prev.xMax * 0.5,
+              yMin: prev.yMin * 0.5,
+              yMax: prev.yMax * 0.5,
+              xScale: prev.xScale,
+              yScale: prev.yScale,
+            }));
+            break;
+          case "window":
+            // Reset window to default
+            setGraphWindow({
+              xMin: -10,
+              xMax: 10,
+              yMin: -10,
+              yMax: 10,
+              xScale: 1,
+              yScale: 1,
+            });
+            break;
+        }
       }
     }
   };
@@ -593,9 +822,22 @@ const ScientificCalculator: React.FC = () => {
           <div
             className={`flex-1 min-h-[300px] ${
               orientation === "landscape" ? "min-h-[400px]" : ""
-            } bg-black rounded-lg mb-4 mx-1`}
+            } bg-black rounded-lg mb-4 mx-1 relative`}
           >
-            {/* Graphing output window */}
+            <canvas
+              ref={canvasRef}
+              className="w-full h-full"
+              style={{ background: "#000" }}
+            />
+            {traceMode && graphFunctions[activeFunction] && (
+              <div className="absolute bottom-2 left-2 bg-gray-800 text-white p-2 rounded text-sm">
+                x: {traceX.toFixed(2)}, y:{" "}
+                {evaluateExpression(
+                  graphFunctions[activeFunction],
+                  traceX
+                ).toFixed(2)}
+              </div>
+            )}
           </div>
         )}
         <div className="relative mb-1">
@@ -749,13 +991,7 @@ const ScientificCalculator: React.FC = () => {
                       ? "bg-gray-100 hover:bg-gray-200 text-gray-800"
                       : "bg-gray-200 hover:bg-gray-300 text-gray-700"
                   }
-                  ${
-                    label === "0" &&
-                    calculatorMode !== "scientific" &&
-                    calculatorMode !== "basic"
-                      ? "col-span-2"
-                      : ""
-                  }
+                  
                 `}
                 aria-label={`Calculator button ${label}`}
               >
