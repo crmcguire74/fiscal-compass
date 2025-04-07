@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 
-const ScientificCalculator: React.FC = () => {
+const ScientificCalculator: React.FC<{}> = () => {
   const [displayValue, setDisplayValue] = useState<string>("0");
   const [currentValue, setCurrentValue] = useState<number | null>(null);
   const [operator, setOperator] = useState<string | null>(null);
@@ -15,6 +15,13 @@ const ScientificCalculator: React.FC = () => {
   const [calculatorMode, setCalculatorMode] = useState<
     "scientific" | "basic" | "graphing"
   >("scientific");
+  const [hasInput, setHasInput] = useState<boolean>(false);
+
+  // Update hasInput whenever displayValue or formula changes
+  useEffect(() => {
+    const hasValue = displayValue !== "0" || formula !== "";
+    setHasInput(hasValue);
+  }, [displayValue, formula]);
   const [orientation, setOrientation] = useState<"portrait" | "landscape">(
     "portrait"
   );
@@ -288,6 +295,7 @@ const ScientificCalculator: React.FC = () => {
   }, [displayValue, operator, currentValue]); // Dependencies for calculation state
 
   const inputDigit = (digit: string) => {
+    setHasInput(true);
     if (waitingForOperand) {
       setDisplayValue(digit);
       setFormula((prev) => prev + digit);
@@ -304,6 +312,7 @@ const ScientificCalculator: React.FC = () => {
   };
 
   const inputDecimal = () => {
+    setHasInput(true);
     if (waitingForOperand) {
       setDisplayValue("0.");
       setFormula((prev) => prev + "0.");
@@ -323,6 +332,7 @@ const ScientificCalculator: React.FC = () => {
     setWaitingForOperand(false);
     setFormula("");
     setParenCount(0);
+    setHasInput(false);
   };
 
   const clearEntry = () => {
@@ -330,9 +340,13 @@ const ScientificCalculator: React.FC = () => {
     if (!operator) {
       setFormula("");
     }
+    if (formula === "") {
+      setHasInput(false);
+    }
   };
 
   const performOperation = (nextOperator: string) => {
+    setHasInput(true);
     const inputValue = parseFloat(displayValue);
 
     if (currentValue === null) {
@@ -360,6 +374,7 @@ const ScientificCalculator: React.FC = () => {
   };
 
   const handleParenthesis = (paren: "(" | ")") => {
+    setHasInput(true);
     if (paren === "(") {
       setParenCount((prev) => prev + 1);
       if (!waitingForOperand && displayValue !== "0") {
@@ -394,6 +409,7 @@ const ScientificCalculator: React.FC = () => {
   };
 
   const handleUnaryOperation = (op: string) => {
+    setHasInput(true);
     const inputValue = parseFloat(displayValue);
     let result: number;
     let formulaOp = "";
@@ -517,12 +533,15 @@ const ScientificCalculator: React.FC = () => {
         setDisplayValue("Error");
         setFormula("Error");
       } else {
-        setDisplayValue(String(result));
-        setFormula(String(result));
+        const resultStr = String(result);
+        // Reset all state together to ensure consistent updates
+        setWaitingForOperand(true);
+        setDisplayValue(resultStr);
+        setFormula("");
+        setCurrentValue(null);
+        setOperator(null);
+        setHasInput(false);
       }
-      setCurrentValue(null);
-      setOperator(null);
-      setWaitingForOperand(false);
     }
   };
 
@@ -561,14 +580,14 @@ const ScientificCalculator: React.FC = () => {
 
   const scientificButtonLayoutPortrait = {
     scientific: [
-      ["(", ")", "mc", "m+", "m-", "mr"],
+      ["AC", ")", "mc", "m+", "m-", "mr"],
       ["2nd", "x²", "x³", "xʸ", "eˣ", "10ˣ"],
       ["¹/ₓ", "³√ₓ", "∛ₓ", "ⁿ√ₓ", "ln", "log₁₀"],
       ["x!", "sin", "cos", "tan", "e", "EE"],
       ["Rand", "sinh", "cosh", "tanh", "π", "Rad"],
     ],
     controls: [
-      ["Bksp", "+/-", "%", "÷"],
+      ["(", "+/-", "%", "÷"],
       ["7", "8", "9", "×"],
       ["4", "5", "6", "-"],
       ["1", "2", "3", "+"],
@@ -577,7 +596,7 @@ const ScientificCalculator: React.FC = () => {
   };
 
   const scientificButtonLayoutLandscape = [
-    ["(", ")", "mc", "m+", "m-", "mr", "AC", "+/-", "%", "÷"],
+    ["(", ")", "mc", "m+", "m-", "mr", "Bksp", "+/-", "%", "÷"],
     ["2nd", "x²", "x³", "xʸ", "eˣ", "10ˣ", "7", "8", "9", "*"],
     ["1/x", "³√x", "⁴√x", "ⁿ√x", "ln", "log₁₀", "4", "5", "6", "-"],
     ["x!", "sin", "cos", "tan", "e", "EE", "1", "2", "3", "+"],
@@ -585,7 +604,7 @@ const ScientificCalculator: React.FC = () => {
   ];
 
   const basicButtonLayout = [
-    ["Bksp", "+/-", "%", "÷"],
+    ["AC", "+/-", "%", "÷"],
     ["7", "8", "9", "*"],
     ["4", "5", "6", "-"],
     ["1", "2", "3", "+"],
@@ -626,7 +645,9 @@ const ScientificCalculator: React.FC = () => {
     if (orientation === "portrait") {
       return [
         ...scientificButtonLayoutPortrait.scientific,
-        ...scientificButtonLayoutPortrait.controls,
+        ...scientificButtonLayoutPortrait.controls.map((row) =>
+          row.map((label) => (label === "Bksp" ? "AC" : label))
+        ),
       ];
     }
     return scientificButtonLayoutLandscape;
@@ -659,22 +680,20 @@ const ScientificCalculator: React.FC = () => {
       performOperation(label === "×" ? "*" : label === "÷" ? "/" : label);
     } else if (label === "=") {
       handleEquals();
-    } else if (
-      label === "AC" ||
-      (label === "Bksp" && displayValue === "0" && formula === "")
-    ) {
-      clearAll();
-    } else if (label === "Bksp") {
-      console.log("Backspace pressed:", { displayValue, formula });
-      if (displayValue === "0" && formula === "") {
+    } else if (label === "AC" || label === "Bksp") {
+      if (!hasInput) {
         clearAll();
       } else {
+        console.log("Backspace pressed:", { displayValue, formula });
         const newDisplayValue =
           displayValue.length > 1 ? displayValue.slice(0, -1) : "0";
         const newFormula = formula.slice(0, -1);
         console.log("New values:", { newDisplayValue, newFormula });
         setDisplayValue(newDisplayValue);
         setFormula(newFormula);
+        if (newDisplayValue === "0" && newFormula === "") {
+          setHasInput(false);
+        }
       }
     } else if (label === "C") {
       clearEntry();
@@ -687,14 +706,17 @@ const ScientificCalculator: React.FC = () => {
     } else if (label === "m-") {
       memorySubtract();
     } else if (label === "π") {
+      setHasInput(true);
       setDisplayValue(String(Math.PI));
       setFormula((prev) => prev + "π");
       setWaitingForOperand(false);
     } else if (label === "e") {
+      setHasInput(true);
       setDisplayValue(String(Math.E));
       setFormula((prev) => prev + "e");
       setWaitingForOperand(false);
     } else if (label === "Rand") {
+      setHasInput(true);
       const rand = Math.random();
       setDisplayValue(String(rand));
       setFormula((prev) => prev + rand.toFixed(8));
@@ -868,8 +890,10 @@ const ScientificCalculator: React.FC = () => {
                   onClick={() => handleButtonClick(label)}
                   className="rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 text-lg h-[3.8rem]"
                 >
-                  {label === "Bksp" && displayValue === "0" && formula === ""
-                    ? "AC"
+                  {label === "AC" || label === "Bksp"
+                    ? !hasInput
+                      ? "AC"
+                      : "⌫"
                     : label}
                 </Button>
               ))}
@@ -882,7 +906,7 @@ const ScientificCalculator: React.FC = () => {
                   className={`
                     text-base h-[3.8rem] flex items-center justify-center
                     ${
-                      ["Bksp", "+/-", "%", "/"].includes(label)
+                      ["Bksp", "AC", "+/-", "%", "/"].includes(label)
                         ? "rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700"
                         : ["×", "+", "-", "=", "÷"].includes(label)
                         ? "rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-bold"
@@ -894,8 +918,10 @@ const ScientificCalculator: React.FC = () => {
                     }
                   `}
                 >
-                  {label === "Bksp" && displayValue === "0" && formula === ""
-                    ? "AC"
+                  {label === "AC" || label === "Bksp"
+                    ? !hasInput
+                      ? "AC"
+                      : "⌫"
                     : label}
                 </Button>
               ))}
@@ -996,8 +1022,12 @@ const ScientificCalculator: React.FC = () => {
                 `}
                 aria-label={`Calculator button ${label}`}
               >
-                {label === "Bksp" && displayValue === "0" && formula === "" ? (
-                  "AC"
+                {label === "Bksp" || label === "AC" ? (
+                  !hasInput ? (
+                    "AC"
+                  ) : (
+                    "⌫"
+                  )
                 ) : label === "calc" ? (
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -1039,4 +1069,4 @@ const ScientificCalculator: React.FC = () => {
   );
 };
 
-export default ScientificCalculator;
+export { ScientificCalculator as default };
