@@ -11,6 +11,7 @@ import NotFound from "./pages/NotFound";
 import CalculatorsIndex from "./pages/calculators/CalculatorsIndex";
 import CompoundInterestPage from "./pages/calculators/investment/CompoundInterestPage";
 import InvestmentCalculatorsIndex from "./pages/calculators/investment/InvestmentCalculatorsIndex";
+import SavingsCalculatorPage from "./pages/calculators/investment/SavingsCalculatorPage";
 import MortgageCalculatorsIndex from "./pages/calculators/mortgage/MortgageCalculatorsIndex";
 import MortgagePaymentPage from "./pages/calculators/mortgage/MortgagePaymentPage";
 import HomeEquityLoanPage from "./pages/calculators/mortgage/HomeEquityLoanPage";
@@ -104,6 +105,10 @@ const App = () => {
               <Route
                 path="/calculators/investment/compound-interest"
                 element={<CompoundInterestPage />}
+              />
+              <Route
+                path="/calculators/investment/savings-calculator"
+                element={<SavingsCalculatorPage />}
               />
               {/* Mortgage Calculator Routes */}
               <Route
