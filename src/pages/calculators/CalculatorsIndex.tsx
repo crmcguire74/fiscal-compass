@@ -145,7 +145,9 @@ const CalculatorsIndex = () => {
                   {getCategoryIcon(category.icon)}
                 </div>
                 <CardTitle className="text-xl">{category.name}</CardTitle>
-                <CardDescription>{category.description}</CardDescription>
+                <CardDescription className="min-h-[4rem] line-clamp-3 flex items-center">
+                  {category.description}
+                </CardDescription>
               </CardHeader>
               <CardFooter>
                 <Button asChild className="w-full hover:bg-finance-accent">

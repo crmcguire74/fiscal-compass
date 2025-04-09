@@ -1,5 +1,29 @@
 export const CALCULATOR_CATEGORIES = [
   {
+    id: 'tax',
+    name: 'Income & Tax Planning',
+    description: 'Estimate income and taxes, planning for tax-efficient strategies',
+    icon: 'dollar-sign',
+  },
+  {
+    id: 'debt',
+    name: 'Debt Management',
+    description: 'Tools to help manage and pay off various types of debt',
+    icon: 'credit-card',
+  },
+  {
+    id: 'investment',
+    name: 'Investment & Wealth',
+    description: 'Calculate investment growth, returns, and portfolio analysis',
+    icon: 'trending-up',
+  },
+  {
+    id: 'retirement',
+    name: 'Retirement Planning',
+    description: 'Tools for planning your retirement and estimating future needs',
+    icon: 'piggy-bank',
+  },
+  {
     id: 'home-mortgage',
     name: 'Home & Mortgage',
     description: 'Calculators for home buying, mortgage payments, closing costs, and refinancing',
@@ -12,46 +36,10 @@ export const CALCULATOR_CATEGORIES = [
     icon: 'car',
   },
   {
-    id: 'retirement',
-    name: 'Retirement Planning',
-    description: 'Tools for planning your retirement and estimating future needs',
-    icon: 'piggy-bank',
-  },
-  {
-    id: 'investment',
-    name: 'Investment & Wealth',
-    description: 'Calculate investment growth, returns, and portfolio analysis',
-    icon: 'trending-up',
-  },
-  {
-    id: 'debt',
-    name: 'Debt Management',
-    description: 'Tools to help manage and pay off various types of debt',
-    icon: 'credit-card',
-  },
-  {
-    id: 'insurance',
-    name: 'Insurance Planning',
-    description: 'Calculate insurance needs and compare different plans',
-    icon: 'shield',
-  },
-  {
-    id: 'tax',
-    name: 'Income & Tax Planning',
-    description: 'Estimate income and taxes, planning for tax-efficient strategies',
-    icon: 'dollar-sign',
-  },
-  {
     id: 'education',
     name: 'Education Planning',
     description: 'Plan for education costs and student loan management',
     icon: 'book',
-  },
-  {
-    id: 'health',
-    name: 'Health & Wellness',
-    description: 'Calculate health costs and plan for medical expenses',
-    icon: 'heart',
   },
   {
     id: 'business',
@@ -64,6 +52,18 @@ export const CALCULATOR_CATEGORIES = [
     name: 'Life Event Planning',
     description: 'Plan for major life events like weddings, children, and more',
     icon: 'calendar',
+  },
+  {
+    id: 'insurance',
+    name: 'Insurance Planning',
+    description: 'Calculate insurance needs and compare different plans',
+    icon: 'shield',
+  },
+  {
+    id: 'health',
+    name: 'Health & Wellness',
+    description: 'Calculate health costs and plan for medical expenses',
+    icon: 'heart',
   },
   {
     id: 'tools',
