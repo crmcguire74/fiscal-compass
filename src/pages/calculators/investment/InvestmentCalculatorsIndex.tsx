@@ -264,13 +264,13 @@ const InvestmentCalculatorsIndex = () => {
 const CalculatorCard = ({ calculator }) => {
   return (
     <div
-      className={`border rounded-lg overflow-hidden transition-all bg-white ${
+      className={`border rounded-lg overflow-hidden transition-all bg-white flex flex-col h-full ${
         calculator.status === "active"
           ? "hover:shadow-md hover:border-blue-200"
           : "opacity-80"
       }`}
     >
-      <div className="p-6">
+      <div className="p-6 flex-1 flex flex-col">
         <div className="w-12 h-12 rounded-full bg-finance-primary/10 flex items-center justify-center mb-4">
           <calculator.icon className="h-6 w-6 text-finance-primary" />
         </div>
@@ -345,8 +345,10 @@ const CalculatorCard = ({ calculator }) => {
             </DrawerContent>
           </Drawer>
         </div>
-        <p className="text-muted-foreground mb-6">{calculator.description}</p>
-        <div className="flex justify-end">
+        <p className="text-muted-foreground mb-auto">
+          {calculator.description}
+        </p>
+        <div className="flex justify-end mt-6">
           {calculator.status === "active" ? (
             <Button asChild className="hover:bg-accent">
               <Link to={`/calculators/investment/${calculator.id}`}>
