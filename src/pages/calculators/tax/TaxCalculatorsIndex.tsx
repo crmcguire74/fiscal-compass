@@ -19,13 +19,24 @@ import { Link } from "react-router-dom";
 
 const TAX_CALCULATORS = [
   {
-    id: "take-home-pay-calculator",
-    name: "Take-Home Pay Calculator",
+    id: "take-home-pay-salaried",
+    name: "Take-Home Pay Calculator (Salaried)",
     description:
       "Calculate your net income after taxes, retirement contributions, and other deductions",
     icon: DollarSign,
+    path: "/calculators/tax/take-home-pay-salaried", // Added path
     status: "active",
     featured: true,
+  },
+  {
+    id: "take-home-pay-hourly",
+    name: "Take-Home Pay Calculator (Hourly)",
+    description:
+      "Estimate net pay for hourly workers, including overtime and tips",
+    icon: DollarSign, // Using the same icon for now
+    path: "/calculators/tax/take-home-pay-hourly",
+    status: "active",
+    featured: false, // Not featured initially
   },
   {
     id: "tax-bracket-calculator",

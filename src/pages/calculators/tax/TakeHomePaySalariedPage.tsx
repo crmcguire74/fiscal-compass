@@ -2,9 +2,9 @@ import { ArrowLeft, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
-import TakeHomePayCalculator from "@/components/calculators/tax/TakeHomePayCalculator";
+import TakeHomePaySalariedCalculator from "@/components/calculators/tax/TakeHomePaySalariedCalculator";
 
-const TakeHomePayPage = () => {
+const TakeHomePaySalariedPage = () => {
   return (
     <Layout>
       <div className="container py-8 max-w-7xl">
@@ -34,26 +34,24 @@ const TakeHomePayPage = () => {
 
         <div className="max-w-5xl mx-auto mb-6">
           <div className="rounded-lg border bg-card text-card-foreground w-full shadow-md border-gray-200">
-            
-            
             <div className="flex flex-col space-y-1.5 p-6 bg-gradient-to-r from-finance-primary to-finance-primary/80 text-white">
               <div className="flex justify-between items-center">
                 <div>
                   <h3 className="font-semibold tracking-tight text-2xl flex items-center gap-2">
-                  <DollarSign className="h-6 w-6 text-white" />
-                    Take-Home Pay Calculator
+                    <DollarSign className="h-6 w-6 text-white" />
+                    Take-Home Pay Calculator (Salaried)
                   </h3>
                   <p className="text-sm text-gray-100 mt-2">
-                    Estimate your take-home pay after taxes, retirement, and other deductions
+                    Estimate your take-home pay after taxes, retirement, and
+                    other deductions
                   </p>
                 </div>
               </div>
             </div>
 
-            <TakeHomePayCalculator />
-            
+            <TakeHomePaySalariedCalculator />
           </div>
-        </div>     
+        </div>
 
         <div className="grid grid-cols-1 gap-6">
           <div className="bg-blue-50 border border-blue-100 rounded-lg p-6 mt-4">
@@ -117,4 +115,4 @@ const TakeHomePayPage = () => {
   );
 };
 
-export default TakeHomePayPage;
+export default TakeHomePaySalariedPage;

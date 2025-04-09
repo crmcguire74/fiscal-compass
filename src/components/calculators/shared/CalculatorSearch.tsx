@@ -100,12 +100,21 @@ const allCalculators: Calculator[] = [
   },
   // Tax calculators
   {
-    id: "take-home-pay-calculator",
-    name: "Take-Home Pay Calculator",
+    id: "take-home-pay-salaried",
+    name: "Take-Home Pay Calculator (Salaried)",
     description: "Calculate your net income after taxes and deductions",
     category: "Tax",
     tags: ["tax", "income", "salary", "paycheck", "withholding"],
-    path: "/calculators/tax/take-home-pay-calculator",
+    path: "/calculators/tax/take-home-pay-salaried",
+  },
+  {
+    id: "take-home-pay-hourly",
+    name: "Take-Home Pay Calculator (Hourly)",
+    description:
+      "Estimate net pay for hourly workers, including overtime and tips",
+    category: "Tax",
+    tags: ["tax", "income", "hourly", "paycheck", "withholding", "tips"],
+    path: "/calculators/tax/take-home-pay-hourly",
   },
   {
     id: "tax-bracket-calculator",
@@ -267,6 +276,31 @@ const allCalculators: Calculator[] = [
     category: "Tools",
     tags: ["time", "date", "calculator", "difference", "duration"],
     path: "/calculators/tools/time-calculator",
+  },
+  {
+    id: "value-of-time",
+    name: "Value of Time Calculator",
+    description:
+      "Calculate how much your time is worth per hour, minute, day, week, or month",
+    category: "Tools",
+    tags: ["time", "value", "productivity", "hourly", "salary", "worth"],
+    path: "/calculators/tools/value-of-time",
+  },
+  {
+    id: "inflation-calculator",
+    name: "Inflation Calculator",
+    description:
+      "Calculate how inflation affects purchasing power over time and understand historical price changes",
+    category: "Tools",
+    tags: [
+      "inflation",
+      "money",
+      "purchasing power",
+      "historical",
+      "prices",
+      "cpi",
+    ],
+    path: "/calculators/tools/inflation",
   },
 ];
 

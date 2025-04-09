@@ -187,9 +187,9 @@ const CalculatorsIndex = () => {
               path="/calculators/retirement/retirement-savings"
             />
             <FeaturedCalculatorCard
-              title="Take-Home Pay Calculator"
+              title="Take-Home Pay Calculator (Salaried)"
               description="Calculate your net income after taxes, retirement contributions, and other deductions."
-              path="/calculators/tax/take-home-pay-calculator"
+              path="/calculators/tax/take-home-pay-salaried"
             />
             <FeaturedCalculatorCard
               title="Debt-to-Income Ratio Calculator"

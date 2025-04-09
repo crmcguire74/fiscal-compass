@@ -7,6 +7,7 @@ import {
   Ruler,
   Globe,
   ChevronRight,
+  TrendingUp,
 } from "lucide-react";
 import {
   Card,
@@ -55,7 +56,25 @@ const ToolsCalculatorsIndex = () => {
         "Perform advanced scientific calculations with mathematical functions.",
       icon: <Calculator className="h-8 w-8 text-primary" />,
       path: "/calculators/tools/scientific-calculator",
-      comingSoon: false, // Changed to false
+      comingSoon: false,
+    },
+    {
+      id: "value-of-time",
+      title: "Value of Time Calculator",
+      description:
+        "Calculate how much your time is worth per hour, minute, day, week, or month.",
+      icon: <Clock className="h-8 w-8 text-primary" />,
+      path: "/calculators/tools/value-of-time",
+      comingSoon: false,
+    },
+    {
+      id: "inflation-calculator",
+      title: "Inflation Calculator",
+      description:
+        "Calculate how inflation affects purchasing power over time and understand historical price changes.",
+      icon: <TrendingUp className="h-8 w-8 text-primary" />,
+      path: "/calculators/tools/inflation",
+      comingSoon: false,
     },
   ];
 

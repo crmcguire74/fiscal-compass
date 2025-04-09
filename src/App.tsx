@@ -31,7 +31,8 @@ import MacroCalculatorPage from "./pages/calculators/health/MacroCalculatorPage"
 import ProteinCalculatorPage from "./pages/calculators/health/ProteinCalculatorPage";
 import TaxCalculatorsIndex from "./pages/calculators/tax/TaxCalculatorsIndex";
 import IncomeTaxCalculatorPage from "./pages/calculators/tax/IncomeTaxCalculatorPage";
-import TakeHomePayPage from "./pages/calculators/tax/TakeHomePayPage";
+import TakeHomePaySalariedPage from "./pages/calculators/tax/TakeHomePaySalariedPage"; // Renamed import
+import TakeHomePayHourlyPage from "./pages/calculators/tax/TakeHomePayHourlyPage"; // Added import
 import BonusTaxCalculatorPage from "./pages/calculators/tax/BonusTaxCalculatorPage";
 import TaxBracketCalculatorPage from "./pages/calculators/tax/TaxBracketCalculatorPage";
 import HomeEquityCalculatorPage from "./pages/calculators/real-estate/HomeEquityCalculatorPage";
@@ -57,7 +58,9 @@ import ToolsCalculatorsIndex from "./pages/calculators/tools/ToolsCalculatorsInd
 import CurrencyConverterPage from "./pages/calculators/tools/CurrencyConverterPage";
 import MeasurementConverterPage from "./pages/calculators/tools/MeasurementConverterPage";
 import TimeCalculatorPage from "./pages/calculators/tools/TimeCalculatorPage";
-import ScientificCalculatorPage from "./pages/calculators/tools/ScientificCalculatorPage"; // Added import
+import ScientificCalculatorPage from "./pages/calculators/tools/ScientificCalculatorPage";
+import ValueTimePage from "./pages/calculators/tools/ValueTimePage";
+import InflationPage from "./pages/calculators/tools/InflationPage"; // Added import
 import AutoLoanPage from "./pages/calculators/auto/AutoLoanPage";
 import AutoLeasePage from "./pages/calculators/auto/AutoLeasePage";
 import GasMaintenancePage from "./pages/calculators/auto/GasMaintenancePage";
@@ -185,8 +188,12 @@ const App = () => {
                 element={<IncomeTaxCalculatorPage />}
               />
               <Route
-                path="/calculators/tax/take-home-pay-calculator"
-                element={<TakeHomePayPage />}
+                path="/calculators/tax/take-home-pay-salaried" // Updated path
+                element={<TakeHomePaySalariedPage />} // Updated element
+              />
+              <Route
+                path="/calculators/tax/take-home-pay-hourly" // Added route
+                element={<TakeHomePayHourlyPage />}
               />
               <Route
                 path="/calculators/tax/bonus-tax-calculator"
@@ -323,8 +330,15 @@ const App = () => {
               <Route
                 path="/calculators/tools/scientific-calculator"
                 element={<ScientificCalculatorPage />}
-              />{" "}
-              {/* Added route */}
+              />
+              <Route
+                path="/calculators/tools/value-of-time"
+                element={<ValueTimePage />}
+              />
+              <Route
+                path="/calculators/tools/inflation"
+                element={<InflationPage />}
+              />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
