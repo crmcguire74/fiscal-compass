@@ -6,12 +6,6 @@ export const CALCULATOR_CATEGORIES = [
     icon: 'dollar-sign',
   },
   {
-    id: 'debt',
-    name: 'Debt Management',
-    description: 'Tools to help manage and pay off various types of debt',
-    icon: 'credit-card',
-  },
-  {
     id: 'investment',
     name: 'Investment & Wealth',
     description: 'Calculate investment growth, returns, and portfolio analysis',
@@ -22,6 +16,12 @@ export const CALCULATOR_CATEGORIES = [
     name: 'Retirement Planning',
     description: 'Tools for planning your retirement and estimating future needs',
     icon: 'piggy-bank',
+  },
+  {
+    id: 'debt',
+    name: 'Debt Management',
+    description: 'Tools to help manage and pay off various types of debt',
+    icon: 'credit-card',
   },
   {
     id: 'home-mortgage',
