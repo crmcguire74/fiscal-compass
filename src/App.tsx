@@ -36,6 +36,7 @@ import TakeHomePaySalariedPage from "./pages/calculators/tax/TakeHomePaySalaried
 import TakeHomePayHourlyPage from "./pages/calculators/tax/TakeHomePayHourlyPage"; // Added import
 import BonusTaxCalculatorPage from "./pages/calculators/tax/BonusTaxCalculatorPage";
 import TaxBracketCalculatorPage from "./pages/calculators/tax/TaxBracketCalculatorPage";
+import FreelanceRateCalculatorPage from "./pages/calculators/tax/FreelanceRateCalculatorPage"; // Added import
 import HomeEquityCalculatorPage from "./pages/calculators/real-estate/HomeEquityCalculatorPage";
 import BusinessCalculatorsIndex from "./pages/calculators/business/BusinessCalculatorsIndex";
 import BreakEvenAnalysisPage from "./pages/calculators/business/BreakEvenAnalysisPage";
@@ -207,6 +208,10 @@ const App = () => {
               <Route
                 path="/calculators/tax/tax-bracket-calculator"
                 element={<TaxBracketCalculatorPage />}
+              />
+              <Route
+                path="/calculators/tax/freelance-rate-calculator" // Added route
+                element={<FreelanceRateCalculatorPage />}
               />
               {/* Real Estate Calculator Routes */}
               <Route
