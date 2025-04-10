@@ -57,6 +57,16 @@ const TAX_CALCULATORS = [
     featured: false,
   },
   {
+    id: "freelance-rate-calculator",
+    name: "Freelance Rate Calculator",
+    description:
+      "Determine a competitive and profitable hourly rate for your freelance services.",
+    icon: DollarSign,
+    path: "/calculators/tax/freelance-rate-calculator",
+    status: "active",
+    featured: false,
+  },
+  {
     id: "income-tax-calculator",
     name: "Income Tax Calculator",
     description:
