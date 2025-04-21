@@ -145,7 +145,9 @@ Most importantly, recognize that experiencing financial stress doesn't reflect p
     tags: ['mental health', 'stress management', 'financial wellness', 'health'],
     coverImage: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80',
     readingTime: 10,
-    featured: true
+    featured: true,
+    metaTitle: "Financial Stress and Health: Understanding the Mind-Body Connection",
+    metaDescription: "Learn how financial stress impacts your physical and mental wellbeing, and discover effective strategies to protect your health while managing money worries."
   },
   {
     id: 'mindful-spending-wellness',
@@ -349,7 +351,9 @@ In a culture that equates consumption with happiness, the radical act of mindful
     category: 'health',
     tags: ['mindfulness', 'financial wellness', 'mental health', 'healthy spending'],
     coverImage: 'https://images.unsplash.com/photo-1434494878577-86c23bcb06b9?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80',
-    readingTime: 11
+    readingTime: 11,
+    metaTitle: "Mindful Spending Guide: Improve Your Financial and Mental Wellness",
+    metaDescription: "Transform your relationship with money through mindful spending. Learn practical strategies to make conscious financial choices that enhance both your wealth and wellbeing."
   },
   {
     id: 'exercise-financial-goals',
@@ -574,7 +578,9 @@ Your financial fitness program, like any exercise regimen, should be personalize
     category: 'health',
     tags: ['exercise', 'financial psychology', 'goal setting', 'habit formation'],
     coverImage: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80',
-    readingTime: 9
+    readingTime: 9,
+    metaTitle: "Exercise Psychology for Financial Success: Goal Achievement Guide",
+    metaDescription: "Apply proven exercise psychology principles to achieve your financial goals. Learn how fitness strategies can improve your money management and wealth building."
   },
   {
     id: 'sleep-financial-decisions',
@@ -779,7 +785,9 @@ In the quest for financial security and growth, sometimes the most important act
     category: 'health',
     tags: ['sleep', 'decision making', 'financial psychology', 'cognitive health'],
     coverImage: 'https://images.unsplash.com/photo-1541199249251-f713e6145474?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2074&q=80',
-    readingTime: 10
+    readingTime: 10,
+    metaTitle: "Sleep Quality and Financial Decisions: The Critical Connection",
+    metaDescription: "Discover how sleep impacts your financial choices. Learn science-backed strategies to improve your sleep quality and make better money decisions."
   },
   {
     id: 'nutrition-budget-strategies',
@@ -1056,7 +1064,9 @@ With these approaches, you can enjoy excellent nutrition while keeping food cost
     category: 'health',
     tags: ['nutrition', 'budget', 'healthy eating', 'meal planning'],
     coverImage: 'https://images.unsplash.com/photo-1610348725531-843dff563e2c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80',
-    readingTime: 12
+    readingTime: 12,
+    metaTitle: "Budget-Friendly Healthy Eating: Complete Nutrition Guide",
+    metaDescription: "Learn how to eat healthy on a budget with our comprehensive guide. Discover cost-effective meal planning, shopping strategies, and nutritious recipes."
   }
 ];
 

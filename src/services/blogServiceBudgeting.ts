@@ -153,7 +153,9 @@ The greatest benefit might be the peace of mind that comes from knowing exactly 
     category: 'Budgeting',
     tags: ['budgeting', 'zero-based budgeting', 'financial planning', 'saving money'],
     coverImage: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80',
-    readingTime: 8
+    readingTime: 8,
+    metaTitle: 'Zero-Based Budgeting Guide: Take Control of Your Finances',
+    metaDescription: 'Master zero-based budgeting with our comprehensive guide. Learn how to allocate every dollar, set financial priorities, and achieve your money goals effectively.'
   },
   {
     id: '50-30-20-budget-rule',
@@ -343,7 +345,9 @@ Whether you're just starting your financial journey or looking to simplify an ov
     category: 'Budgeting',
     tags: ['budgeting', '50/30/20 rule', 'money management', 'personal finance'],
     coverImage: 'https://images.unsplash.com/photo-1589666564459-93cdd3ab856a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80',
-    readingTime: 7
+    readingTime: 7,
+    metaTitle: '50/30/20 Budget Rule: Simple Money Management Guide',
+    metaDescription: 'Learn the 50/30/20 budgeting rule for easy money management. Discover how to balance needs, wants, and savings with this straightforward budgeting approach.'
   },
   {
     id: 'envelope-budgeting-digital-age',
@@ -589,7 +593,9 @@ Whether you're a budgeting novice or a seasoned pro, digital envelope systems of
     category: 'Budgeting',
     tags: ['envelope budgeting', 'budgeting apps', 'personal finance', 'money management'],
     coverImage: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80',
-    readingTime: 9
+    readingTime: 9,
+    metaTitle: 'Digital Envelope Budgeting Guide: Modern Money Management',
+    metaDescription: 'Modernize your finances with digital envelope budgeting. Compare top apps and tools to implement this classic budgeting method in todays digital world.'
   },
   {
     id: 'budgeting-for-variable-income',
@@ -840,6 +846,8 @@ Remember that your financial management system should serve your goals and value
     category: 'Budgeting',
     tags: ['freelancing', 'variable income', 'gig economy', 'budgeting', 'self-employed'],
     coverImage: 'https://images.unsplash.com/photo-1593672715438-d88a1cf7a48f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1674&q=80',
-    readingTime: 11
+    readingTime: 11,
+    metaTitle: 'Variable Income Budgeting Guide: Tips for Freelancers & Gig Workers',
+    metaDescription: 'Master budgeting with irregular income. Essential strategies for freelancers and gig workers to create financial stability despite unpredictable earnings.'
   }
 ];

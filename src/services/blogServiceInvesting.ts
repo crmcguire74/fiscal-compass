@@ -242,6 +242,8 @@ Investing during inflation doesn't have to be daunting. Taking small, informed s
     coverImage:
       "https://images.unsplash.com/photo-1560472355-536de3962603?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
     readingTime: 9,
+    metaTitle: "Inflation Investment Guide: Protect and Grow Your Wealth",
+    metaDescription: "Learn effective strategies for investing during inflation. Discover how to protect your portfolio, preserve purchasing power, and find growth opportunities in challenging markets."
   },
   {
     id: "sustainable-investing-guide",
@@ -375,6 +377,8 @@ For more insights on sustainable practices, check out articles on [Morningstar](
     coverImage:
       "https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1674&q=80",
     readingTime: 10,
+    metaTitle: "ESG Investing Guide: Sustainable Investment Strategies",
+    metaDescription: "Master sustainable investing with our comprehensive ESG guide. Learn how to integrate environmental, social, and governance factors into your investment strategy."
   },
   {
     id: "global-investing-beginners",
@@ -446,6 +450,8 @@ Remember, every international step you take is a learning experience, so enjoy t
     coverImage:
       "https://images.unsplash.com/photo-1519692933481-e162a57d6721?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
     readingTime: 12,
+    metaTitle: "Global Investing Guide: International Portfolio Strategies",
+    metaDescription: "Start global investing with our beginner-friendly guide. Learn how to build a diversified international portfolio and access worldwide investment opportunities."
   },
   {
     id: "behavioral-investing-mistakes",
@@ -543,5 +549,7 @@ Use budgeting apps and regular financial check-ups to keep your investing habits
     coverImage:
       "https://images.unsplash.com/photo-1642543348474-07ac1b6bed44?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1674&q=80",
     readingTime: 10,
+    metaTitle: "Common Investment Mistakes: Behavioral Finance Guide",
+    metaDescription: "Avoid costly investment mistakes with our behavioral finance guide. Learn to recognize and overcome psychological biases that affect your investment decisions."
   },
 ];

@@ -75,7 +75,9 @@ An emergency fund isn't just financial protection—it's peace of mind that allo
     category: 'Budgeting',
     tags: ['emergency fund', 'savings', 'financial security', 'budgeting'],
     coverImage: 'https://images.unsplash.com/photo-1586473219010-2ffc57b0d282?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80',
-    readingTime: 6
+    readingTime: 6,
+    metaTitle: "Emergency Fund Guide: How Much Should You Save?",
+    metaDescription: "Calculate the right emergency fund size for your situation. Learn expert recommendations for savings targets and strategies to build your financial safety net."
   },
   {
     id: 'index-funds-investing-guide',
@@ -177,7 +179,9 @@ Start small if necessary, but start—the power of compound returns works best w
     category: 'Investing',
     tags: ['index funds', 'investing', 'passive income', 'retirement'],
     coverImage: 'https://images.unsplash.com/photo-1591696205602-2f950c417cb9?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80',
-    readingTime: 8
+    readingTime: 8,
+    metaTitle: "Index Fund Investing: Complete Beginner's Guide",
+    metaDescription: "Master index fund investing with our beginner-friendly guide. Learn how to build wealth through passive investing and discover the best funds for your portfolio."
   },
   {
     id: 'credit-score-boost',
@@ -313,7 +317,9 @@ Remember that the goal isn't just a higher score—it's the financial opportunit
     category: 'Credit',
     tags: ['credit score', 'FICO score', 'debt management', 'financial planning'],
     coverImage: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80',
-    readingTime: 7
+    readingTime: 7,
+    metaTitle: "Credit Score Improvement: 7 Proven Strategies",
+    metaDescription: "Boost your credit score by 100+ points with our proven strategies. Learn expert tips for credit repair and building a strong credit profile."
   },
   {
     id: 'recession-proof-finances',
@@ -478,7 +484,9 @@ Remember that recessions are temporary, but the financial habits you develop in 
     category: 'Financial Planning',
     tags: ['recession', 'economic downturn', 'emergency fund', 'financial security'],
     coverImage: 'https://images.unsplash.com/photo-1583752028088-91e3e9880b46?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80',
-    readingTime: 9
+    readingTime: 9,
+    metaTitle: "Recession-Proof Your Finances: Complete Protection Guide",
+    metaDescription: "Learn how to protect your finances during economic downturns. Discover practical strategies to prepare for and thrive during a recession."
   },
   {
     id: 'home-buying-first-steps',
@@ -638,7 +646,9 @@ Remember that in homebuying, preparation isn't just about avoiding problems—it
     category: 'Real Estate',
     tags: ['homebuying', 'mortgage', 'real estate', 'first-time homebuyer'],
     coverImage: 'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80',
-    readingTime: 8
+    readingTime: 8,
+    metaTitle: "First-Time Home Buying: Essential Preparation Steps",
+    metaDescription: "Planning to buy your first home? Learn the 10 crucial steps to take before house hunting. Expert tips for a successful home purchase."
   },
   {
     id: 'retirement-account-types',
@@ -758,7 +768,9 @@ Planning for retirement involves navigating a complex landscape of different acc
     category: 'Retirement',
     tags: ['retirement', '401k', 'IRA', 'retirement planning', 'tax planning'],
     coverImage: 'https://images.unsplash.com/photo-1600096194534-95cf5eec4c20?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80',
-    readingTime: 9
+    readingTime: 9,
+    metaTitle: "Retirement Account Guide: Choose Your Best Options",
+    metaDescription: "Compare retirement account types to find your best options. Expert analysis of 401(k)s, IRAs, and other retirement savings vehicles."
   }
 ];
 
@@ -893,7 +905,9 @@ Most importantly, view budgeting not as a restriction but as a tool that brings 
     category: 'Budgeting',
     tags: ['budgeting', 'personal finance', 'money management', 'financial planning'],
     coverImage: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80',
-    readingTime: 7
+    readingTime: 7,
+    metaTitle: "Budget Methods Comparison: Find Your Perfect Match",
+    metaDescription: "Discover which budgeting method works best for you. Compare 5 popular approaches and learn how to implement them effectively."
   },
   {
     id: 'holiday-budget-survival',
@@ -1030,7 +1044,9 @@ When the season is over, the greatest gift you can give yourself is starting the
     category: 'Budgeting',
     tags: ['budgeting', 'holiday planning', 'gift strategy', 'financial planning'],
     coverImage: 'https://images.unsplash.com/photo-1482517967863-00e15c9b44be?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80',
-    readingTime: 6
+    readingTime: 6,
+    metaTitle: "Holiday Budget Guide: Celebrate Without Overspending",
+    metaDescription: "Keep your holiday spending under control with our complete budget guide. Learn strategies for saving money while creating meaningful celebrations."
   }
 ];
 

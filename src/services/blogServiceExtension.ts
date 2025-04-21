@@ -84,7 +84,9 @@ export const ADDITIONAL_BLOG_POSTS: BlogPost[] = [
     tags: ['ROI', 'business', 'finance', 'investment'],
     coverImage: '/placeholder.svg',
     readingTime: 8,
-    featured: true
+    featured: true,
+    metaTitle: 'How to Calculate ROI: A Complete Business Investment Guide',
+    metaDescription: 'Learn how to calculate ROI for business investments, understand ROI interpretation, and make data-driven decisions. Includes formulas, examples, and best practices.'
   },
   {
     id: 'protein-nutrition',
@@ -207,7 +209,9 @@ export const ADDITIONAL_BLOG_POSTS: BlogPost[] = [
     tags: ['nutrition', 'protein', 'fitness', 'muscle building', 'weight loss'],
     coverImage: '/placeholder.svg',
     readingTime: 10,
-    featured: true
+    featured: true,
+    metaTitle: 'Protein Requirements Guide: Optimize Your Fitness Goals',
+    metaDescription: 'Discover the optimal protein requirements for different fitness goals. Learn about protein timing, sources, and how much you need for muscle building, weight loss, and endurance training.'
   },
   {
     id: 'macro-nutrition',
@@ -369,6 +373,8 @@ export const ADDITIONAL_BLOG_POSTS: BlogPost[] = [
     tags: ['nutrition', 'macronutrients', 'diet', 'healthy eating'],
     coverImage: '/placeholder.svg',
     readingTime: 12,
-    featured: false
+    featured: false,
+    metaTitle: 'Macronutrients Guide: Understanding Proteins, Carbs, and Fats',
+    metaDescription: 'Complete guide to understanding macronutrients. Learn about proteins, carbohydrates, and fats, their functions, sources, and how to balance them for optimal health and fitness.'
   }
 ];
