@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import {
   Calculator,
   TrendingUp,
@@ -31,6 +32,11 @@ const Home = () => {
 
   return (
     <div className="bg-background">
+      <Helmet>
+        <title>Free Financial Calculators - Plan Your Finances with Fiscal Compass</title>
+        <meta name="description" content="Access a comprehensive suite of free financial calculators for retirement planning, debt management, mortgages, investments, and more. No sign-up required, your data stays private." />
+        {/* Add other relevant meta tags here */}
+      </Helmet>
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-r from-finance-primary to-finance-primary/90 text-white py-16 md:py-24">
         <div

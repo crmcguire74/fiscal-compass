@@ -18,6 +18,8 @@ export interface BlogPost {
   relatedPosts?: string[];
   featured?: boolean;
   readingTime: number; // Make readingTime required
+  metaTitle?: string;
+  metaDescription?: string;
 }
 
 export interface BlogCategory {

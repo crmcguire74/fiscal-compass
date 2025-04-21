@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import { getBlogPostBySlug, getRelatedPosts } from '@/services/blogService';
@@ -186,6 +187,21 @@ const BlogPostPage = () => {
   
   return (
     <Layout>
+      <Helmet>
+        <title>{post.metaTitle || post.title} - Fiscal Compass Blog</title>
+        <meta name="description" content={post.metaDescription || post.excerpt} />
+        {/* Add other relevant meta tags here, e.g., Open Graph, Twitter Cards */}
+        <meta property="og:title" content={post.metaTitle || post.title} />
+        <meta property="og:description" content={post.metaDescription || post.excerpt} />
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content={`${window.location.origin}/blog/${post.slug}`} />
+        {post.coverImage && <meta property="og:image" content={`${window.location.origin}${post.coverImage}`} />}
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={post.metaTitle || post.title} />
+        <meta name="twitter:description" content={post.metaDescription || post.excerpt} />
+        {post.coverImage && <meta name="twitter:image" content={`${window.location.origin}${post.coverImage}`} />}
+      </Helmet>
       <div className="relative min-h-screen bg-gradient-to-b from-background to-background/80">
         <div className="container relative z-10 max-w-4xl py-8 px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
@@ -203,8 +219,8 @@ const BlogPostPage = () => {
               <div className="space-y-6 md:space-y-8 text-center">
                 <div>
                   <Link to={`/blog/related/category/${post.category}`}>
-                    <Badge 
-                      className="capitalize bg-primary/10 hover:bg-primary/20 text-primary hover:text-primary/80" 
+                    <Badge
+                      className="capitalize bg-primary/10 hover:bg-primary/20 text-primary hover:text-primary/80"
                       variant="outline"
                     >
                       {post.category}
