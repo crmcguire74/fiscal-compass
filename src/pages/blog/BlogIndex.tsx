@@ -90,24 +90,40 @@ const BlogIndex = () => {
     let filteredPosts: BlogPost[] = [];
 
     if (search && search.trim()) {
-      // Use the new search function if there's a search term
-      filteredPosts = searchBlogPosts(search);
+      // Get all search results
+      const searchResults = searchBlogPosts(search);
 
-      // Apply category filter if needed
+      // Apply additional filters
+      filteredPosts = searchResults;
       if (category) {
         filteredPosts = filteredPosts.filter(
           (post) => post.category.toLowerCase() === category.toLowerCase()
         );
       }
-
-      // Apply tag filter if needed
       if (tag) {
         filteredPosts = filteredPosts.filter((post) =>
           post.tags.some((t) => t.toLowerCase() === tag.toLowerCase())
         );
       }
+
+      // Calculate pagination after all filters are applied
+      const totalFilteredPages = Math.max(
+        1,
+        Math.ceil(filteredPosts.length / postsPerPage)
+      );
+      const adjustedPage = Math.min(Math.max(1, page), totalFilteredPages);
+      const startIndex = (adjustedPage - 1) * postsPerPage;
+      const endIndex = Math.min(
+        startIndex + postsPerPage,
+        filteredPosts.length
+      );
+      const paginatedPosts = filteredPosts.slice(startIndex, endIndex);
+
+      setPosts(paginatedPosts);
+      setTotalPages(totalFilteredPages);
+      setCurrentPage(adjustedPage);
     } else {
-      // If no search term, use regular getBlogPosts
+      // Use the regular getBlogPosts with built-in pagination
       const result = getBlogPosts(page, postsPerPage, category || undefined);
       filteredPosts = result.posts;
 
@@ -116,19 +132,30 @@ const BlogIndex = () => {
         filteredPosts = filteredPosts.filter((post) =>
           post.tags.some((t) => t.toLowerCase() === tag.toLowerCase())
         );
+
+        // Recalculate pagination if tag filter was applied
+        const totalFilteredPages = Math.max(
+          1,
+          Math.ceil(filteredPosts.length / postsPerPage)
+        );
+        const adjustedPage = Math.min(Math.max(1, page), totalFilteredPages);
+        const startIndex = (adjustedPage - 1) * postsPerPage;
+        const endIndex = Math.min(
+          startIndex + postsPerPage,
+          filteredPosts.length
+        );
+        filteredPosts = filteredPosts.slice(startIndex, endIndex);
+
+        setPosts(filteredPosts);
+        setTotalPages(totalFilteredPages);
+        setCurrentPage(adjustedPage);
+      } else {
+        // Use pagination from getBlogPosts result
+        setPosts(result.posts);
+        setTotalPages(result.totalPages);
+        setCurrentPage(result.currentPage);
       }
     }
-
-    // Calculate pagination for filtered results
-    const totalFilteredPages = Math.ceil(filteredPosts.length / postsPerPage);
-    const adjustedPage = Math.min(page, totalFilteredPages);
-    const startIndex = (adjustedPage - 1) * postsPerPage;
-    const endIndex = startIndex + postsPerPage;
-    const paginatedPosts = filteredPosts.slice(startIndex, endIndex);
-
-    setPosts(paginatedPosts);
-    setTotalPages(totalFilteredPages);
-    setCurrentPage(adjustedPage);
     setIsLoading(false);
   };
 

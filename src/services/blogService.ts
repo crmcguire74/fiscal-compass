@@ -87,6 +87,13 @@ export const getBlogTags = (): BlogTag[] => {
   return tags.sort((a, b) => b.count! - a.count!);
 };
 
+const generateRandomDate = () => {
+  const start = new Date("2025-01-10").getTime();
+  const end = new Date("2025-04-22").getTime();
+  const randomTime = start + Math.random() * (end - start);
+  return new Date(randomTime).toISOString();
+};
+
 export const getAllBlogPosts = (): BlogPost[] => {
   // Combine all blog posts
   let allPosts = [
@@ -107,6 +114,7 @@ export const getAllBlogPosts = (): BlogPost[] => {
       ? post.category.charAt(0).toUpperCase() + post.category.slice(1)
       : "";
     const defaultImage = getDefaultImage(normalizedCategory);
+    const randomDate = generateRandomDate();
 
     const postWithDefaults: BlogPost = {
       ...post,
@@ -114,10 +122,13 @@ export const getAllBlogPosts = (): BlogPost[] => {
       readingTime: post.readingTime || Math.ceil(post.content.length / 1500), // Estimate reading time if not provided
       author: "Christopher R McGuire",
       authorTitle: "Senior Vice President of Software Engineering at Mesirow",
+      authorUrl: "https://www.paguire.com",
       avatar: "/lovable-uploads/61f9246e-544a-4f54-a156-a5374baed0c1.png",
       coverImage:
         (post as any).coverImage || (post as any).image || defaultImage,
       image: (post as any).coverImage || (post as any).image || defaultImage,
+      date: randomDate,
+      publishedAt: randomDate,
     };
     return postWithDefaults;
   });
@@ -151,11 +162,17 @@ export const getBlogPosts = (
     );
   }
 
-  // Calculate pagination
-  const totalPages = Math.ceil(allPosts.length / postsPerPage);
-  const adjustedPage = page < 1 ? 1 : page > totalPages ? totalPages : page;
+  // Always ensure there's at least one page
+  const totalPages = Math.max(1, Math.ceil(allPosts.length / postsPerPage));
+
+  // Adjust the page number to be within valid bounds
+  const adjustedPage = Math.min(Math.max(1, page), totalPages);
+
+  // Calculate the slice indices
   const startIndex = (adjustedPage - 1) * postsPerPage;
-  const endIndex = startIndex + postsPerPage;
+  const endIndex = Math.min(startIndex + postsPerPage, allPosts.length);
+
+  // Get the posts for the current page
   const paginatedPosts = allPosts.slice(startIndex, endIndex);
 
   return {
