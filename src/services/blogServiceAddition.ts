@@ -1,10 +1,11 @@
 // Export additional blog posts without creating circular dependencies
 export const BLOG_POSTS = [
   {
-    id: '9',
-    title: 'The Basics of Tax-Advantaged Retirement Accounts',
-    slug: 'basics-tax-advantaged-retirement-accounts',
-    excerpt: 'Learn how 401(k)s, IRAs, and other tax-advantaged accounts can supercharge your retirement savings.',
+    id: "9",
+    title: "The Basics of Tax-Advantaged Retirement Accounts",
+    slug: "basics-tax-advantaged-retirement-accounts",
+    excerpt:
+      "Learn how 401(k)s, IRAs, and other tax-advantaged accounts can supercharge your retirement savings.",
     content: `
 # The Basics of Tax-Advantaged Retirement Accounts
 
@@ -117,18 +118,20 @@ Tax-advantaged retirement accounts are essential tools for building long-term we
 
 Remember that tax laws and contribution limits change periodically, so staying informed about updates is important. Consider consulting with a financial advisor to develop a personalized retirement savings strategy that aligns with your specific goals and circumstances.
     `,
-    coverImage: 'https://images.unsplash.com/photo-1589666564459-93cdd3ab856a?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300&q=80',
-    author: 'Thomas Bennett',
-    publishedAt: '2023-10-08T09:30:00Z',
-    category: 'retirement',
-    tags: ['retirement', '401k', 'IRA', 'tax planning', 'investing', 'HSA'],
+    coverImage:
+      "https://images.unsplash.com/photo-1589666564459-93cdd3ab856a?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300&q=80",
+    author: "Thomas Bennett",
+    publishedAt: "2023-10-08T09:30:00Z",
+    category: "retirement",
+    tags: ["retirement", "401k", "IRA", "tax planning", "investing", "HSA"],
     readingTime: 11,
   },
   {
-    id: '10',
-    title: 'First-Time Home Buyer Guide: From Saving to Closing',
-    slug: 'first-time-home-buyer-guide',
-    excerpt: 'A comprehensive roadmap for first-time homebuyers navigating the complex process of purchasing a home.',
+    id: "10",
+    title: "First-Time Home Buyer Guide: From Saving to Closing",
+    slug: "first-time-home-buyer-guide",
+    excerpt:
+      "A comprehensive roadmap for first-time homebuyers navigating the complex process of purchasing a home.",
     content: `
 # First-Time Home Buyer Guide: From Saving to Closing
 
@@ -340,18 +343,26 @@ Before house hunting, evaluate these key financial factors:
 
 Purchasing your first home is a journey filled with learning experiences and significant decisions. By approaching the process methodically and assembling the right team of professionals, you can navigate each step with confidence. Remember that homeownership is both a financial investment and a lifestyle choice—finding the right balance between the two is key to long-term satisfaction with your purchase.
     `,
-    coverImage: 'https://images.unsplash.com/photo-1582407947304-fd86f028f716?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300&q=80',
-    author: 'Sophia Reynolds',
-    publishedAt: '2023-11-15T13:20:00Z',
-    category: 'mortgage',
-    tags: ['mortgage', 'home buying', 'first-time buyer', 'real estate', 'housing market'],
+    coverImage:
+      "https://images.unsplash.com/photo-1582407947304-fd86f028f716?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300&q=80",
+    author: "Sophia Reynolds",
+    publishedAt: "2023-11-15T13:20:00Z",
+    category: "mortgage",
+    tags: [
+      "mortgage",
+      "home buying",
+      "first-time buyer",
+      "real estate",
+      "housing market",
+    ],
     readingTime: 15,
   },
   {
-    id: '11',
-    title: 'Sustainable Investing: Aligning Your Portfolio With Your Values',
-    slug: 'sustainable-investing-portfolio-values',
-    excerpt: 'How to build an investment strategy that generates returns while supporting environmental and social responsibility.',
+    id: "11",
+    title: "Sustainable Investing: Aligning Your Portfolio With Your Values",
+    slug: "sustainable-investing-portfolio-values",
+    excerpt:
+      "How to build an investment strategy that generates returns while supporting environmental and social responsibility.",
     content: `
 # Sustainable Investing: Aligning Your Portfolio With Your Values
 
@@ -593,18 +604,26 @@ Sustainable investing offers the opportunity to align your investment portfolio 
 
 Remember that sustainable investing is a journey, not a destination. As your understanding deepens and the field evolves, your strategy can become more sophisticated and aligned with both your values and financial objectives. The most successful sustainable investors maintain a long-term perspective, focusing on companies and funds that are positioning themselves for a more sustainable future.
     `,
-    coverImage: 'https://images.unsplash.com/photo-1618044733300-9472054094ee?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300&q=80',
-    author: 'Daniel Rivera',
-    publishedAt: '2023-12-07T16:15:00Z',
-    category: 'investing',
-    tags: ['ESG investing', 'sustainable investing', 'impact investing', 'portfolio management', 'socially responsible'],
+    coverImage:
+      "https://images.unsplash.com/photo-1618044733300-9472054094ee?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300&q=80",
+    author: "Daniel Rivera",
+    publishedAt: "2023-12-07T16:15:00Z",
+    category: "investing",
+    tags: [
+      "ESG investing",
+      "sustainable investing",
+      "impact investing",
+      "portfolio management",
+      "socially responsible",
+    ],
     readingTime: 14,
   },
   {
-    id: '12',
-    title: 'Zero-Based Budgeting: The Complete Guide',
-    slug: 'zero-based-budgeting-guide',
-    excerpt: 'Master zero-based budgeting to give every dollar a purpose and transform your financial life.',
+    id: "12",
+    title: "Zero-Based Budgeting: The Complete Guide",
+    slug: "zero-based-budgeting-guide",
+    excerpt:
+      "Master zero-based budgeting to give every dollar a purpose and transform your financial life.",
     content: `
 # Zero-Based Budgeting: The Complete Guide
 
@@ -852,18 +871,26 @@ The method isn't about restriction but intention. You decide what matters most a
 
 Start small, be patient with yourself, and remember that budgeting is a skill that improves with practice. Your future self will thank you for the financial clarity and progress that zero-based budgeting enables.
     `,
-    coverImage: 'https://images.unsplash.com/photo-1579621970795-87facc2f976d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300&q=80',
-    author: 'Emily Chen',
-    publishedAt: '2024-01-12T08:45:00Z',
-    category: 'personal-finance',
-    tags: ['budgeting', 'zero-based budget', 'personal finance', 'money management', 'financial planning'],
+    coverImage:
+      "https://images.unsplash.com/photo-1654430857551-1a567d8fae2d?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    author: "Emily Chen",
+    publishedAt: "2024-01-12T08:45:00Z",
+    category: "personal-finance",
+    tags: [
+      "budgeting",
+      "zero-based budget",
+      "personal finance",
+      "money management",
+      "financial planning",
+    ],
     readingTime: 12,
   },
   {
-    id: '13',
-    title: 'Navigating Student Loan Repayment Strategies',
-    slug: 'student-loan-repayment-strategies',
-    excerpt: 'A comprehensive guide to managing and paying off student loans efficiently.',
+    id: "13",
+    title: "Navigating Student Loan Repayment Strategies",
+    slug: "student-loan-repayment-strategies",
+    excerpt:
+      "A comprehensive guide to managing and paying off student loans efficiently.",
     content: `
 # Navigating Student Loan Repayment Strategies: A Comprehensive Guide
 
@@ -1079,11 +1106,18 @@ Remember Sophia Patel, the pediatric nurse mentioned earlier? Six years after cr
 
 With the right repayment strategy tailored to your unique situation, persistent effort, and informed decisions along the way, you too can successfully navigate the student loan repayment journey and move toward greater financial freedom.
     `,
-    coverImage: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300&q=80',
-    author: 'Jonathan Fisher',
-    publishedAt: '2024-02-03T11:30:00Z',
-    category: 'education',
-    tags: ['student loans', 'debt management', 'loan repayment', 'personal finance', 'education financing'],
+    coverImage:
+      "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300&q=80",
+    author: "Jonathan Fisher",
+    publishedAt: "2024-02-03T11:30:00Z",
+    category: "education",
+    tags: [
+      "student loans",
+      "debt management",
+      "loan repayment",
+      "personal finance",
+      "education financing",
+    ],
     readingTime: 13,
-  }
+  },
 ];
