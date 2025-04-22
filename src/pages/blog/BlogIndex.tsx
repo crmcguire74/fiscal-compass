@@ -6,6 +6,7 @@ import {
   getBlogPosts,
   getBlogCategories,
   getBlogTags,
+  searchBlogPosts,
 } from "@/services/blogService";
 import { BlogPost, BlogCategory, BlogTag } from "@/types/blog";
 import { Badge } from "@/components/ui/badge";
@@ -86,29 +87,48 @@ const BlogIndex = () => {
     tag?: string | null,
     search?: string | null
   ) => {
-    const result = getBlogPosts(page, postsPerPage, category || undefined);
+    let filteredPosts: BlogPost[] = [];
 
-    let filteredPosts = result.posts;
+    if (search && search.trim()) {
+      // Use the new search function if there's a search term
+      filteredPosts = searchBlogPosts(search);
 
-    if (tag && tag.trim() !== "") {
-      filteredPosts = filteredPosts.filter((post) =>
-        post.tags.some((t) => t.toLowerCase() === tag.toLowerCase())
-      );
+      // Apply category filter if needed
+      if (category) {
+        filteredPosts = filteredPosts.filter(
+          (post) => post.category.toLowerCase() === category.toLowerCase()
+        );
+      }
+
+      // Apply tag filter if needed
+      if (tag) {
+        filteredPosts = filteredPosts.filter((post) =>
+          post.tags.some((t) => t.toLowerCase() === tag.toLowerCase())
+        );
+      }
+    } else {
+      // If no search term, use regular getBlogPosts
+      const result = getBlogPosts(page, postsPerPage, category || undefined);
+      filteredPosts = result.posts;
+
+      // Apply tag filter if needed
+      if (tag) {
+        filteredPosts = filteredPosts.filter((post) =>
+          post.tags.some((t) => t.toLowerCase() === tag.toLowerCase())
+        );
+      }
     }
 
-    if (search && search.trim() !== "") {
-      const searchLower = search.toLowerCase();
-      filteredPosts = filteredPosts.filter(
-        (post) =>
-          post.title.toLowerCase().includes(searchLower) ||
-          post.excerpt.toLowerCase().includes(searchLower) ||
-          post.tags.some((tag) => tag.toLowerCase().includes(searchLower))
-      );
-    }
+    // Calculate pagination for filtered results
+    const totalFilteredPages = Math.ceil(filteredPosts.length / postsPerPage);
+    const adjustedPage = Math.min(page, totalFilteredPages);
+    const startIndex = (adjustedPage - 1) * postsPerPage;
+    const endIndex = startIndex + postsPerPage;
+    const paginatedPosts = filteredPosts.slice(startIndex, endIndex);
 
-    setPosts(filteredPosts);
-    setTotalPages(result.totalPages);
-    setCurrentPage(result.currentPage);
+    setPosts(paginatedPosts);
+    setTotalPages(totalFilteredPages);
+    setCurrentPage(adjustedPage);
     setIsLoading(false);
   };
 
@@ -353,19 +373,25 @@ const BlogIndex = () => {
                     {activeCategory && (
                       <span>
                         Category:{" "}
-                        <Badge variant="outline">
+                        <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-border text-foreground">
                           {activeCategory.replace("category/", "")}
-                        </Badge>{" "}
+                        </span>{" "}
                       </span>
                     )}
                     {activeTag && (
                       <span>
-                        Tag: <Badge variant="outline">{activeTag}</Badge>{" "}
+                        Tag:{" "}
+                        <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-border text-foreground">
+                          {activeTag}
+                        </span>{" "}
                       </span>
                     )}
                     {searchTerm && (
                       <span>
-                        Search: <Badge variant="outline">{searchTerm}</Badge>
+                        Search:{" "}
+                        <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-border text-foreground">
+                          {searchTerm}
+                        </span>
                       </span>
                     )}
                   </div>
