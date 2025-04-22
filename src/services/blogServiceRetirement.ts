@@ -1,12 +1,12 @@
-
-import { BlogPost } from '@/types/blog';
+import { BlogPost } from "@/types/blog";
 
 export const retirementBlogPosts: BlogPost[] = [
   {
-    id: 'retirement-withdrawal-strategies',
-    title: 'Retirement Withdrawal Strategies: Making Your Money Last',
-    slug: 'retirement-withdrawal-strategies',
-    excerpt: 'Learn about different retirement withdrawal strategies to maximize your income while ensuring your savings last throughout retirement.',
+    id: "retirement-withdrawal-strategies",
+    title: "Retirement Withdrawal Strategies: Making Your Money Last",
+    slug: "retirement-withdrawal-strategies",
+    excerpt:
+      "Learn about different retirement withdrawal strategies to maximize your income while ensuring your savings last throughout retirement.",
     content: `
 # Retirement Withdrawal Strategies: Making Your Money Last
 
@@ -108,19 +108,27 @@ Remember, your withdrawal strategy isn't a one-time decision set in stone. It's 
 
 *What withdrawal strategy are you considering? Do you have questions about navigating this transition? Share your thoughts in the comments below!*
     `,
-    publishedAt: '2024-02-10',
-    author: 'Eleanor Richards',
-    authorTitle: 'Retirement Income Specialist',
-    category: 'Retirement',
-    tags: ['retirement', 'withdrawal strategies', '4% rule', 'RMDs', 'tax planning'],
-    coverImage: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80',
-    readingTime: 9
+    publishedAt: "2024-02-10",
+    author: "Eleanor Richards",
+    authorTitle: "Retirement Income Specialist",
+    category: "Retirement",
+    tags: [
+      "retirement",
+      "withdrawal strategies",
+      "4% rule",
+      "RMDs",
+      "tax planning",
+    ],
+    coverImage:
+      "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
+    readingTime: 9,
   },
   {
-    id: 'roth-vs-traditional',
-    title: 'Roth vs. Traditional Retirement Accounts: Pay Taxes Now or Later?',
-    slug: 'roth-vs-traditional',
-    excerpt: 'A comprehensive comparison of Roth and Traditional retirement accounts to help you make the optimal choice for your financial future.',
+    id: "roth-vs-traditional",
+    title: "Roth vs. Traditional Retirement Accounts: Pay Taxes Now or Later?",
+    slug: "roth-vs-traditional",
+    excerpt:
+      "A comprehensive comparison of Roth and Traditional retirement accounts to help you make the optimal choice for your financial future.",
     content: `
 # Roth vs. Traditional Retirement Accounts: Pay Taxes Now or Later?
 
@@ -202,19 +210,22 @@ However, the most crucial step is always to *start saving consistently and dilig
 
 *Which account type feels like a better fit for your current situation, and what factors are most important in your decision? Share your thoughts or questions in the comments below!*
     `,
-    publishedAt: '2024-01-15',
-    author: 'Marcus Freeman',
-    authorTitle: 'Tax and Retirement Planning Specialist',
-    category: 'Retirement',
-    tags: ['retirement', 'Roth IRA', 'Traditional IRA', 'tax planning', '401k'],
-    coverImage: 'https://images.unsplash.com/photo-1579621970795-87facc2f976d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80',
-    readingTime: 10
+    publishedAt: "2024-01-15",
+    author: "Marcus Freeman",
+    authorTitle: "Tax and Retirement Planning Specialist",
+    category: "Retirement",
+    tags: ["retirement", "Roth IRA", "Traditional IRA", "tax planning", "401k"],
+    coverImage:
+      "https://images.unsplash.com/photo-1692896365152-dc73208ecd74?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    readingTime: 10,
   },
   {
-    id: 'sequence-of-returns-risk',
-    title: 'Sequence of Returns Risk: The Hidden Danger to Your Retirement Plan',
-    slug: 'sequence-of-returns-risk',
-    excerpt: 'Understand how the timing of market returns can dramatically impact your retirement security, and learn strategies to protect your portfolio.',
+    id: "sequence-of-returns-risk",
+    title:
+      "Sequence of Returns Risk: The Hidden Danger to Your Retirement Plan",
+    slug: "sequence-of-returns-risk",
+    excerpt:
+      "Understand how the timing of market returns can dramatically impact your retirement security, and learn strategies to protect your portfolio.",
     content: `
 # Sequence of Returns Risk: The Hidden Danger to Your Retirement Plan
 
@@ -455,12 +466,18 @@ The most effective approach combines prudent financial strategies with lifestyle
 
 By addressing sequence of returns risk proactively, you can significantly increase the probability of a secure retirement, regardless of when you retire relative to market cycles. The peace of mind that comes from this preparation may be just as valuable as the financial security it provides.
     `,
-    publishedAt: '2024-03-20',
-    author: 'Victoria Martinez',
-    authorTitle: 'Retirement Risk Management Specialist',
-    category: 'Retirement',
-    tags: ['retirement', 'sequence risk', 'portfolio management', 'market volatility'],
-    coverImage: 'https://images.unsplash.com/photo-1535320903710-d993d3d77d29?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80',
-    readingTime: 10
-  }
+    publishedAt: "2024-03-20",
+    author: "Victoria Martinez",
+    authorTitle: "Retirement Risk Management Specialist",
+    category: "Retirement",
+    tags: [
+      "retirement",
+      "sequence risk",
+      "portfolio management",
+      "market volatility",
+    ],
+    coverImage:
+      "https://images.unsplash.com/photo-1535320903710-d993d3d77d29?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
+    readingTime: 10,
+  },
 ];
