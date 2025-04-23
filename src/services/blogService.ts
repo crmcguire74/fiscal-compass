@@ -87,13 +87,6 @@ export const getBlogTags = (): BlogTag[] => {
   return tags.sort((a, b) => b.count! - a.count!);
 };
 
-const generateRandomDate = () => {
-  const start = new Date("2025-01-10").getTime();
-  const end = new Date("2025-04-22").getTime();
-  const randomTime = start + Math.random() * (end - start);
-  return new Date(randomTime).toISOString();
-};
-
 export const getAllBlogPosts = (): BlogPost[] => {
   // Combine all blog posts
   let allPosts = [
@@ -114,7 +107,6 @@ export const getAllBlogPosts = (): BlogPost[] => {
       ? post.category.charAt(0).toUpperCase() + post.category.slice(1)
       : "";
     const defaultImage = getDefaultImage(normalizedCategory);
-    const randomDate = generateRandomDate();
 
     const postWithDefaults: BlogPost = {
       ...post,
@@ -127,8 +119,7 @@ export const getAllBlogPosts = (): BlogPost[] => {
       coverImage:
         (post as any).coverImage || (post as any).image || defaultImage,
       image: (post as any).coverImage || (post as any).image || defaultImage,
-      date: randomDate,
-      publishedAt: randomDate,
+      publishedAt: post.publishedAt || (post as any).date || new Date().toISOString(), // Use existing date or current date as fallback
     };
     return postWithDefaults;
   });
@@ -247,7 +238,7 @@ export const searchBlogPosts = (searchTerm: string): BlogPost[] => {
   const allPosts = getAllBlogPosts();
   const searchTermLower = searchTerm.toLowerCase().trim();
 
-  return allPosts.filter((post) => {
+  const filteredPosts = allPosts.filter((post) => {
     // Search in title
     if (post.title.toLowerCase().includes(searchTermLower)) {
       return true;
@@ -273,5 +264,12 @@ export const searchBlogPosts = (searchTerm: string): BlogPost[] => {
     }
 
     return false;
+  });
+
+  // Sort by date (newest first)
+  return filteredPosts.sort((a, b) => {
+    const dateA = a.publishedAt || (a as any).date || '';
+    const dateB = b.publishedAt || (b as any).date || '';
+    return new Date(dateB).getTime() - new Date(dateA).getTime();
   });
 };

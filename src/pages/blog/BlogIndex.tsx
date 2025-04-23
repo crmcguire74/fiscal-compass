@@ -129,9 +129,17 @@ const BlogIndex = () => {
 
       // Apply tag filter if needed
       if (tag) {
+        // Filter by tag
         filteredPosts = filteredPosts.filter((post) =>
           post.tags.some((t) => t.toLowerCase() === tag.toLowerCase())
         );
+
+        // Ensure posts are sorted by date (newest first)
+        filteredPosts.sort((a, b) => {
+          const dateA = a.publishedAt || (a as any).date || "";
+          const dateB = b.publishedAt || (b as any).date || "";
+          return new Date(dateB).getTime() - new Date(dateA).getTime();
+        });
 
         // Recalculate pagination if tag filter was applied
         const totalFilteredPages = Math.max(
