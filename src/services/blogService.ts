@@ -46,12 +46,17 @@ export const getBlogCategories = (): BlogCategory[] => {
   // Extract unique categories
   const categoriesMap = new Map<string, number>();
 
+  // First normalize all categories to Title Case before counting
   allPosts.forEach((post) => {
-    const category = post.category || "";
-    categoriesMap.set(category, (categoriesMap.get(category) || 0) + 1);
+    const normalizedCategory = post.category
+      ? post.category.split(' ').map(word => 
+          word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        ).join(' ')
+      : "";
+    categoriesMap.set(normalizedCategory, (categoriesMap.get(normalizedCategory) || 0) + 1);
   });
 
-  // Convert to array of category objects
+  // Convert to array of category objects (categories are already normalized)
   const categories: BlogCategory[] = Array.from(categoriesMap).map(
     ([name, count]) => ({
       id: name.toLowerCase().replace(/\s+/g, "-"),
@@ -102,15 +107,17 @@ export const getAllBlogPosts = (): BlogPost[] => {
 
   // Set the author and ensure each post has a valid image
   allPosts = allPosts.map((post) => {
-    // Normalize category case to match DEFAULT_IMAGES keys
+    // Normalize category to Title Case
     const normalizedCategory = post.category
-      ? post.category.charAt(0).toUpperCase() + post.category.slice(1)
+      ? post.category.split(' ').map(word => 
+          word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        ).join(' ')
       : "";
     const defaultImage = getDefaultImage(normalizedCategory);
 
     const postWithDefaults: BlogPost = {
       ...post,
-      category: normalizedCategory || "General", // Ensure category is always set
+      category: normalizedCategory || "General", // Ensure category is always set with normalized case
       readingTime: post.readingTime || Math.ceil(post.content.length / 1500), // Estimate reading time if not provided
       author: "Christopher R McGuire",
       authorTitle: "Senior Vice President of Software Engineering at Mesirow",
@@ -134,23 +141,33 @@ export const getAllBlogPosts = (): BlogPost[] => {
   return allPosts;
 };
 
+// Helper function to convert slug to category name
+const slugToCategoryName = (slug: string): string => {
+  return slug
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+};
+
 export const getBlogPosts = (
   page: number = 1,
   postsPerPage: number = 10,
-  category?: string
+  categorySlug?: string
 ): { posts: BlogPost[]; currentPage: number; totalPages: number } => {
   // Get all posts
   let allPosts = getAllBlogPosts();
 
   // Filter by category if provided
-  if (category) {
-    allPosts = allPosts.filter(
-      (post) =>
-        (post.category || "").toLowerCase() === category.toLowerCase() ||
-        (post.categories || []).some(
-          (cat) => cat.toLowerCase() === category.toLowerCase()
-        )
-    );
+  if (categorySlug) {
+    const categoryName = slugToCategoryName(categorySlug);
+    allPosts = allPosts.filter((post) => {
+      const normalizedPostCategory = (post.category || "")
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
+      
+      return normalizedPostCategory === categoryName;
+    });
   }
 
   // Always ensure there's at least one page

@@ -875,7 +875,7 @@ Start small, be patient with yourself, and remember that budgeting is a skill th
       "https://images.unsplash.com/photo-1654430857551-1a567d8fae2d?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     author: "Emily Chen",
     publishedAt: "2024-01-12T08:45:00Z",
-    category: "personal-finance",
+    category: "Personal Finance",
     tags: [
       "budgeting",
       "zero-based budget",
