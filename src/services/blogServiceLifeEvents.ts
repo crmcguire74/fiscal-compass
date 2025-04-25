@@ -312,23 +312,6 @@ As you continue your planning journey, remember that the ultimate goal isn't a p
     relatedPosts: ["college-saving-strategies", "family-insurance-needs", "parenting-financial-tips"],
     featured: true,
     readingTime: 10
-  },
-  {
-    id: "preparing-finances-for-retirement",
-    title: "The 5-Year Countdown: Preparing Your Finances for Retirement",
-    slug: "preparing-finances-for-retirement",
-    excerpt: "Essential financial steps to take in the five years before retirement to ensure you're fully prepared for this major life transition.",
-    content: `[... content unchanged ...]`,
-    date: "2023-12-10",
-    author: "Victoria Reynolds",
-    authorTitle: "Retirement Planning Specialist",
-    category: "Life Events",
-    image: "https://images.unsplash.com/photo-1578469550956-0e16b69c6a3d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
-    categories: ["life-events", "retirement", "financial-planning"],
-    tags: ["retirement planning", "pre-retirement", "retirement income", "retirement budget"],
-    relatedPosts: ["social-security-optimization", "retirement-withdrawal-strategies", "healthcare-in-retirement"],
-    featured: false,
-    readingTime: 12
   }
 ];
 

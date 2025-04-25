@@ -2,6 +2,254 @@ import { BlogPost } from "@/types/blog";
 
 export const retirementBlogPosts: BlogPost[] = [
   {
+    id: "5-year-countdown",
+    title: "The 5-Year Countdown: Preparing Your Finances for Retirement",
+    slug: "5-year-countdown",
+    excerpt:
+      "A comprehensive guide to optimizing your finances in the crucial five years before retirement, with actionable strategies for a smooth transition.",
+    content: `
+# The 5-Year Countdown: Preparing Your Finances for Retirement
+
+Rachel Martinez sat at her kitchen table, calculator in hand, staring at the retirement projection numbers on her laptop screen. At 60, she was just five years away from her target retirement date, and a mix of excitement and anxiety swirled in her stomach. "I've been saving for decades," she thought, "but how do I make sure everything's truly ready for the big transition?"
+
+This scenario plays out in homes across the country as workers approach their retirement years. "The five-year countdown to retirement is absolutely critical," explains Dr. James Chen, Director of Retirement Studies at Capital Financial Institute. "It's your last opportunity to make meaningful adjustments to your retirement strategy and optimize your financial position before the transition begins."
+
+## Why the Five-Year Mark Matters
+
+The five years before retirement represent a unique window of opportunity. You're likely at or near your peak earning years, your major expenses (like mortgages or children's education) might be winding down, and you still have enough time to make impactful changes to your retirement plan. However, you're also entering what financial experts call the "retirement risk zone" – the period where your portfolio is most vulnerable to market downturns.
+
+## Creating Your Five-Year Action Plan
+
+Let's break down the essential steps to take during this crucial period, following Rachel's journey as she optimizes her retirement preparation.
+
+### Year 5: The Foundation Year
+
+Rachel's first step was taking a comprehensive inventory of her financial situation. "It's like preparing for a long journey," her financial advisor explained. "You need to know exactly where you're starting from."
+
+**Action Items:**
+1. **Gather and Organize Financial Documents**
+   - List all retirement accounts (401(k)s, IRAs, pensions)
+   - Document all assets and liabilities
+   - Review insurance policies
+   - Locate and organize estate planning documents
+
+2. **Create a Detailed Retirement Budget**
+   - Track current expenses for 3-6 months
+   - Categorize expenses as essential vs. discretionary
+   - Project retirement lifestyle costs
+   - Factor in healthcare expenses
+   - Include potential long-term care needs
+
+3. **Review Social Security Strategy**
+   - Request updated benefits statement
+   - Calculate benefits at different claiming ages
+   - Consider spousal benefit strategies
+   - Evaluate whether to delay benefits for higher payments
+
+### Year 4: Risk Management and Portfolio Optimization
+
+With a clear picture of her financial situation, Rachel turned her attention to protecting and optimizing her retirement assets.
+
+**Key Focus Areas:**
+1. **Portfolio Rebalancing**
+   - Gradually shift to a more conservative asset allocation
+   - Consider the "bucket strategy" for different time horizons
+   - Review and adjust investment fees
+   - Evaluate whether to consolidate scattered accounts
+
+2. **Insurance Assessment**
+   - Review health insurance options for pre-Medicare period
+   - Evaluate long-term care insurance needs
+   - Consider life insurance adjustments
+   - Review property and liability coverage
+
+3. **Debt Evaluation**
+   - Create plan to eliminate high-interest debt
+   - Evaluate mortgage payoff strategy
+   - Review and potentially refinance any remaining loans
+   - Consider impact of debt on retirement income needs
+
+### Year 3: Income Strategy Development
+
+"This is where we get specific about turning your nest egg into reliable income," Rachel's advisor explained as they began mapping out her retirement paycheck strategy.
+
+**Strategic Planning:**
+1. **Create a Retirement Income Plan**
+   - Map out all income sources (investments, Social Security, pensions)
+   - Develop withdrawal strategy across accounts
+   - Plan for Required Minimum Distributions (RMDs)
+   - Consider Roth conversion opportunities
+
+2. **Tax Efficiency Planning**
+   - Project retirement tax brackets
+   - Identify opportunities for tax-loss harvesting
+   - Plan charitable giving strategies
+   - Consider establishing donor-advised funds
+
+3. **Healthcare Planning**
+   - Research Medicare options and supplements
+   - Consider Health Savings Account (HSA) contributions
+   - Project healthcare costs through retirement
+   - Evaluate gap insurance needs before Medicare eligibility
+
+### Year 2: Lifestyle and Legal Preparation
+
+As retirement drew closer, Rachel focused on both practical and legal aspects of her transition.
+
+**Essential Preparations:**
+1. **Update Estate Planning**
+   - Review and update will
+   - Check beneficiary designations
+   - Update powers of attorney
+   - Consider trust arrangements
+   - Document digital assets and passwords
+
+2. **Lifestyle Planning**
+   - Research retirement housing options
+   - Plan for social and recreational activities
+   - Consider part-time work opportunities
+   - Develop volunteer or encore career plans
+
+3. **Family Communications**
+   - Discuss plans with spouse/partner
+   - Share key information with adult children
+   - Document important financial information
+   - Create emergency contact lists
+
+### Year 1: Final Preparations and Test Drive
+
+In her final year before retirement, Rachel focused on fine-tuning her plan and testing her retirement strategy.
+
+**Final Steps:**
+1. **Test Drive Your Budget**
+   - Live on projected retirement income for 3-6 months
+   - Track any gaps or necessary adjustments
+   - Build emergency fund to 1-2 years of expenses
+   - Fine-tune spending categories
+
+2. **Workplace Transitions**
+   - Review pension payout options
+   - Understand retiree benefits (if any)
+   - Plan for employer stock options or restricted stock
+   - Arrange for rollover of retirement accounts
+   - Document key work contacts and information
+
+3. **Healthcare Preparation**
+   - Complete Medicare enrollment (if eligible)
+   - Schedule medical/dental procedures while still employed
+   - Maximize HSA contributions if applicable
+   - Research and select Medicare supplemental coverage
+
+## Common Pitfalls to Avoid
+
+As Dr. Chen notes, "Even well-prepared retirees can stumble in the final years before retirement." Here are key mistakes to avoid:
+
+1. **Taking on New Debt**
+   - Avoid major new financial obligations
+   - Resist helping adult children if it compromises your security
+   - Don't co-sign loans that could affect your retirement income
+
+2. **Ignoring Tax Planning**
+   - Failing to understand tax implications of withdrawals
+   - Missing Roth conversion opportunities
+   - Not planning for RMDs
+   - Overlooking state tax considerations
+
+3. **Maintaining an Overly Aggressive Portfolio**
+   - Not adjusting risk tolerance for retirement
+   - Failing to protect against sequence of returns risk
+   - Overconcentration in employer stock
+   - Ignoring inflation protection
+
+4. **Underestimating Healthcare Costs**
+   - Not budgeting for out-of-pocket expenses
+   - Failing to consider long-term care needs
+   - Misunderstanding Medicare coverage and costs
+   - Overlooking dental and vision expenses
+
+## Special Considerations for Different Situations
+
+### For Singles
+- Build a stronger emergency fund
+- Consider long-term care insurance more seriously
+- Establish a trusted contact for financial matters
+- Create detailed healthcare directives
+
+### For Couples
+- Coordinate Social Security claiming strategies
+- Consider survivorship needs in pension choices
+- Plan for healthcare coverage gaps between spouses
+- Balance both partners' retirement goals
+
+### For Business Owners
+- Develop succession or sale plans
+- Value the business professionally
+- Structure transition to maximize tax efficiency
+- Consider seller financing options
+
+## The Emotional Aspect of Transition
+
+Rachel discovered that preparing for retirement isn't just about numbers. "The emotional preparation is just as important as the financial," notes Dr. Sarah Williams, a retirement transition coach. Consider these aspects:
+
+1. **Identity Transition**
+   - Plan meaningful activities for retirement
+   - Develop new social connections
+   - Consider phased retirement options
+   - Explore encore career opportunities
+
+2. **Relationship Adjustments**
+   - Discuss expectations with spouse/partner
+   - Plan for changing family dynamics
+   - Consider impact on friendships
+   - Prepare for more together time
+
+3. **Purpose and Meaning**
+   - Identify post-retirement goals
+   - Plan volunteer or mentoring activities
+   - Consider educational opportunities
+   - Develop new hobbies or interests
+
+## Creating Your Personal Countdown Checklist
+
+To help you stay on track, create a personalized countdown checklist. Here's a framework:
+
+**Monthly Tasks:**
+- Review and track expenses
+- Monitor investment performance
+- Save additional funds when possible
+- Research retirement topics
+
+**Quarterly Tasks:**
+- Rebalance investment portfolios
+- Review progress toward goals
+- Update retirement projections
+- Adjust strategies as needed
+
+**Annual Tasks:**
+- Update estate planning documents
+- Review insurance coverage
+- Reassess asset allocation
+- Update beneficiary designations
+
+## The Bottom Line: Preparation Meets Opportunity
+
+As Rachel approached her retirement date, she felt increasingly confident. "The five-year countdown gave me a framework to transform anxiety into action," she reflected. "Each step brought me closer to the retirement I envisioned."
+
+The final years before retirement present a unique opportunity to optimize your financial future. By taking a systematic approach to preparation, you can enter retirement with confidence, knowing you've addressed the key aspects of this significant life transition.
+
+Remember, it's never too early to start your five-year countdown, but it's also never too late to begin taking positive steps toward your retirement goals. The key is to start where you are and make the most of the time you have.
+
+*What steps are you taking to prepare for retirement? Share your experiences and questions in the comments below!*
+    `,
+    publishedAt: "2024-04-15",
+    author: "Dr. James Chen",
+    authorTitle: "Director of Retirement Studies, Capital Financial Institute",
+    category: "Retirement",
+    tags: ["retirement", "financial planning", "retirement countdown", "retirement preparation", "retirement transition"],
+    coverImage: "https://images.unsplash.com/photo-1434626881859-194d67b2b86f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
+    readingTime: 12,
+  },
+  {
     id: "retirement-withdrawal-strategies",
     title: "Retirement Withdrawal Strategies: Making Your Money Last",
     slug: "retirement-withdrawal-strategies",
