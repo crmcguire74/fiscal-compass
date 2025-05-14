@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { pageview } from "./utils/analytics";
-import { HelmetProvider } from 'react-helmet-async'; // Reverting to named import
+import { HelmetProvider } from "react-helmet-async"; // Reverting to named import
 import ScrollToTop from "./components/shared/ScrollToTop";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
@@ -71,6 +71,9 @@ import AutoCalculatorsIndex from "./pages/calculators/auto/AutoCalculatorsIndex"
 import RentVsBuyPage from "./pages/calculators/mortgage/RentVsBuyPage";
 import RealEstateCalculatorsIndex from "./pages/calculators/real-estate/RealEstateCalculatorsIndex";
 import CostToClosePage from "./pages/calculators/mortgage/CostToClosePage";
+import PrivacyPolicy from "./pages/legal/PrivacyPolicy";
+import TermsOfService from "./pages/legal/TermsOfService";
+import Disclaimer from "./pages/legal/Disclaimer";
 
 const queryClient = new QueryClient();
 
@@ -316,7 +319,10 @@ const App = () => {
                 />
                 {/* Blog Routes */}
                 <Route path="/blog" element={<BlogIndex />} />
-                <Route path="/blog/featured" element={<FeaturedArticlesPage />} />
+                <Route
+                  path="/blog/featured"
+                  element={<FeaturedArticlesPage />}
+                />
                 <Route
                   path="/blog/related/:type/:value"
                   element={<RelatedArticlesPage />}
@@ -351,6 +357,10 @@ const App = () => {
                   path="/calculators/tools/inflation"
                   element={<InflationPage />}
                 />
+                {/* Legal Routes */}
+                <Route path="/privacy" element={<PrivacyPolicy />} />
+                <Route path="/terms" element={<TermsOfService />} />
+                <Route path="/disclaimer" element={<Disclaimer />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
