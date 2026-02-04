@@ -13,7 +13,7 @@ const About = () => {
       <div className="bg-gradient-to-r from-finance-primary to-finance-primary/90 text-white py-16">
         <div className="container">
           <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">About Financial Insight Hub</h1>
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">About Fiscal Compass</h1>
             <p className="text-xl text-white/90 mb-6">
               Empowering you to make smarter financial decisions with practical tools and knowledge
             </p>
