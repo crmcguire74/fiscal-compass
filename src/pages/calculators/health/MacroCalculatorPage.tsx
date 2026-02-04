@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ChevronRight, Salad, Carrot, Beef, Scale } from 'lucide-react';
+import { Helmet } from "react-helmet-async";  // ADD THIS
 import Layout from '@/components/layout/Layout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -93,6 +94,10 @@ const MacroCalculatorPage = () => {
   
   return (
     <Layout>
+      <Helmet>
+            <title>Macro Calculator | Macronutrient Calculator | Fiscal Compass</title>
+            <meta name="description" content="Calculate your daily protein, carb, and fat needs based on your goals. Custom macro splits for weight loss or muscle building." />
+      </Helmet>      
       {/* Header */}
       <div className="bg-gradient-to-r from-finance-primary to-finance-primary/90 text-white py-12">
         <div className="container">

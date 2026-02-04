@@ -1,11 +1,16 @@
 import { ArrowLeft, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";  // ADD THIS
 import Layout from "@/components/layout/Layout";
 import InflationCalculator from "@/components/calculators/tools/InflationCalculator";
 
 const InflationPage = () => {
   return (
     <Layout>
+      <Helmet>
+        <title>Inflation Calculator | CPI Calculator | Fiscal Compass</title>
+        <meta name="description" content="Calculate the impact of inflation on purchasing power over time. See how much money from the past is worth today." />
+      </Helmet>
       <div className="container py-8 max-w-7xl">
         <div className="mb-6">
           <a

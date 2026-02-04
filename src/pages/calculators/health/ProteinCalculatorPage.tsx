@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { Helmet } from "react-helmet-async";  // ADD THIS
 import Layout from '@/components/layout/Layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -109,8 +110,12 @@ const ProteinCalculatorPage = () => {
     setShowResults(false);
   };
   
-  return (
+  return ( 
     <Layout>
+      <Helmet>
+            <title>Protein Calculator | Daily Protein Needs | Fiscal Compass</title>
+            <meta name="description" content="Calculate how much protein you need daily based on weight, activity level, and fitness goals." />
+      </Helmet>   
       <div className="container py-8">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold mb-6 text-center">Protein Intake Calculator</h1>

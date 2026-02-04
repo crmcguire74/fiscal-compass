@@ -2,6 +2,7 @@
 import Layout from '@/components/layout/Layout';
 import MortgagePaymentCalculator from '@/components/calculators/mortgage/MortgagePaymentCalculator';
 import { ArrowLeft } from 'lucide-react';
+import { Helmet } from "react-helmet-async";  // ADD THIS
 import { Link } from 'react-router-dom';
 
 const MortgagePaymentPage = () => {

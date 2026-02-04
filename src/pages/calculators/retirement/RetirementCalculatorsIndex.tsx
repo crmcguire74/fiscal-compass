@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from "react-helmet-async";  // ADD THIS
 import Layout from '@/components/layout/Layout';
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, TrendingUp, CalendarClock, Calculator, PiggyBank, ChevronRight } from 'lucide-react';

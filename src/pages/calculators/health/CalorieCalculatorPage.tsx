@@ -1,12 +1,17 @@
 
 import Layout from '@/components/layout/Layout';
 import CalorieCalculator from '@/components/calculators/health/CalorieCalculator';
+import { Helmet } from "react-helmet-async";  // ADD THIS
 import { Link } from 'react-router-dom';
 import { ArrowRight, ChevronRight } from 'lucide-react';
 
 const CalorieCalculatorPage = () => {
   return (
     <Layout>
+      <Helmet>
+            <title>Calorie Calculator | Daily Calorie Needs TDEE | Fiscal Compass</title>
+            <meta name="description" content="Calculate your daily calorie needs (TDEE) for weight loss, maintenance, or muscle gain based on activity level and goals." />
+      </Helmet>
       <div className="container py-8">
         <div className="max-w-5xl mx-auto">
           <div className="flex items-center text-sm mb-5 text-muted-foreground">

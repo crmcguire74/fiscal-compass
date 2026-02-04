@@ -1,4 +1,5 @@
 import CostToCloseCalculator from '@/components/calculators/mortgage/CostToCloseCalculator';
+import { Helmet } from "react-helmet-async";  // ADD THIS
 import Layout from '@/components/layout/Layout';
 import { ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';

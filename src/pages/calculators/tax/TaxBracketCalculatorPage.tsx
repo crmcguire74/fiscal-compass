@@ -2,6 +2,7 @@
 import { ArrowLeft, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import { Helmet } from "react-helmet-async";  // ADD THIS
 import Layout from '@/components/layout/Layout';
 import TaxBracketVisualization from '@/components/calculators/tax/TaxBracketVisualization';
 

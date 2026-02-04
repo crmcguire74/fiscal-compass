@@ -1,5 +1,6 @@
 
 import React from "react";
+import { Helmet } from "react-helmet-async";  // ADD THIS
 import Layout from "@/components/layout/Layout";
 import BabyCostCalculator from "@/components/calculators/life-events/BabyCostCalculator";
 

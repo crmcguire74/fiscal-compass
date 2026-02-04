@@ -1,6 +1,7 @@
 
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from "react-helmet-async";  // ADD THIS
 import Layout from '@/components/layout/Layout';
 import { toast } from '@/hooks/use-toast';
 

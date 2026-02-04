@@ -1,6 +1,7 @@
 import Layout from "@/components/layout/Layout";
 import SavingsCalculator from "@/components/calculators/investment/SavingsCalculator";
 import { ArrowLeft } from "lucide-react";
+import { Helmet } from "react-helmet-async";  // ADD THIS
 import { Link } from "react-router-dom";
 
 const SavingsCalculatorPage = () => {

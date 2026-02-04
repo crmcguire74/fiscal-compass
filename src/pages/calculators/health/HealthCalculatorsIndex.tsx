@@ -3,6 +3,7 @@ import { Calculator, Activity, Scale, Salad, ArrowRight, ChevronRight, Heart, He
 import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Helmet } from "react-helmet-async";  // ADD THIS
 import { Link } from 'react-router-dom';
 
 const HEALTH_CALCULATORS = [

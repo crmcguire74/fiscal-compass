@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import RentVsBuyCalculator from "@/components/calculators/mortgage/RentVsBuyCalculator";
+import { Helmet } from "react-helmet-async";  // ADD THIS
 import Layout from "@/components/layout/Layout";
 
 const RentVsBuyPage: React.FC = () => {

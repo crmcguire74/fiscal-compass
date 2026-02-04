@@ -2,6 +2,7 @@
 import React from "react";
 import Layout from "@/components/layout/Layout";
 import WeddingBudgetCalculator from "@/components/calculators/life-events/WeddingBudgetCalculator";
+import { Helmet } from "react-helmet-async";  // ADD THIS
 import { Link } from "react-router-dom";
 import { ChevronRight, Heart } from "lucide-react";
 

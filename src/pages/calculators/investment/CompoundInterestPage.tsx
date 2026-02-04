@@ -2,6 +2,7 @@
 import Layout from '@/components/layout/Layout';
 import CompoundInterestCalculator from '@/components/calculators/investment/CompoundInterestCalculator';
 import { ArrowLeft } from 'lucide-react';
+import { Helmet } from "react-helmet-async";  // ADD THIS
 import { Link } from 'react-router-dom';
 
 const CompoundInterestPage = () => {

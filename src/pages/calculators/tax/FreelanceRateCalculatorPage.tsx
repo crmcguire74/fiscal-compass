@@ -1,5 +1,6 @@
 import Layout from "@/components/layout/Layout";
 import FreelanceRateCalculator from "@/components/calculators/tax/FreelanceRateCalculator";
+import { Helmet } from "react-helmet-async";  // ADD THIS
 import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 

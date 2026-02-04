@@ -1,12 +1,17 @@
 
 import Layout from '@/components/layout/Layout';
 import BmiCalculator from '@/components/calculators/health/BmiCalculator';
+import { Helmet } from "react-helmet-async";  // ADD THIS
 import { Link } from 'react-router-dom';
 import { ArrowRight, ChevronRight } from 'lucide-react';
 
 const BmiCalculatorPage = () => {
   return (
     <Layout>
+      <Helmet>
+            <title>BMI Calculator | Body Mass Index Calculator | Fiscal Compass</title>
+            <meta name="description" content="Calculate your BMI and see where you fall on the weight classification scale. Understand limitations of BMI measurement." />
+      </Helmet>
       <div className="container py-8">
         <div className="max-w-5xl mx-auto">
           <div className="flex items-center text-sm mb-5 text-muted-foreground">

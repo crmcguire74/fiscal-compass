@@ -1,11 +1,16 @@
 import { ArrowLeft, Clock } from "lucide-react"; // Using Clock icon
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";  // ADD THIS
 import Layout from "@/components/layout/Layout";
 import ValueTimeCalculator from "@/components/calculators/tools/ValueTimeCalculator";
 
 const ValueTimePage = () => {
   return (
     <Layout>
+      <Helmet>
+            <title>Value of Time Calculator | What Is Your Time Worth | Fiscal Compass</title>
+            <meta name="description" content="Calculate the monetary value of your time based on income. Make better decisions about time vs money trade-offs." />
+      </Helmet>      
       <div className="container py-8 max-w-7xl">
         <div className="mb-6">
           <a

@@ -1,12 +1,17 @@
 
 import Layout from '@/components/layout/Layout';
 import BodyFatCalculator from '@/components/calculators/health/BodyFatCalculator';
+import { Helmet } from "react-helmet-async";  // ADD THIS
 import { Link } from 'react-router-dom';
 import { ArrowRight, ChevronRight } from 'lucide-react';
 
 const BodyFatCalculatorPage = () => {
   return (
     <Layout>
+      <Helmet>
+            <title>Body Fat Calculator | Body Fat Percentage Estimator | Fiscal Compass</title>
+            <meta name="description" content="Estimate your body fat percentage using the US Navy method. More accurate than BMI for assessing body composition." />
+      </Helmet>
       <div className="container py-8">
         <div className="max-w-5xl mx-auto">
           <div className="flex items-center text-sm mb-5 text-muted-foreground">
