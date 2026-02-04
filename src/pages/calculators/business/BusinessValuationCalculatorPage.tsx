@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from "react-helmet-async";  // ADD THIS
 import Layout from '@/components/layout/Layout';
 import BusinessValuationCalculator from '@/components/calculators/business/BusinessValuationCalculator';
 import { ChevronRight, LineChart } from 'lucide-react';
@@ -8,6 +9,10 @@ import { ChevronRight, LineChart } from 'lucide-react';
 const BusinessValuationCalculatorPage = () => {
   return (
     <Layout>
+      <Helmet>
+            <title>Business Valuation Calculator | How Much Is My Business Worth | Fiscal Compass</title>
+            <meta name="description" content="Estimate your business value using multiple valuation methods including DCF, revenue multiples, and asset-based approaches." />
+      </Helmet>
 {/* Header */}
       <div className="bg-gradient-to-r from-finance-primary to-finance-primary/90 text-white py-12">
         <div className="container">

@@ -7,6 +7,10 @@ import BabyCostCalculator from "@/components/calculators/life-events/BabyCostCal
 const BabyCostPage = () => {
   return (
     <Layout>
+      <Helmet>
+            <title>Baby Cost Calculator | First Year Baby Expenses | Fiscal Compass</title>
+            <meta name="description" content="Calculate the cost of having a baby in the first year. Budget for diapers, formula, childcare, and medical expenses." />
+      </Helmet>
       <div className="container mx-auto px-4 py-12 max-w-5xl">
         <div className="mb-8">
           <h1 className="text-3xl font-bold tracking-tight mb-2">Baby Cost Calculator</h1>

@@ -7,6 +7,10 @@ import AutoInsuranceCalculator from "@/components/calculators/insurance/AutoInsu
 const AutoInsurancePage = () => {
   return (
     <Layout>
+      <Helmet>
+            <title>Auto Insurance Calculator | Car Insurance Estimate | Fiscal Compass</title>
+            <meta name="description" content="Estimate auto insurance costs based on vehicle, driving history, coverage levels, and location factors." />
+      </Helmet>
       <div className="container py-8">
         <div className="mb-6">
           <Link

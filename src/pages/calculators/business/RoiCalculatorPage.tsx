@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { ArrowRight, Calculator, ChevronRight, DollarSign, Percent } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
+import { Helmet } from "react-helmet-async";  // ADD THIS
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Slider } from '@/components/ui/slider';
@@ -32,6 +33,10 @@ const RoiCalculatorPage = () => {
   
   return (
     <Layout>
+      <Helmet>
+            <title>ROI Calculator | Return on Investment Calculator | Fiscal Compass</title>
+            <meta name="description" content="Calculate return on investment for any business or personal investment. See ROI percentage, annualized returns, and net profit." />
+      </Helmet>
       {/* Header */}
       <div className="bg-gradient-to-r from-finance-primary to-finance-primary/90 text-white py-12">
         <div className="container">

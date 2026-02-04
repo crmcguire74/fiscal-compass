@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from "react-helmet-async";  // ADD THIS
 import Layout from '@/components/layout/Layout';
 import ProfitMarginCalculator from '@/components/calculators/business/ProfitMarginCalculator';
 import { ChevronRight, Percent } from 'lucide-react';
@@ -8,6 +9,10 @@ import { ChevronRight, Percent } from 'lucide-react';
 const ProfitMarginCalculatorPage = () => {
   return (
     <Layout>
+      <Helmet>
+            <title>Profit Margin Calculator | Gross, Operating, Net Margin | Fiscal Compass</title>
+            <meta name="description" content="Calculate profit margins including gross margin, operating margin, and net profit margin. Understand markup vs margin." />
+      </Helmet>
       <div className="bg-gradient-to-r from-finance-primary to-finance-primary/90 text-white py-12">
         <div className="container">
           <div className="max-w-3xl">

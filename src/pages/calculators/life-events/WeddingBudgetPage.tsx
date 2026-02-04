@@ -9,6 +9,10 @@ import { ChevronRight, Heart } from "lucide-react";
 const WeddingBudgetPage = () => {
   return (
     <Layout>
+      <Helmet>
+            <title>Wedding Budget Calculator | Wedding Cost Estimator | Fiscal Compass</title>
+            <meta name="description" content="Plan your wedding budget with our free calculator. See average costs by category, track spending, and stay on budget." />
+      </Helmet>
       <div className="bg-gradient-to-r from-finance-primary to-finance-primary/90 text-white py-12">
         <div className="container">
           <div className="max-w-3xl">
