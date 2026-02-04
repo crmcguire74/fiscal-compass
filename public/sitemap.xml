@@ -1,86 +1,311 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- Home Page -->
+
+  <!-- Main Pages -->
   <url>
     <loc>https://fiscalcompass.net/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
-  </url>
-
-  <!-- Main Sections -->
-  <url>
-    <loc>https://fiscalcompass.net/about</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://fiscalcompass.net/blog</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://fiscalcompass.net/calculators</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
+  <url>
+    <loc>https://fiscalcompass.net/blog</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/about</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/privacy</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/terms</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/disclaimer</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/contact</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
 
-  <!-- Individual Calculator Pages -->
+  <!-- Calculator Category Pages -->
   <url>
-    <loc>https://fiscalcompass.net/calculators/mortgage/mortgage-payment-calculator</loc>
+    <loc>https://fiscalcompass.net/calculators/tax</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/calculators/investment</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/calculators/retirement</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/calculators/debt</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/calculators/home-mortgage</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/calculators/auto</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/calculators/education</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/calculators/business</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/calculators/life-events</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/calculators/insurance</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/calculators/health</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/calculators/tools</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Tax Calculators -->
+  <url>
+    <loc>https://fiscalcompass.net/calculators/tax/take-home-pay-salaried</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://fiscalcompass.net/calculators/mortgage/heloc-calculator</loc>
+    <loc>https://fiscalcompass.net/calculators/tax/take-home-pay-hourly</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://fiscalcompass.net/calculators/mortgage/home-equity-loan-calculator</loc>
+    <loc>https://fiscalcompass.net/calculators/tax/tax-bracket-calculator</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/calculators/tax/bonus-tax-calculator</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/calculators/tax/freelance-rate-calculator</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
+  <!-- Investment Calculators -->
   <url>
-    <loc>https://fiscalcompass.net/calculators/retirement/retirement-calculator</loc>
+    <loc>https://fiscalcompass.net/calculators/investment/savings-calculator</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://fiscalcompass.net/calculators/retirement/early-ira-withdrawal-calculator</loc>
+    <loc>https://fiscalcompass.net/calculators/investment/compound-interest</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
+  <!-- Retirement Calculators -->
   <url>
-    <loc>https://fiscalcompass.net/calculators/debt/debt-payoff-calculator</loc>
+    <loc>https://fiscalcompass.net/calculators/retirement/retirement-savings</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
+  <url>
+    <loc>https://fiscalcompass.net/calculators/retirement/early-ira-withdrawal</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Debt Calculators -->
   <url>
     <loc>https://fiscalcompass.net/calculators/debt/dti-calculator</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
-
   <url>
-    <loc>https://fiscalcompass.net/calculators/investment/compound-interest-calculator</loc>
+    <loc>https://fiscalcompass.net/calculators/debt/payoff-calculator</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/calculators/debt/consolidation-calculator</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
+  <!-- Mortgage Calculators -->
   <url>
-    <loc>https://fiscalcompass.net/calculators/tax/take-home-pay-calculator</loc>
+    <loc>https://fiscalcompass.net/calculators/mortgage/mortgage-payment</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/calculators/mortgage/rent-vs-buy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/calculators/mortgage/dti-calculator</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/calculators/mortgage/home-equity-loan</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/calculators/mortgage/heloc</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/calculators/real-estate/home-equity-calculator</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/calculators/mortgage/cost-to-close</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
+  <!-- Auto Calculators -->
   <url>
-    <loc>https://fiscalcompass.net/calculators/education/college-savings-calculator</loc>
+    <loc>https://fiscalcompass.net/calculators/auto/auto-loan</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/calculators/auto/auto-lease</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/calculators/auto/gas-maintenance</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
+  <!-- Education Calculators -->
+  <url>
+    <loc>https://fiscalcompass.net/calculators/education/college-savings</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Business Calculators -->
+  <url>
+    <loc>https://fiscalcompass.net/calculators/business/break-even-analysis</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/calculators/business/roi-calculator</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/calculators/business/profit-margin-calculator</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/calculators/business/business-valuation</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Life Events Calculators -->
+  <url>
+    <loc>https://fiscalcompass.net/calculators/life-events/wedding-budget</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/calculators/life-events/baby-costs</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/calculators/life-events/divorce-calculator</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Insurance Calculators -->
+  <url>
+    <loc>https://fiscalcompass.net/calculators/insurance/life-insurance-needs</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/calculators/insurance/homeowners-insurance</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/calculators/insurance/auto-insurance</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/calculators/insurance/umbrella-insurance</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/calculators/insurance/disability-insurance</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/calculators/insurance/health-insurance</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Health Calculators -->
   <url>
     <loc>https://fiscalcompass.net/calculators/health/bmi-calculator</loc>
     <changefreq>monthly</changefreq>
@@ -96,75 +321,199 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
-
   <url>
-    <loc>https://fiscalcompass.net/calculators/business/break-even-analysis-calculator</loc>
+    <loc>https://fiscalcompass.net/calculators/health/macro-calculator</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://fiscalcompass.net/calculators/business/business-valuation-calculator</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://fiscalcompass.net/calculators/business/profit-margin-calculator</loc>
+    <loc>https://fiscalcompass.net/calculators/health/protein-calculator</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
-  <url>
-    <loc>https://fiscalcompass.net/calculators/life-events/baby-cost-calculator</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://fiscalcompass.net/calculators/life-events/divorce-calculator</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://fiscalcompass.net/calculators/life-events/wedding-budget-calculator</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
+  <!-- Tools -->
   <url>
     <loc>https://fiscalcompass.net/calculators/tools/currency-converter</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://fiscalcompass.net/calculators/tools/measurement-converter</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://fiscalcompass.net/calculators/tools/time-calculator</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://fiscalcompass.net/calculators/insurance/auto-insurance-calculator</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://fiscalcompass.net/calculators/insurance/life-insurance-needs-calculator</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <!-- Blog Articles -->
-  <url>
-    <loc>https://fiscalcompass.net/blog/featured-articles</loc>
-    <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://fiscalcompass.net/blog/related-articles</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://fiscalcompass.net/calculators/tools/scientific-calculator</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+  <url>
+    <loc>https://fiscalcompass.net/calculators/tools/value-of-time</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/calculators/tools/inflation</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Blog Posts -->
+  <url>
+    <loc>https://fiscalcompass.net/blog/first-time-home-buyer-guide</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/blog/5-year-countdown</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/blog/sequence-of-returns-risk</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/blog/real-estate-investment-types</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/blog/investing-during-inflation</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/blog/global-investing-beginners</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/blog/budgeting-for-variable-income</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/blog/healthy-eating-on-a-budget</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/blog/retirement-withdrawal-strategies</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/blog/rental-property-analysis</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/blog/student-loan-repayment-strategies</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/blog/how-sleep-affects-financial-decisions</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/blog/sustainable-investing-guide</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/blog/roth-vs-traditional</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/blog/zero-based-budgeting-guide</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/blog/envelope-budgeting-digital-age</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/blog/behavioral-investing-mistakes</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/blog/sustainable-investing-portfolio-values</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/blog/using-exercise-psychology-to-achieve-financial-goals</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/blog/zero-based-budgeting</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/blog/50-30-20-budget-rule</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/blog/wedding-budget-planning</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/blog/how-financial-stress-affects-your-health</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/blog/mindful-spending-for-financial-wellness</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/blog/basics-tax-advantaged-retirement-accounts</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/blog/house-hacking-guide</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/blog/first-year-baby-costs</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/blog/how-to-calculate-roi-for-business-investment</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/blog/protein-requirements-fitness-goals</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://fiscalcompass.net/blog/understanding-macronutrients-complete-guide</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
 </urlset>
