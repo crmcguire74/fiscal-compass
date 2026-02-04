@@ -68,7 +68,7 @@ const CalculatorsIndex = () => {
       name: "Retirement Savings",
     },
     {
-      path: "/calculators/tax/take-home-pay-calculator",
+      path: "/calculators/tax/take-home-pay-salaried",
       name: "Take-Home Pay",
     },
     {
